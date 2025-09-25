@@ -12,11 +12,11 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.6.2",
-    "turbo": "^2.5.5",
-    "typescript": "5.8.3"
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.2"
   },
-  "packageManager": "pnpm@9.15.9",
+  "packageManager": "pnpm@10.17.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
