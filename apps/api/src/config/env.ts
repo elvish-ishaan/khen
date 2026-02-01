@@ -17,6 +17,7 @@ const envSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().optional(),
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_FILE_SIZE: z.string().default('5242880'), // 5MB
+  COST_PER_KM: z.string().default('10').transform(Number),
 });
 
 const parsed = envSchema.safeParse(process.env);

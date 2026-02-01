@@ -4,8 +4,7 @@ import { LogisticsAuthenticatedRequest } from '../types';
 import { acceptOrderSchema, updateDeliveryStatusSchema } from '../validators/logistics.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { calculateDistance } from '../services/location.service';
-
-const EARNINGS_PER_KM = 10; // ₹10 per km
+import { env } from '../config/env';
 
 export const getAvailableOrdersHandler = asyncHandler(
   async (req: LogisticsAuthenticatedRequest, res: Response) => {
@@ -106,7 +105,7 @@ export const getAvailableOrdersHandler = asyncHandler(
           ...order,
           distanceToRestaurant,
           deliveryDistance,
-          estimatedEarnings: deliveryDistance * EARNINGS_PER_KM,
+          estimatedEarnings: deliveryDistance * env.COST_PER_KM,
         };
       })
       .filter((order) => order !== null);
@@ -190,7 +189,7 @@ export const acceptOrderHandler = asyncHandler(
           )
         : 0;
 
-    const earnings = deliveryDistance * EARNINGS_PER_KM;
+    const earnings = deliveryDistance * env.COST_PER_KM;
 
     // Create delivery and update order status
     const delivery = await prisma.$transaction(async (tx) => {

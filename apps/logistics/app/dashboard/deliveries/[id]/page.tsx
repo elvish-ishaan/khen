@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useDeliveryStore } from '@/stores/delivery-store';
+import { useLocationStore } from '@/stores/location-store';
+import { DeliveryRouteInfo } from '@/components/delivery/delivery-route-info';
 
 export default function DeliveryDetailPage() {
   const router = useRouter();
@@ -10,13 +12,19 @@ export default function DeliveryDetailPage() {
   const deliveryId = params.id as string;
   const { activeDeliveries, markPickedUp, markDelivered, fetchActiveDeliveries } =
     useDeliveryStore();
+  const { latitude, longitude, startTracking, isTracking } = useLocationStore();
 
   const [delivery, setDelivery] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     fetchActiveDeliveries();
-  }, [fetchActiveDeliveries]);
+
+    // Start location tracking if not already tracking
+    if (!isTracking) {
+      startTracking();
+    }
+  }, [fetchActiveDeliveries, isTracking, startTracking]);
 
   useEffect(() => {
     const foundDelivery = activeDeliveries.find((d) => d.id === deliveryId);
@@ -154,22 +162,14 @@ export default function DeliveryDetailPage() {
           </div>
         </div>
 
-        {/* Distance Info */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-blue-600 mb-1">Total Distance</div>
-            <div className="text-2xl font-bold text-blue-900">
-              {delivery.distance?.toFixed(1)} km
-            </div>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-sm text-green-600 mb-1">Earnings</div>
-            <div className="text-2xl font-bold text-green-900">₹{delivery.earnings}</div>
-            <div className="text-xs text-gray-600 mt-1">
-              ₹10 per km × {delivery.distance?.toFixed(1)} km
-            </div>
-          </div>
-        </div>
+        {/* Route Distance & Earnings Calculator */}
+        {latitude && longitude && (
+          <DeliveryRouteInfo
+            delivery={delivery}
+            driverLocation={{ lat: latitude, lng: longitude }}
+            costPerKm={10}
+          />
+        )}
 
         {/* Restaurant Info */}
         <div className="mb-8">
