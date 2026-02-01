@@ -1,0 +1,104 @@
+import { apiClient } from './client';
+
+export interface Restaurant {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  cuisineType: string[];
+  coverImageUrl?: string;
+  phone: string;
+  email?: string;
+  opensAt: string;
+  closesAt: string;
+  isActive: boolean;
+  categories?: Category[];
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+  items?: MenuItem[];
+}
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  isVeg: boolean;
+  isAvailable: boolean;
+  sortOrder: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: number;
+  createdAt: string;
+  user: {
+    id: string;
+    name?: string;
+    phone: string;
+  };
+  items: any[];
+  address: any;
+}
+
+export const restaurantApi = {
+  getProfile: async () => {
+    return apiClient.get<{ restaurant: Restaurant }>(
+      '/restaurant-manage/profile'
+    );
+  },
+
+  updateProfile: async (formData: FormData) => {
+    return apiClient.put<{ restaurant: Restaurant }>(
+      '/restaurant-manage/profile',
+      formData
+    );
+  },
+
+  getMenu: async () => {
+    return apiClient.get<{ categories: Category[] }>('/restaurant-manage/menu');
+  },
+
+  getOrders: async (params?: { status?: string; page?: number; limit?: number }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const endpoint = `/restaurant-manage/orders${
+      queryParams.toString() ? `?${queryParams}` : ''
+    }`;
+
+    return apiClient.get<{
+      orders: Order[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+    }>(endpoint);
+  },
+
+  getOrderById: async (orderId: string) => {
+    return apiClient.get<{ order: Order }>(
+      `/restaurant-manage/orders/${orderId}`
+    );
+  },
+
+  updateOrderStatus: async (orderId: string, status: string) => {
+    return apiClient.put<{ order: Order }>(
+      `/restaurant-manage/orders/${orderId}/status`,
+      { status }
+    );
+  },
+};

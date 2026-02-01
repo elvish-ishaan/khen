@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(pnpm --filter @repo/db generate:*)",
+      "Bash(pnpm --filter @repo/db build:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(node -e:*)",
+      "Bash(pnpm seed)",
+      "Bash(ls:*)",
+      "Bash(pnpm prisma migrate dev:*)",
+      "Bash(pnpm prisma generate:*)",
+      "Bash(pnpm --filter @repo/db prisma migrate dev:*)",
+      "Bash(pnpm migrate:*)",
+      "Bash(pnpm generate:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

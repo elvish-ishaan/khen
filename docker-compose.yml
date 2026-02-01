@@ -1,0 +1,17 @@
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: khen_postgres
+    environment:
+      POSTGRES_DB: khen_db
+      POSTGRES_USER: khen_user
+      POSTGRES_PASSWORD: khen_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
