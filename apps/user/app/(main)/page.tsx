@@ -9,8 +9,16 @@ export default function HomePage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const { coordinates, requestLocation } = useLocationStore();
+  const { coordinates, permissionGranted, requestLocation, error: locationError } = useLocationStore();
 
+  // Auto-request location on mount if not already granted
+  useEffect(() => {
+    if (!coordinates && !permissionGranted && !locationError) {
+      requestLocation();
+    }
+  }, []);
+
+  // Fetch restaurants when coordinates change
   useEffect(() => {
     fetchRestaurants();
   }, [coordinates]);
@@ -41,16 +49,38 @@ export default function HomePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Location Banner */}
-      {!coordinates && (
+      {/* Location Permission Denied Banner */}
+      {locationError && !coordinates && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="font-medium text-amber-900">
+                Location permission denied
+              </h3>
+              <p className="text-sm text-amber-700 mt-1">
+                To see restaurants within 20km of you, please enable location access in your browser settings
+              </p>
+            </div>
+            <button
+              onClick={requestLocation}
+              className="bg-amber-600 text-white px-4 py-2 rounded-md hover:bg-amber-700 whitespace-nowrap ml-4"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Location Not Yet Granted Banner */}
+      {!coordinates && !locationError && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium text-blue-900">
-                Enable location for better results
+                Enable location to find nearby restaurants
               </h3>
               <p className="text-sm text-blue-700 mt-1">
-                We'll show you restaurants near you
+                We'll show you restaurants within 20km of your location
               </p>
             </div>
             <button
@@ -66,10 +96,12 @@ export default function HomePage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Restaurants near you
+          {coordinates ? 'Restaurants within 20km' : 'All Restaurants'}
         </h1>
         <p className="text-gray-600">
-          Discover delicious food from the best restaurants
+          {coordinates
+            ? 'Showing restaurants near your location'
+            : 'Discover delicious food from restaurants'}
         </p>
       </div>
 
@@ -111,7 +143,18 @@ export default function HomePage() {
       {/* Empty State */}
       {!isLoading && !error && restaurants.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No restaurants found</p>
+          <div className="max-w-md mx-auto">
+            <p className="text-gray-500 text-lg mb-2">
+              {coordinates
+                ? 'No restaurants found within 20km'
+                : 'No restaurants found'}
+            </p>
+            {coordinates && (
+              <p className="text-gray-400 text-sm">
+                Try expanding your search radius or checking back later
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>

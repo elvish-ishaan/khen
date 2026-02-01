@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const restaurantListSchema = z.object({
   latitude: z.string().optional().transform((val) => val ? parseFloat(val) : undefined),
   longitude: z.string().optional().transform((val) => val ? parseFloat(val) : undefined),
+  radius: z.string().optional().transform((val) => val ? parseFloat(val) : 20),
   cuisine: z.string().optional(),
   minRating: z.string().optional().transform((val) => val ? parseFloat(val) : undefined),
   search: z.string().optional(),

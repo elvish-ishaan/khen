@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addressesApi, type Address } from '@/lib/api/addresses.api';
+import { LocationPicker } from '@/components/maps/location-picker';
 
 export default function AddressesPage() {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function AddressesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   const [formData, setFormData] = useState({
     label: '',
@@ -19,6 +21,8 @@ export default function AddressesPage() {
     city: '',
     state: '',
     postalCode: '',
+    latitude: undefined as number | undefined,
+    longitude: undefined as number | undefined,
   });
 
   useEffect(() => {
@@ -87,9 +91,19 @@ export default function AddressesPage() {
       city: address.city,
       state: address.state,
       postalCode: address.postalCode,
+      latitude: address.latitude || undefined,
+      longitude: address.longitude || undefined,
     });
     setEditingId(address.id);
     setShowForm(true);
+  };
+
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setFormData({
+      ...formData,
+      latitude: lat,
+      longitude: lng,
+    });
   };
 
   const resetForm = () => {
@@ -101,6 +115,8 @@ export default function AddressesPage() {
       city: '',
       state: '',
       postalCode: '',
+      latitude: undefined,
+      longitude: undefined,
     });
   };
 
@@ -245,6 +261,59 @@ export default function AddressesPage() {
               </div>
             </div>
 
+            {/* Location Picker Section */}
+            <div className="border-t border-gray-200 pt-4">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Delivery Location (Optional)
+                </label>
+                {formData.latitude && formData.longitude && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                    Location Set
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Set the exact location on map for accurate delivery
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setShowLocationPicker(true)}
+                className="w-full md:w-auto bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center justify-center gap-2"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                {formData.latitude && formData.longitude
+                  ? 'Update Location on Map'
+                  : 'Set Location on Map'}
+              </button>
+
+              {formData.latitude && formData.longitude && (
+                <div className="mt-2 text-xs font-mono text-gray-600">
+                  <div>Lat: {formData.latitude.toFixed(6)}</div>
+                  <div>Lng: {formData.longitude.toFixed(6)}</div>
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-3">
               <button
                 type="submit"
@@ -288,6 +357,15 @@ export default function AddressesPage() {
                         Default
                       </span>
                     )}
+                    {address.latitude && address.longitude ? (
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                        Location Set
+                      </span>
+                    ) : (
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
+                        No Location
+                      </span>
+                    )}
                   </div>
                   <p className="text-gray-700">
                     {address.addressLine1}
@@ -299,6 +377,11 @@ export default function AddressesPage() {
                   <p className="text-gray-700">
                     {address.city}, {address.state} - {address.postalCode}
                   </p>
+                  {!address.latitude && !address.longitude && (
+                    <p className="text-amber-600 text-xs mt-1">
+                      Consider setting location for better delivery accuracy
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -327,6 +410,16 @@ export default function AddressesPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Location Picker Modal */}
+      {showLocationPicker && (
+        <LocationPicker
+          initialLat={formData.latitude}
+          initialLng={formData.longitude}
+          onLocationSelect={handleLocationSelect}
+          onClose={() => setShowLocationPicker(false)}
+        />
       )}
     </div>
   );

@@ -14,7 +14,8 @@
       "Bash(pnpm --filter @repo/db prisma migrate dev:*)",
       "Bash(pnpm migrate:*)",
       "Bash(pnpm generate:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(pnpm --filter user add:*)"
     ]
   }
 }
