@@ -13,6 +13,12 @@ export interface RequestWithdrawalRequest {
   amount: number;
 }
 
+export interface DeliveryUser {
+  id: string;
+  phone: string;
+  name: string | null;
+}
+
 export const logisticsApi = {
   // Duty management
   startDuty: async () => {

@@ -115,6 +115,7 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
 
       // Refresh active deliveries
       await get().fetchActiveDeliveries();
+      set({ isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to mark as picked up',

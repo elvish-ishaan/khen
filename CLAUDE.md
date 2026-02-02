@@ -23,9 +23,12 @@
 
 **Khen** is a full-stack food delivery platform built as a monorepo using Turborepo. The platform consists of:
 
-- **User App** (Next.js) - Customer-facing application
-- **API Backend** (Express.js) - RESTful API server
+- **User App** (Next.js, port 3000) - Customer-facing application
+- **Restaurant App** (Next.js, port 3001) - Restaurant partner dashboard
+- **Logistics App** (Next.js, port 3002) - Delivery partner application
+- **API Backend** (Express.js, port 4000) - RESTful API server
 - **Database Package** (@repo/db) - Shared Prisma client and types
+- **UI Package** (@workspace/ui) - Shared UI components (shadcn/ui)
 
 ### Key Features
 - Phone OTP authentication (MSG91)
@@ -34,6 +37,10 @@
 - Payment integration (Razorpay)
 - Real-time order tracking
 - User profiles, addresses, and favorites
+- Restaurant dashboard for managing orders and menu
+- Logistics tracking and delivery management
+- Google Maps integration for location services
+- Google Cloud Storage for asset management
 
 ---
 
@@ -44,31 +51,91 @@
 ```
 khen/
 ├── apps/
-│   ├── api/              # Express.js backend (port 4000)
-│   └── user/             # Next.js frontend (port 3000)
+│   ├── api/                      # Express.js backend (port 4000)
+│   ├── user/                     # Customer Next.js app (port 3000)
+│   ├── restaurant/               # Restaurant Next.js app (port 3001)
+│   └── logistics/                # Logistics Next.js app (port 3002)
 ├── packages/
-│   ├── db/               # Prisma client and database utilities
-│   ├── ui/               # Shared UI components (shadcn/ui)
-│   ├── eslint-config/    # Shared ESLint configuration
-│   └── typescript-config/# Shared TypeScript configuration
-├── docker-compose.yml    # PostgreSQL database
-└── turbo.json           # Turborepo configuration
+│   ├── db/                       # Prisma client and database utilities
+│   ├── ui/                       # Shared UI components (shadcn/ui)
+│   ├── eslint-config/            # Shared ESLint configuration
+│   └── typescript-config/        # Shared TypeScript configuration
+├── docker-compose.yml            # Development PostgreSQL database
+├── docker-compose.production.yml # Production deployment (all services)
+├── .dockerignore                 # Docker build optimization
+├── build-all.sh / .bat           # Build all Docker images
+├── README.Docker.md              # Docker deployment guide
+└── turbo.json                    # Turborepo configuration
 ```
 
 ### Communication Flow
 
 ```
-┌─────────────┐         ┌──────────────┐         ┌────────────┐
-│   Browser   │ ──────> │  Next.js App │ ──────> │ Express.js │
-│             │ <────── │  (port 3000) │ <────── │ (port 4000)│
-└─────────────┘         └──────────────┘         └────────────┘
-                                                         │
-                                                         ▼
-                                                  ┌────────────┐
-                                                  │ PostgreSQL │
-                                                  │  (Prisma)  │
-                                                  └────────────┘
+┌──────────────────┐         ┌──────────────────┐
+│  User App        │────────>│                  │
+│  (port 3000)     │<────────│                  │
+└──────────────────┘         │                  │         ┌────────────┐
+                              │   Express.js    │────────>│ PostgreSQL │
+┌──────────────────┐         │   API Backend   │<────────│  Database  │
+│  Restaurant App  │────────>│   (port 4000)   │         │  (Prisma)  │
+│  (port 3001)     │<────────│                  │         └────────────┘
+└──────────────────┘         │                  │                │
+                              │                  │                │
+┌──────────────────┐         │                  │                ▼
+│  Logistics App   │────────>│                  │         ┌────────────┐
+│  (port 3002)     │<────────│                  │         │   Google   │
+└──────────────────┘         └──────────────────┘         │   Cloud    │
+                                      │                    │  Storage   │
+                                      │                    └────────────┘
+                                      ▼
+                              ┌────────────┐
+                              │  External  │
+                              │  Services  │
+                              ├────────────┤
+                              │ MSG91      │
+                              │ Razorpay   │
+                              │ Google Maps│
+                              └────────────┘
 ```
+
+### Service Responsibilities
+
+**User App (port 3000)**
+- Customer authentication and profile management
+- Restaurant browsing and search
+- Shopping cart and checkout
+- Order placement and tracking
+- Payment processing
+- Address management
+- Favorites and reviews
+
+**Restaurant App (port 3001)**
+- Restaurant partner authentication
+- Order management (accept/reject/prepare)
+- Menu management (items, categories, pricing)
+- Restaurant profile and settings
+- Order status updates
+- Toggle taking orders on/off
+- View earnings and analytics
+
+**Logistics App (port 3002)**
+- Delivery partner authentication
+- Order assignment and acceptance
+- Real-time location tracking
+- Delivery status updates
+- Navigation and route optimization
+- Earnings tracking
+- On-duty status management
+
+**API Backend (port 4000)**
+- RESTful API for all applications
+- Authentication (JWT, OTP via MSG91)
+- Business logic and data validation
+- Database operations via Prisma
+- Payment processing (Razorpay)
+- File uploads (Google Cloud Storage)
+- Location services (Google Maps API)
+- Order lifecycle management
 
 ### Authentication Flow
 
@@ -176,7 +243,9 @@ src/
 └── index.ts                      # Server entry point
 ```
 
-### Frontend Structure (apps/user/)
+### Frontend Structure
+
+#### User App (apps/user/)
 
 ```
 apps/user/
@@ -216,6 +285,57 @@ apps/user/
 │   ├── cart-store.ts             # Cart state
 │   └── location-store.ts         # Location state
 └── middleware.ts                 # Next.js route protection
+```
+
+#### Restaurant App (apps/restaurant/)
+
+```
+apps/restaurant/
+├── app/
+│   ├── (auth)/                   # Auth routes
+│   │   ├── login/page.tsx        # Restaurant login
+│   │   └── verify-otp/page.tsx   # OTP verification
+│   └── (main)/                   # Restaurant dashboard
+│       ├── layout.tsx            # Dashboard layout
+│       ├── page.tsx              # Dashboard home
+│       ├── orders/               # Order management
+│       │   ├── page.tsx          # Active orders
+│       │   └── [id]/page.tsx     # Order details
+│       ├── menu/                 # Menu management
+│       │   ├── page.tsx          # Menu items list
+│       │   ├── categories/       # Category management
+│       │   └── items/            # Menu item CRUD
+│       ├── profile/              # Restaurant profile
+│       └── settings/             # Restaurant settings
+├── components/                   # Restaurant-specific components
+├── stores/                       # Zustand stores
+└── middleware.ts                 # Route protection
+```
+
+#### Logistics App (apps/logistics/)
+
+```
+apps/logistics/
+├── app/
+│   ├── (auth)/                   # Auth routes
+│   │   ├── login/page.tsx        # Delivery partner login
+│   │   └── verify-otp/page.tsx   # OTP verification
+│   └── (main)/                   # Logistics dashboard
+│       ├── layout.tsx            # Dashboard layout
+│       ├── page.tsx              # Available orders map
+│       ├── orders/               # Order management
+│       │   ├── active/page.tsx   # Active deliveries
+│       │   ├── history/page.tsx  # Delivery history
+│       │   └── [id]/page.tsx     # Delivery details
+│       ├── earnings/page.tsx     # Earnings tracking
+│       └── profile/page.tsx      # Profile and settings
+├── components/                   # Logistics-specific components
+│   ├── map/                      # Map components
+│   └── order-card.tsx            # Order card for delivery
+├── stores/                       # Zustand stores
+│   ├── location-store.ts         # Real-time location tracking
+│   └── order-store.ts            # Active order state
+└── middleware.ts                 # Route protection
 ```
 
 ---
@@ -931,7 +1051,160 @@ Before committing:
 
 ---
 
-## Deployment
+## Docker Deployment
+
+### Docker Architecture
+
+The platform uses Docker for containerized deployment with the following services:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Docker Network (khen-network)          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │   User App   │  │ Restaurant   │  │  Logistics   │     │
+│  │  (Next.js)   │  │     App      │  │     App      │     │
+│  │  Port: 3000  │  │  Port: 3001  │  │  Port: 3002  │     │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
+│         │                 │                  │              │
+│         └─────────────────┼──────────────────┘              │
+│                           ▼                                 │
+│                  ┌─────────────────┐                        │
+│                  │   API Backend   │                        │
+│                  │   (Express.js)  │                        │
+│                  │   Port: 4000    │                        │
+│                  └────────┬────────┘                        │
+│                           │                                 │
+│                           ▼                                 │
+│                  ┌─────────────────┐                        │
+│                  │   PostgreSQL    │                        │
+│                  │   Port: 5432    │                        │
+│                  │   (with volume) │                        │
+│                  └─────────────────┘                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Dockerfiles
+
+Each application has its own optimized multi-stage Dockerfile:
+
+- **apps/api/Dockerfile** - Express.js backend with Prisma client
+- **apps/user/Dockerfile** - Next.js user app with Turbopack
+- **apps/restaurant/Dockerfile** - Next.js restaurant dashboard
+- **apps/logistics/Dockerfile** - Next.js logistics app
+
+### Multi-Stage Build Benefits
+
+All Dockerfiles follow this pattern:
+1. **Base**: Install pnpm
+2. **Dependencies**: Install workspace dependencies
+3. **Builder**: Build application with all source code
+4. **Production**: Minimal image with only production dependencies
+
+This results in:
+- Smaller final images (only production dependencies)
+- Faster builds (layer caching)
+- Better security (no dev dependencies in production)
+- Proper monorepo workspace resolution
+
+### Docker Compose Services
+
+**Development** (`docker-compose.yml`)
+```bash
+# Only PostgreSQL for local development
+docker-compose up -d
+```
+
+**Production** (`docker-compose.production.yml`)
+```bash
+# All services (API, User, Restaurant, Logistics, PostgreSQL)
+docker-compose -f docker-compose.production.yml up -d
+```
+
+### Building Docker Images
+
+**Build all at once:**
+```bash
+# Linux/Mac
+chmod +x build-all.sh
+./build-all.sh
+
+# Windows
+build-all.bat
+```
+
+**Build individually:**
+```bash
+docker build -f apps/api/Dockerfile -t khen-api:latest .
+docker build -f apps/user/Dockerfile -t khen-user:latest .
+docker build -f apps/restaurant/Dockerfile -t khen-restaurant:latest .
+docker build -f apps/logistics/Dockerfile -t khen-logistics:latest .
+```
+
+### Environment Configuration
+
+Copy and configure production environment:
+```bash
+cp .env.production.example .env.production
+# Edit .env.production with your credentials
+```
+
+Required environment variables:
+- Database credentials (PostgreSQL)
+- JWT secret (minimum 32 characters)
+- MSG91 API keys (OTP service)
+- Razorpay keys (payment gateway)
+- Google Cloud Storage credentials
+- Google Maps API key
+
+### Health Checks
+
+All services include Docker health checks:
+- **API**: HTTP GET to `/health` endpoint
+- **Frontends**: HTTP GET to root path
+- **PostgreSQL**: `pg_isready` command
+
+Check service health:
+```bash
+docker inspect --format='{{.State.Health.Status}}' khen-api
+docker inspect --format='{{.State.Health.Status}}' khen-user
+docker inspect --format='{{.State.Health.Status}}' khen-restaurant
+docker inspect --format='{{.State.Health.Status}}' khen-logistics
+```
+
+### Database Migrations
+
+Run Prisma migrations in production:
+```bash
+docker exec khen-api pnpm --filter @repo/db prisma migrate deploy
+```
+
+### Monitoring
+
+View logs:
+```bash
+# All services
+docker-compose -f docker-compose.production.yml logs -f
+
+# Specific service
+docker-compose -f docker-compose.production.yml logs -f api
+```
+
+View resource usage:
+```bash
+docker stats khen-api khen-user khen-restaurant khen-logistics khen-postgres
+```
+
+### Complete Docker Documentation
+
+For comprehensive Docker deployment instructions, see:
+- **README.Docker.md** - Complete deployment guide with troubleshooting
+
+---
+
+## Traditional Deployment
 
 ### Environment Variables
 
@@ -948,14 +1221,61 @@ Before committing:
 
 ### Production Checklist
 
-- [ ] Environment variables configured
-- [ ] Database migrations applied
-- [ ] HTTPS enabled
-- [ ] CORS restricted to production domain
-- [ ] Rate limiting enabled
-- [ ] Logging configured
-- [ ] Error monitoring (Sentry, etc.)
+**Infrastructure**
+- [ ] Docker Engine 20.10+ installed
+- [ ] Docker Compose 2.0+ installed
+- [ ] Sufficient disk space (minimum 5GB)
+- [ ] Reverse proxy configured (Nginx/Traefik)
+- [ ] SSL/TLS certificates installed
+
+**Configuration**
+- [ ] Environment variables configured (.env.production)
+- [ ] Database credentials secured
+- [ ] JWT secret generated (minimum 32 characters)
+- [ ] API keys configured (MSG91, Razorpay, Google)
+- [ ] CORS origins restricted to production domains
+- [ ] HTTPS enabled for all services
+
+**Database**
+- [ ] PostgreSQL running in Docker with persistent volume
+- [ ] Database migrations applied (prisma migrate deploy)
 - [ ] Database backups scheduled
+- [ ] Backup restoration tested
+
+**Security**
+- [ ] Rate limiting enabled on API
+- [ ] Helmet security headers configured
+- [ ] Input validation (Zod) on all endpoints
+- [ ] Authentication middleware protecting routes
+- [ ] httpOnly cookies for JWT tokens
+- [ ] No sensitive data in frontend localStorage
+- [ ] Container security scanning configured
+
+**Monitoring & Logging**
+- [ ] Docker health checks verified
+- [ ] Log aggregation configured (optional)
+- [ ] Error monitoring (Sentry, etc.) configured
+- [ ] Resource usage monitoring (docker stats)
+- [ ] Alerts for service failures configured
+
+**Application Services**
+- [ ] All Docker images built successfully
+- [ ] All containers healthy and running
+- [ ] API accessible at configured port
+- [ ] User app accessible at configured port
+- [ ] Restaurant app accessible at configured port
+- [ ] Logistics app accessible at configured port
+- [ ] Services can communicate within Docker network
+
+**Testing**
+- [ ] User authentication flow working
+- [ ] Restaurant dashboard accessible
+- [ ] Logistics app functioning
+- [ ] Payment integration tested (test mode)
+- [ ] Order placement working end-to-end
+- [ ] Real-time order updates working
+- [ ] File uploads to Google Cloud Storage working
+- [ ] Google Maps integration working
 
 ---
 
@@ -1006,6 +1326,83 @@ pnpm db:generate
 
 ---
 
-**Last Updated**: 2026-01-31
-**Version**: 1.0.0
+---
+
+## Quick Reference
+
+### Port Assignments
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| User App | 3000 | Customer-facing application |
+| Restaurant App | 3001 | Restaurant partner dashboard |
+| Logistics App | 3002 | Delivery partner application |
+| API Backend | 4000 | RESTful API server |
+| PostgreSQL | 5432 | Database |
+
+### Development Commands
+
+```bash
+# Start all apps in development mode
+pnpm dev
+
+# Start specific app
+pnpm --filter user dev
+pnpm --filter restaurant dev
+pnpm --filter logistics dev
+pnpm --filter api dev
+
+# Build all apps
+pnpm build
+
+# Database commands
+pnpm --filter @repo/db prisma migrate dev
+pnpm --filter @repo/db prisma studio
+pnpm --filter @repo/db prisma generate
+
+# Docker commands (development)
+docker-compose up -d                    # Start PostgreSQL
+docker-compose down                     # Stop PostgreSQL
+
+# Docker commands (production)
+docker-compose -f docker-compose.production.yml up -d
+docker-compose -f docker-compose.production.yml down
+docker-compose -f docker-compose.production.yml logs -f
+```
+
+### API Endpoints Overview
+
+**Authentication**
+- POST `/api/auth/send-otp` - Send OTP
+- POST `/api/auth/verify-otp` - Verify OTP and login
+- POST `/api/auth/logout` - Logout
+
+**Restaurants**
+- GET `/api/restaurants` - List restaurants
+- GET `/api/restaurants/:slug` - Get restaurant details
+
+**Cart** (Protected)
+- GET `/api/cart` - Get user's cart
+- POST `/api/cart` - Add item to cart
+- DELETE `/api/cart/items/:id` - Remove cart item
+
+**Orders** (Protected)
+- POST `/api/orders` - Create order
+- GET `/api/orders` - List user's orders
+- GET `/api/orders/:id` - Get order details
+
+**Payments** (Protected)
+- POST `/api/payments/create-order` - Create Razorpay order
+- POST `/api/payments/verify` - Verify payment
+
+**Addresses** (Protected)
+- GET `/api/addresses` - List user addresses
+- POST `/api/addresses` - Create address
+- PUT `/api/addresses/:id` - Update address
+- DELETE `/api/addresses/:id` - Delete address
+
+---
+
+**Last Updated**: 2026-02-02
+**Version**: 2.0.0
 **Maintainer**: Khen Development Team

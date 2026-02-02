@@ -155,6 +155,42 @@ export default function OrderDetailPage() {
         </div>
       )}
 
+      {/* Restaurant Contact - Show after restaurant confirms order */}
+      {order.status !== 'PENDING' &&
+        order.status !== 'CANCELLED' &&
+        order.restaurant?.phone && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Restaurant Contact
+            </h2>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Name:</span>
+                <span className="text-sm text-gray-900">{order.restaurant.name}</span>
+              </div>
+              {order.restaurant.addressLine1 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    Address:
+                  </span>
+                  <span className="text-sm text-gray-900">
+                    {order.restaurant.addressLine1}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Phone:</span>
+                <a
+                  href={`tel:${order.restaurant.phone}`}
+                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {order.restaurant.phone}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Order Items */}
         <div className="lg:col-span-2 space-y-6">

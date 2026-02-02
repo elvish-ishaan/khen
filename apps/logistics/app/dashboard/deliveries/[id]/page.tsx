@@ -29,13 +29,19 @@ export default function DeliveryDetailPage() {
   useEffect(() => {
     const foundDelivery = activeDeliveries.find((d) => d.id === deliveryId);
     setDelivery(foundDelivery);
+
+    // Debug logging
+    if (foundDelivery) {
+      console.log('Delivery status:', foundDelivery.status);
+      console.log('Delivery order user data:', foundDelivery.order?.user);
+    }
   }, [activeDeliveries, deliveryId]);
 
   const handleMarkPickedUp = async () => {
     try {
       setIsUpdating(true);
       await markPickedUp(deliveryId);
-      await fetchActiveDeliveries();
+      // markPickedUp already calls fetchActiveDeliveries internally
     } catch (error) {
       console.error('Failed to mark as picked up:', error);
     } finally {
@@ -207,6 +213,68 @@ export default function DeliveryDetailPage() {
               <p className="text-sm text-gray-500 mt-2">
                 Landmark: {delivery.order.address.landmark}
               </p>
+            )}
+          </div>
+        </div>
+
+        {/* Customer Contact - Only visible after pickup */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-bold mb-4">Customer Contact</h2>
+
+            {/* Debug info */}
+            <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
+              <div>Status: {delivery.status}</div>
+              <div>Has user data: {delivery.order?.user ? 'Yes' : 'No'}</div>
+              {delivery.order?.user && (
+                <>
+                  <div>User phone: {delivery.order.user.phone}</div>
+                  <div>User name: {delivery.order.user.name || 'null'}</div>
+                </>
+              )}
+            </div>
+
+            {delivery.status === 'PICKED_UP' || delivery.status === 'IN_TRANSIT' ? (
+              delivery.order?.user ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">Name:</span>
+                    <span className="text-sm text-gray-900">
+                      {delivery.order.user.name || 'Not provided'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">Phone:</span>
+                    <a
+                      href={`tel:${delivery.order.user.phone}`}
+                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {delivery.order.user.phone}
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Contact information not available
+                </p>
+              )
+            ) : (
+              <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-md">
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-sm">
+                  Customer contact will be visible after you pick up the order
+                </span>
+              </div>
             )}
           </div>
         </div>

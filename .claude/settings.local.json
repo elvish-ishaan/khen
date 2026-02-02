@@ -25,7 +25,10 @@
       "Bash(npx prisma db execute:*)",
       "Bash(dir:*)",
       "Bash(findstr:*)",
-      "Bash(pnpm --filter logistics tsc:*)"
+      "Bash(pnpm --filter logistics tsc:*)",
+      "Bash(pnpm --filter api typecheck:*)",
+      "Bash(pnpm --filter user typecheck:*)",
+      "Bash(pnpm --filter logistics typecheck:*)"
     ]
   }
 }

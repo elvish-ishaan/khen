@@ -38,6 +38,9 @@ export interface Order {
     id: string;
     name: string;
     slug: string;
+    phone?: string;
+    addressLine1?: string;
+    imageUrl?: string | null;
   };
   address?: {
     label: string;

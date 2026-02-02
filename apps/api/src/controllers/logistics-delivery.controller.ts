@@ -380,8 +380,18 @@ export const getActiveDeliveriesHandler = asyncHandler(
                 addressLine1: true,
                 addressLine2: true,
                 city: true,
+                state: true,
+                postalCode: true,
+                landmark: true,
                 latitude: true,
                 longitude: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                phone: true,
+                name: true,
               },
             },
             items: {
@@ -401,9 +411,38 @@ export const getActiveDeliveriesHandler = asyncHandler(
       },
     });
 
+    // Debug logging
+    console.log('=== Active Deliveries Debug ===');
+    deliveries.forEach((d, i) => {
+      console.log(`Delivery ${i}: status=${d.status}, hasUser=${!!d.order.user}`);
+      if (d.order.user) {
+        console.log(`  User: phone=${d.order.user.phone}, name=${d.order.user.name}`);
+      }
+    });
+
+    // Apply privacy filter - only show user contact if picked up or in transit
+    const deliveriesWithPrivacy = deliveries.map((delivery) => {
+      console.log(`Privacy filter for delivery ${delivery.id}: status="${delivery.status}"`);
+      console.log(`  Condition check: status !== 'PICKED_UP' = ${delivery.status !== 'PICKED_UP'}`);
+      console.log(`  Condition check: status !== 'IN_TRANSIT' = ${delivery.status !== 'IN_TRANSIT'}`);
+
+      // Only show user contact if picked up or in transit
+      if (delivery.status !== 'PICKED_UP' && delivery.status !== 'IN_TRANSIT') {
+        console.log('  -> Removing user data (status is not PICKED_UP/IN_TRANSIT)');
+        // Destructure to exclude user data for ACCEPTED status
+        const { user, ...orderWithoutUser } = delivery.order;
+        return {
+          ...delivery,
+          order: orderWithoutUser,
+        };
+      }
+      console.log('  -> Keeping user data (status is PICKED_UP or IN_TRANSIT)');
+      return delivery;
+    });
+
     res.json({
       success: true,
-      data: { deliveries },
+      data: { deliveries: deliveriesWithPrivacy },
     });
   }
 );
