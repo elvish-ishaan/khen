@@ -6,6 +6,7 @@ import {
   getOrdersHandler,
   getOrderByIdHandler,
   updateOrderStatusHandler,
+  toggleAcceptingOrdersHandler,
 } from '../controllers/restaurant-manage.controller';
 import { authenticateRestaurant } from '../middleware/restaurant-auth';
 import { uploadSingle, processAndUploadToGcs } from '../middleware/upload';
@@ -31,6 +32,7 @@ router.put(
   processAndUploadToGcs('restaurants', { isPublic: true, optimize: true }),
   updateProfileHandler
 );
+router.patch('/orders/toggle', toggleAcceptingOrdersHandler);
 
 // Menu management (reuse onboarding controllers)
 router.get('/menu', getMenuHandler);

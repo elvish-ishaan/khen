@@ -12,6 +12,7 @@ export interface Restaurant {
   opensAt: string;
   closesAt: string;
   isActive: boolean;
+  isAcceptingOrders: boolean;
   categories?: Category[];
 }
 
@@ -99,6 +100,13 @@ export const restaurantApi = {
     return apiClient.put<{ order: Order }>(
       `/restaurant-manage/orders/${orderId}/status`,
       { status }
+    );
+  },
+
+  toggleAcceptingOrders: async (isAcceptingOrders: boolean) => {
+    return apiClient.patch<{ restaurant: Restaurant; message: string }>(
+      '/restaurant-manage/orders/toggle',
+      { isAcceptingOrders }
     );
   },
 };

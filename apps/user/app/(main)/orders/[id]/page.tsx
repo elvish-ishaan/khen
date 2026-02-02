@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ordersApi, type Order } from '@/lib/api/orders.api';
+import { ReviewForm } from '@/components/restaurant/review-form';
+import { StarRating } from '@/components/restaurant/star-rating';
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -12,6 +14,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   useEffect(() => {
     fetchOrder();
@@ -200,6 +203,53 @@ export default function OrderDetailPage() {
                   {order.address.postalCode}
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Review Section */}
+          {order.status === 'DELIVERED' && (
+            <div>
+              {order.review || reviewSubmitted ? (
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    Your Review
+                  </h2>
+                  {order.review && (
+                    <div>
+                      <StarRating
+                        rating={order.review.rating}
+                        size="md"
+                        readonly
+                      />
+                      {order.review.comment && (
+                        <p className="text-gray-700 mt-3 text-sm leading-relaxed">
+                          {order.review.comment}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 mt-3">
+                        Submitted on{' '}
+                        {new Date(order.review.createdAt).toLocaleDateString(
+                          'en-IN',
+                          {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          }
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <ReviewForm
+                  orderId={order.id}
+                  restaurantName={order.restaurant?.name || 'this restaurant'}
+                  onSuccess={() => {
+                    setReviewSubmitted(true);
+                    fetchOrder();
+                  }}
+                />
+              )}
             </div>
           )}
         </div>

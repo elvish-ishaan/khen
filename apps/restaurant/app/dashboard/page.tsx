@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { restaurantApi } from '@/lib/api/restaurant.api';
 import { useAuthStore } from '@/stores/auth-store';
+import { AcceptingOrdersToggle } from '@/components/accepting-orders-toggle';
 
 interface Stats {
   totalOrders: number;
@@ -12,9 +13,16 @@ interface Stats {
   activeMenuItems: number;
 }
 
+interface Restaurant {
+  id: string;
+  name: string;
+  isAcceptingOrders: boolean;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { owner, fetchOwner } = useAuthStore();
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [stats, setStats] = useState<Stats>({
     totalOrders: 0,
     pendingOrders: 0,
@@ -29,6 +37,16 @@ export default function DashboardPage() {
       try {
         // Fetch owner to check onboarding status
         await fetchOwner();
+
+        // Fetch restaurant profile
+        const profileResponse = await restaurantApi.getProfile();
+        if (profileResponse.success && profileResponse.data) {
+          setRestaurant({
+            id: profileResponse.data.restaurant.id,
+            name: profileResponse.data.restaurant.name,
+            isAcceptingOrders: profileResponse.data.restaurant.isAcceptingOrders,
+          });
+        }
 
         // Fetch orders
         const ordersResponse = await restaurantApi.getOrders({ limit: 5 });
@@ -88,6 +106,18 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-gray-600">Welcome back! Here's your restaurant overview.</p>
       </div>
+
+      {/* Order Acceptance Toggle */}
+      {restaurant && (
+        <div className="mb-6">
+          <AcceptingOrdersToggle
+            initialStatus={restaurant.isAcceptingOrders}
+            onToggle={(newStatus) => {
+              setRestaurant((prev) => prev ? { ...prev, isAcceptingOrders: newStatus } : null);
+            }}
+          />
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

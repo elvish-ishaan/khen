@@ -217,7 +217,6 @@ model Restaurant {
   @@index([latitude, longitude])
   @@index([rating])
   @@index([isActive])
-  @@index([isAcceptingOrders])
 }
 
 model FavoriteRestaurant {

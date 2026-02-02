@@ -17,7 +17,12 @@
       "Bash(npx tsc:*)",
       "Bash(pnpm --filter user add:*)",
       "Bash(pnpm --filter api add:*)",
-      "Bash(pnpm db:generate:*)"
+      "Bash(pnpm db:generate:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx prisma generate)",
+      "Bash(find \"C:\\\\Users\\\\hp\\\\projects\\\\khen\\\\apps\\\\user\\\\app\\\\\\(main\\)\" -type f -name \"*.tsx\")",
+      "Bash(docker-compose restart:*)",
+      "Bash(npx prisma db execute:*)"
     ]
   }
 }

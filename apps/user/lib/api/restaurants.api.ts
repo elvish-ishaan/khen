@@ -9,6 +9,7 @@ export interface Restaurant {
   imageUrl: string | null;
   rating: number;
   totalReviews: number;
+  totalCompletedOrders: number;
   minOrderAmount: number;
   deliveryFee: number;
   estimatedDeliveryTime: number;
@@ -16,6 +17,7 @@ export interface Restaurant {
   longitude: number;
   opensAt: string;
   closesAt: string;
+  isAcceptingOrders: boolean;
   distance?: number;
 }
 

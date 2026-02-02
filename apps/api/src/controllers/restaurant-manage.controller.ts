@@ -4,6 +4,7 @@ import { RestaurantAuthenticatedRequest } from '../types';
 import {
   updateRestaurantProfileSchema,
   updateOrderStatusSchema,
+  toggleAcceptingOrdersSchema,
 } from '../validators/restaurant-manage.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { getFileUrl, RequestWithFileUrl } from '../middleware/upload';
@@ -61,6 +62,7 @@ export const updateProfileHandler = asyncHandler(
     if (req.body.deliveryFee !== undefined) parsedBody.deliveryFee = Number(req.body.deliveryFee);
     if (req.body.estimatedDeliveryTime !== undefined) parsedBody.estimatedDeliveryTime = Number(req.body.estimatedDeliveryTime);
     if (req.body.isActive !== undefined) parsedBody.isActive = req.body.isActive === 'true';
+    if (req.body.isAcceptingOrders !== undefined) parsedBody.isAcceptingOrders = req.body.isAcceptingOrders === 'true';
 
     const data = updateRestaurantProfileSchema.parse(parsedBody);
     const coverImageUrl = req.fileUrl || null; // Get URL from middleware
@@ -232,29 +234,76 @@ export const updateOrderStatusHandler = asyncHandler(
       throw new AppError(404, 'Order not found');
     }
 
-    // Update order status
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        status,
-        ...(status === 'DELIVERED' && { deliveredAt: new Date() }),
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
+    // Update order status and increment completed orders if delivered
+    const updatedOrder = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status,
+          ...(status === 'DELIVERED' && { deliveredAt: new Date() }),
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+            },
+          },
+          items: true,
+          restaurant: {
+            select: {
+              id: true,
+            },
           },
         },
-        items: true,
-      },
+      });
+
+      // Increment restaurant's total completed orders when marked delivered
+      if (status === 'DELIVERED') {
+        await tx.restaurant.update({
+          where: { id: order.restaurant.id },
+          data: {
+            totalCompletedOrders: { increment: 1 },
+          },
+        });
+      }
+
+      return order;
     });
 
     res.json({
       success: true,
       message: 'Order status updated successfully',
       data: { order: updatedOrder },
+    });
+  }
+);
+
+// Toggle accepting orders status
+export const toggleAcceptingOrdersHandler = asyncHandler(
+  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+    if (!req.owner || !req.owner.restaurantId) {
+      throw new AppError(400, 'Restaurant not found');
+    }
+
+    const { isAcceptingOrders } = toggleAcceptingOrdersSchema.parse(req.body);
+
+    const restaurant = await prisma.restaurant.update({
+      where: { id: req.owner.restaurantId },
+      data: { isAcceptingOrders },
+      select: {
+        id: true,
+        name: true,
+        isActive: true,
+        isAcceptingOrders: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: `Restaurant is now ${isAcceptingOrders ? 'accepting' : 'not accepting'} orders`,
+      data: { restaurant },
     });
   }
 );

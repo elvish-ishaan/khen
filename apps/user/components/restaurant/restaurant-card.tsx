@@ -66,6 +66,12 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
             </div>
           </div>
 
+          <div className="text-xs text-gray-500 mt-2 pt-2 border-t">
+            {restaurant.totalCompletedOrders}{' '}
+            {restaurant.totalCompletedOrders === 1 ? 'order' : 'orders'}{' '}
+            completed
+          </div>
+
           {restaurant.distance && (
             <div className="text-xs text-gray-500 mt-2">
               {restaurant.distance.toFixed(1)} km away

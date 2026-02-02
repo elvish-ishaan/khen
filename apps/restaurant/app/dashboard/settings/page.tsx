@@ -38,6 +38,7 @@ export default function SettingsPage() {
     deliveryFee: 0,
     estimatedDeliveryTime: 0,
     isActive: true,
+    isAcceptingOrders: true,
   });
 
   const [coverImage, setCoverImage] = useState<File | null>(null);
@@ -61,6 +62,7 @@ export default function SettingsPage() {
             deliveryFee: rest.deliveryFee || 0,
             estimatedDeliveryTime: rest.estimatedDeliveryTime || 0,
             isActive: rest.isActive ?? true,
+            isAcceptingOrders: rest.isAcceptingOrders ?? true,
           });
         }
       } catch (error) {
@@ -107,6 +109,7 @@ export default function SettingsPage() {
       submitData.append('deliveryFee', formData.deliveryFee.toString());
       submitData.append('estimatedDeliveryTime', formData.estimatedDeliveryTime.toString());
       submitData.append('isActive', formData.isActive.toString());
+      submitData.append('isAcceptingOrders', formData.isAcceptingOrders.toString());
 
       if (coverImage) {
         submitData.append('coverImage', coverImage);
@@ -315,17 +318,35 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => handleChange('isActive', e.target.checked)}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                />
-                <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
-                  Restaurant is accepting orders
-                </label>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={formData.isActive}
+                    onChange={(e) => handleChange('isActive', e.target.checked)}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
+                    Restaurant is active (Account status)
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isAcceptingOrders"
+                    checked={formData.isAcceptingOrders}
+                    onChange={(e) => handleChange('isAcceptingOrders', e.target.checked)}
+                    className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                  />
+                  <label htmlFor="isAcceptingOrders" className="ml-2 text-sm font-medium text-gray-700">
+                    Currently accepting orders
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 ml-6">
+                  Use the toggle on the dashboard for quick on/off switching
+                </p>
               </div>
 
               {error && (
@@ -386,9 +407,15 @@ export default function SettingsPage() {
                 <p className="font-mono text-xs break-all">{restaurant?.id}</p>
               </div>
               <div>
-                <span className="text-gray-600">Status:</span>
+                <span className="text-gray-600">Account Status:</span>
                 <p className={`font-medium ${restaurant?.isActive ? 'text-green-600' : 'text-red-600'}`}>
                   {restaurant?.isActive ? 'Active' : 'Inactive'}
+                </p>
+              </div>
+              <div>
+                <span className="text-gray-600">Order Status:</span>
+                <p className={`font-medium ${restaurant?.isAcceptingOrders ? 'text-green-600' : 'text-orange-600'}`}>
+                  {restaurant?.isAcceptingOrders ? 'Accepting Orders' : 'Not Accepting'}
                 </p>
               </div>
             </div>

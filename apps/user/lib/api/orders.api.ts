@@ -34,10 +34,27 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
-  restaurant?: any;
-  address?: any;
+  restaurant?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  address?: {
+    label: string;
+    addressLine1: string;
+    addressLine2: string | null;
+    landmark: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
   payment?: any;
-  review?: any;
+  review?: {
+    id: string;
+    rating: number;
+    comment: string | null;
+    createdAt: string;
+  };
 }
 
 export const ordersApi = {

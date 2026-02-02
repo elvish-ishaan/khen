@@ -23,6 +23,7 @@ export const getRestaurantsHandler = asyncHandler(
     // Build where clause
     const where: any = {
       isActive: true,
+      isAcceptingOrders: true,
     };
 
     if (cuisine) {
@@ -151,6 +152,7 @@ export const searchRestaurantsHandler = asyncHandler(
     const restaurants = await prisma.restaurant.findMany({
       where: {
         isActive: true,
+        isAcceptingOrders: true,
         OR: [
           { name: { contains: q, mode: 'insensitive' } },
           { description: { contains: q, mode: 'insensitive' } },
@@ -235,7 +237,7 @@ export const getRestaurantBySlugHandler = asyncHandler(
     const { slug } = req.params;
 
     const restaurant = await prisma.restaurant.findUnique({
-      where: { slug, isActive: true },
+      where: { slug, isActive: true, isAcceptingOrders: true },
       include: {
         categories: {
           where: { isActive: true },
@@ -266,7 +268,7 @@ export const getRestaurantMenuHandler = asyncHandler(
     const { slug } = req.params;
 
     const restaurant = await prisma.restaurant.findUnique({
-      where: { slug, isActive: true },
+      where: { slug, isActive: true, isAcceptingOrders: true },
       select: {
         id: true,
         slug: true,

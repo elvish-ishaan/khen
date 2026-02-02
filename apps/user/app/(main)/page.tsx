@@ -146,14 +146,12 @@ export default function HomePage() {
           <div className="max-w-md mx-auto">
             <p className="text-gray-500 text-lg mb-2">
               {coordinates
-                ? 'No restaurants found within 20km'
-                : 'No restaurants found'}
+                ? 'No restaurants accepting orders within 20km'
+                : 'No restaurants accepting orders right now'}
             </p>
-            {coordinates && (
-              <p className="text-gray-400 text-sm">
-                Try expanding your search radius or checking back later
-              </p>
-            )}
+            <p className="text-gray-400 text-sm">
+              Please check back later or try a different location
+            </p>
           </div>
         </div>
       )}

@@ -96,6 +96,20 @@ export const addToCartHandler = asyncHandler(
       throw new AppError(404, 'Menu item not found or unavailable');
     }
 
+    // Verify restaurant is accepting orders
+    const restaurant = await prisma.restaurant.findFirst({
+      where: {
+        id: restaurantId,
+        isActive: true,
+        isAcceptingOrders: true,
+      },
+      select: { id: true, name: true },
+    });
+
+    if (!restaurant) {
+      throw new AppError(400, 'Restaurant is not accepting orders at this time');
+    }
+
     // Check if user has existing cart
     let cart = await prisma.cart.findFirst({
       where: {

@@ -298,31 +298,46 @@ export const markDeliveredHandler = asyncHandler(
       throw new AppError(400, 'Order has already been delivered');
     }
 
-    // Update delivery and order status, record earnings
-    await prisma.$transaction([
-      prisma.delivery.update({
-        where: { id },
-        data: {
-          status: 'DELIVERED',
-          deliveryTime: new Date(),
-        },
-      }),
-      prisma.order.update({
+    // Update delivery and order status, record earnings, increment completed orders
+    await prisma.$transaction(async (tx) => {
+      // Get order to find restaurantId
+      const order = await tx.order.findUnique({
         where: { id: delivery.orderId },
-        data: {
-          status: 'DELIVERED',
-          deliveredAt: new Date(),
-        },
-      }),
-      prisma.deliveryEarning.create({
-        data: {
-          personnelId: req.personnel.id,
-          orderId: delivery.orderId,
-          amount: delivery.earnings,
-          distance: delivery.distance || 0,
-        },
-      }),
-    ]);
+        select: { restaurantId: true },
+      });
+
+      await Promise.all([
+        tx.delivery.update({
+          where: { id },
+          data: {
+            status: 'DELIVERED',
+            deliveryTime: new Date(),
+          },
+        }),
+        tx.order.update({
+          where: { id: delivery.orderId },
+          data: {
+            status: 'DELIVERED',
+            deliveredAt: new Date(),
+          },
+        }),
+        tx.deliveryEarning.create({
+          data: {
+            personnelId: req.personnel.id,
+            orderId: delivery.orderId,
+            amount: delivery.earnings,
+            distance: delivery.distance || 0,
+          },
+        }),
+        // Increment restaurant's total completed orders
+        tx.restaurant.update({
+          where: { id: order!.restaurantId },
+          data: {
+            totalCompletedOrders: { increment: 1 },
+          },
+        }),
+      ]);
+    });
 
     res.json({
       success: true,

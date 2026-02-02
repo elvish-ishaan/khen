@@ -137,6 +137,11 @@ export const createOrderHandler = asyncHandler(
       throw new AppError(400, 'Cart is empty');
     }
 
+    // Verify restaurant is still accepting orders
+    if (!cart.restaurant.isActive || !cart.restaurant.isAcceptingOrders) {
+      throw new AppError(400, 'Restaurant is not accepting orders at this time');
+    }
+
     // Calculate totals
     const subtotal = cart.items.reduce((sum, item) => {
       return sum + item.menuItem.price * item.quantity;

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { restaurantsApi, type RestaurantDetail } from '@/lib/api/restaurants.api';
 import { useCartStore } from '@/stores/cart-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { ReviewsList } from '@/components/restaurant/reviews-list';
 
 export default function RestaurantPage() {
   const params = useParams();
@@ -214,6 +215,18 @@ export default function RestaurantPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12 pt-8 border-t">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Customer Reviews
+        </h2>
+        <ReviewsList
+          restaurantId={restaurant.id}
+          averageRating={restaurant.rating}
+          totalReviews={restaurant.totalReviews}
+        />
       </div>
     </div>
   );
