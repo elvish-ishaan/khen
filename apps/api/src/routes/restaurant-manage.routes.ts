@@ -8,7 +8,7 @@ import {
   updateOrderStatusHandler,
 } from '../controllers/restaurant-manage.controller';
 import { authenticateRestaurant } from '../middleware/restaurant-auth';
-import { uploadSingle } from '../middleware/upload';
+import { uploadSingle, processAndUploadToGcs } from '../middleware/upload';
 import {
   addCategoryHandler,
   updateCategoryHandler,
@@ -25,7 +25,12 @@ router.use(authenticateRestaurant);
 
 // Restaurant profile
 router.get('/profile', getProfileHandler);
-router.put('/profile', uploadSingle('coverImage'), updateProfileHandler);
+router.put(
+  '/profile',
+  uploadSingle('coverImage'),
+  processAndUploadToGcs('restaurants', { isPublic: true, optimize: true }),
+  updateProfileHandler
+);
 
 // Menu management (reuse onboarding controllers)
 router.get('/menu', getMenuHandler);
@@ -33,8 +38,18 @@ router.post('/menu/categories', addCategoryHandler);
 router.put('/menu/categories/:categoryId', updateCategoryHandler);
 router.delete('/menu/categories/:categoryId', deleteCategoryHandler);
 
-router.post('/menu/items', uploadSingle('itemImage'), addMenuItemHandler);
-router.put('/menu/items/:itemId', uploadSingle('itemImage'), updateMenuItemHandler);
+router.post(
+  '/menu/items',
+  uploadSingle('itemImage'),
+  processAndUploadToGcs('menu-items', { isPublic: true, optimize: true }),
+  addMenuItemHandler
+);
+router.put(
+  '/menu/items/:itemId',
+  uploadSingle('itemImage'),
+  processAndUploadToGcs('menu-items', { isPublic: true, optimize: true }),
+  updateMenuItemHandler
+);
 router.delete('/menu/items/:itemId', deleteMenuItemHandler);
 
 // Order management

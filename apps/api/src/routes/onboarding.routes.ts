@@ -14,7 +14,7 @@ import {
   completeOnboardingHandler,
 } from '../controllers/onboarding.controller';
 import { authenticateRestaurant } from '../middleware/restaurant-auth';
-import { uploadFields, uploadSingle } from '../middleware/upload';
+import { uploadFields, uploadSingle, processAndUploadToGcs } from '../middleware/upload';
 
 const router = Router();
 
@@ -33,6 +33,7 @@ router.post(
     { name: 'aadhar', maxCount: 1 },
     { name: 'gstin', maxCount: 1 },
   ]),
+  processAndUploadToGcs('documents', { isPublic: false, optimize: false }),
   uploadDocumentsHandler
 );
 
@@ -40,15 +41,30 @@ router.post(
 router.post('/bank-details', submitBankDetailsHandler);
 
 // Step 3: Restaurant info
-router.post('/restaurant', uploadSingle('coverImage'), createRestaurantHandler);
+router.post(
+  '/restaurant',
+  uploadSingle('coverImage'),
+  processAndUploadToGcs('restaurants', { isPublic: true, optimize: true }),
+  createRestaurantHandler
+);
 
 // Step 4: Menu management
 router.post('/menu/categories', addCategoryHandler);
 router.put('/menu/categories/:categoryId', updateCategoryHandler);
 router.delete('/menu/categories/:categoryId', deleteCategoryHandler);
 
-router.post('/menu/items', uploadSingle('itemImage'), addMenuItemHandler);
-router.put('/menu/items/:itemId', uploadSingle('itemImage'), updateMenuItemHandler);
+router.post(
+  '/menu/items',
+  uploadSingle('itemImage'),
+  processAndUploadToGcs('menu-items', { isPublic: true, optimize: true }),
+  addMenuItemHandler
+);
+router.put(
+  '/menu/items/:itemId',
+  uploadSingle('itemImage'),
+  processAndUploadToGcs('menu-items', { isPublic: true, optimize: true }),
+  updateMenuItemHandler
+);
 router.delete('/menu/items/:itemId', deleteMenuItemHandler);
 
 // Step 5: Location

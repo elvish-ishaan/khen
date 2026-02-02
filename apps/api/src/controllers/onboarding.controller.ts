@@ -12,7 +12,7 @@ import {
   locationSchema,
 } from '../validators/onboarding.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
-import { getFileUrl } from '../middleware/upload';
+import { getFileUrl, RequestWithFileUrl } from '../middleware/upload';
 
 // Get onboarding status
 export const getStatusHandler = asyncHandler(
@@ -58,15 +58,15 @@ export const getStatusHandler = asyncHandler(
 
 // Upload documents
 export const uploadDocumentsHandler = asyncHandler(
-  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+  async (req: RestaurantAuthenticatedRequest & RequestWithFileUrl, res: Response) => {
     if (!req.owner) {
       throw new AppError(401, 'Not authenticated');
     }
 
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const uploadedFiles = (req as any).uploadedFiles as { [fieldname: string]: string[] };
     const data = uploadDocumentsSchema.parse(req.body);
 
-    if (!files || Object.keys(files).length === 0) {
+    if (!uploadedFiles || Object.keys(uploadedFiles).length === 0) {
       throw new AppError(400, 'At least one document is required');
     }
 
@@ -79,8 +79,8 @@ export const uploadDocumentsHandler = asyncHandler(
     };
 
     // Create document records
-    const documentPromises = Object.entries(files).map(([fieldName, fileArray]) => {
-      const file = fileArray[0];
+    const documentPromises = Object.entries(uploadedFiles).map(([fieldName, fileUrls]) => {
+      const fileUrl = fileUrls[0]; // Get first file URL
       const docType = documentTypeMap[fieldName];
 
       if (!docType) return null;
@@ -100,13 +100,13 @@ export const uploadDocumentsHandler = asyncHandler(
           },
         },
         update: {
-          fileUrl: getFileUrl(file.path),
+          fileUrl,
           documentNumber,
         },
         create: {
           ownerId: req.owner!.id,
           type: docType as any,
-          fileUrl: getFileUrl(file.path),
+          fileUrl,
           documentNumber,
         },
       });
@@ -169,7 +169,7 @@ export const submitBankDetailsHandler = asyncHandler(
 
 // Create restaurant
 export const createRestaurantHandler = asyncHandler(
-  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+  async (req: RestaurantAuthenticatedRequest & RequestWithFileUrl, res: Response) => {
     if (!req.owner) {
       throw new AppError(401, 'Not authenticated');
     }
@@ -189,7 +189,7 @@ export const createRestaurantHandler = asyncHandler(
     };
 
     const data = restaurantInfoSchema.parse(parsedBody);
-    const coverImage = (req.file as Express.Multer.File) || null;
+    const coverImageUrl = req.fileUrl || null; // Get URL from middleware
 
     // Check if restaurant already exists
     const existingRestaurant = await prisma.restaurant.findFirst({
@@ -211,7 +211,7 @@ export const createRestaurantHandler = asyncHandler(
           minOrderAmount: data.minOrderAmount || 0,
           deliveryFee: data.deliveryFee || 0,
           estimatedDeliveryTime: data.estimatedDeliveryTime,
-          ...(coverImage && { coverImageUrl: getFileUrl(coverImage.path) }),
+          ...(coverImageUrl && { coverImageUrl }),
         },
       });
 
@@ -249,7 +249,7 @@ export const createRestaurantHandler = asyncHandler(
           minOrderAmount: data.minOrderAmount || 0,
           deliveryFee: data.deliveryFee || 0,
           estimatedDeliveryTime: data.estimatedDeliveryTime,
-          coverImageUrl: coverImage ? getFileUrl(coverImage.path) : undefined,
+          coverImageUrl: coverImageUrl || undefined,
           // Placeholder location (will be updated in location step)
           addressLine1: 'Pending',
           city: 'Pending',
@@ -371,7 +371,7 @@ export const deleteCategoryHandler = asyncHandler(
 
 // Add menu item
 export const addMenuItemHandler = asyncHandler(
-  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+  async (req: RestaurantAuthenticatedRequest & RequestWithFileUrl, res: Response) => {
     if (!req.owner || !req.owner.restaurantId) {
       throw new AppError(400, 'Restaurant not created yet');
     }
@@ -388,7 +388,7 @@ export const addMenuItemHandler = asyncHandler(
     };
 
     const data = addMenuItemSchema.parse(parsedBody);
-    const itemImage = (req.file as Express.Multer.File) || null;
+    const itemImageUrl = req.fileUrl || null; // Get URL from middleware
 
     // Verify category belongs to this restaurant
     const category = await prisma.category.findFirst({
@@ -411,7 +411,7 @@ export const addMenuItemHandler = asyncHandler(
         isVeg: data.isVeg,
         isAvailable: data.isAvailable,
         sortOrder: data.sortOrder,
-        ...(itemImage && { imageUrl: getFileUrl(itemImage.path) }),
+        ...(itemImageUrl && { imageUrl: itemImageUrl }),
       },
     });
 
@@ -425,7 +425,7 @@ export const addMenuItemHandler = asyncHandler(
 
 // Update menu item
 export const updateMenuItemHandler = asyncHandler(
-  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+  async (req: RestaurantAuthenticatedRequest & RequestWithFileUrl, res: Response) => {
     if (!req.owner || !req.owner.restaurantId) {
       throw new AppError(400, 'Restaurant not created yet');
     }
@@ -442,7 +442,7 @@ export const updateMenuItemHandler = asyncHandler(
     if (req.body.sortOrder !== undefined) parsedBody.sortOrder = Number(req.body.sortOrder);
 
     const data = updateMenuItemSchema.parse(parsedBody);
-    const itemImage = (req.file as Express.Multer.File) || null;
+    const itemImageUrl = req.fileUrl || null; // Get URL from middleware
 
     // Verify menu item belongs to this restaurant
     const menuItem = await prisma.menuItem.findFirst({
@@ -462,7 +462,7 @@ export const updateMenuItemHandler = asyncHandler(
       where: { id: itemId },
       data: {
         ...data,
-        ...(itemImage && { imageUrl: getFileUrl(itemImage.path) }),
+        ...(itemImageUrl && { imageUrl: itemImageUrl }),
       },
     });
 

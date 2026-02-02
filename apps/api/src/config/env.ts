@@ -15,7 +15,12 @@ const envSchema = z.object({
   MSG91_SENDER_ID: z.string().default('KHENFD'),
   RAZORPAY_KEY_ID: z.string().optional(),
   RAZORPAY_KEY_SECRET: z.string().optional(),
-  UPLOAD_DIR: z.string().default('./uploads'),
+  // Google Cloud Storage - REQUIRED for image uploads
+  GCS_ENABLED: z.string().default('true').transform((v) => v === 'true'),
+  GCS_PROJECT_ID: z.string().min(1, 'GCS_PROJECT_ID is required for image uploads'),
+  GCS_BUCKET_NAME: z.string().min(1, 'GCS_BUCKET_NAME is required for image uploads'),
+  GCS_KEY_FILE: z.string().min(1, 'GCS_KEY_FILE path is required for image uploads'),
+  GCS_CDN_URL: z.string().optional(),
   MAX_FILE_SIZE: z.string().default('5242880'), // 5MB
   COST_PER_KM: z.string().default('10').transform(Number),
 });

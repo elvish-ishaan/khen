@@ -6,7 +6,7 @@ import {
   updateOrderStatusSchema,
 } from '../validators/restaurant-manage.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
-import { getFileUrl } from '../middleware/upload';
+import { getFileUrl, RequestWithFileUrl } from '../middleware/upload';
 
 // Get restaurant profile
 export const getProfileHandler = asyncHandler(
@@ -42,7 +42,7 @@ export const getProfileHandler = asyncHandler(
 
 // Update restaurant profile
 export const updateProfileHandler = asyncHandler(
-  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+  async (req: RestaurantAuthenticatedRequest & RequestWithFileUrl, res: Response) => {
     if (!req.owner || !req.owner.restaurantId) {
       throw new AppError(400, 'Restaurant not found');
     }
@@ -63,13 +63,13 @@ export const updateProfileHandler = asyncHandler(
     if (req.body.isActive !== undefined) parsedBody.isActive = req.body.isActive === 'true';
 
     const data = updateRestaurantProfileSchema.parse(parsedBody);
-    const coverImage = (req.file as Express.Multer.File) || null;
+    const coverImageUrl = req.fileUrl || null; // Get URL from middleware
 
     const restaurant = await prisma.restaurant.update({
       where: { id: req.owner.restaurantId },
       data: {
         ...data,
-        ...(coverImage && { coverImageUrl: getFileUrl(coverImage.path) }),
+        ...(coverImageUrl && { coverImageUrl }),
       },
     });
 
