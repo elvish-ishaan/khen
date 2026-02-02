@@ -6,6 +6,7 @@ import { useCartStore } from '@/stores/cart-store';
 import { addressesApi, type Address } from '@/lib/api/addresses.api';
 import { ordersApi } from '@/lib/api/orders.api';
 import { paymentsApi } from '@/lib/api/payments.api';
+import { cartApi } from '@/lib/api/cart.api';
 
 declare global {
   interface Window {
@@ -23,6 +24,13 @@ export default function CheckoutPage() {
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Delivery fee calculation state
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
+  const [deliveryDistance, setDeliveryDistance] = useState<string>('');
+  const [deliveryDuration, setDeliveryDuration] = useState<string>('');
+  const [isCalculatingFee, setIsCalculatingFee] = useState(false);
+  const [feeError, setFeeError] = useState<string>('');
 
   useEffect(() => {
     fetchCart();
@@ -54,6 +62,39 @@ export default function CheckoutPage() {
       console.error('Failed to fetch addresses:', err);
     }
   };
+
+  const calculateDeliveryFeeForAddress = async (addressId: string) => {
+    if (!cart) return;
+
+    setIsCalculatingFee(true);
+    setFeeError('');
+
+    try {
+      const response = await cartApi.calculateDeliveryFee({ addressId });
+
+      if (response.success && response.data) {
+        setDeliveryFee(response.data.deliveryFee);
+        setDeliveryDistance(response.data.distanceText);
+        setDeliveryDuration(response.data.durationText);
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to calculate delivery fee';
+      setFeeError(errorMsg);
+      // Fallback to static fee
+      setDeliveryFee(cart?.restaurant.deliveryFee || 0);
+      setDeliveryDistance('');
+      setDeliveryDuration('');
+    } finally {
+      setIsCalculatingFee(false);
+    }
+  };
+
+  // Calculate delivery fee when address changes
+  useEffect(() => {
+    if (selectedAddressId && cart) {
+      calculateDeliveryFeeForAddress(selectedAddressId);
+    }
+  }, [selectedAddressId, cart?.id]);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) {
@@ -166,7 +207,6 @@ export default function CheckoutPage() {
     );
   }
 
-  const deliveryFee = cart.restaurant.deliveryFee;
   const tax = subtotal * 0.05;
   const total = subtotal + deliveryFee + tax;
 
@@ -325,8 +365,26 @@ export default function CheckoutPage() {
                 <span>₹{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-700">
-                <span>Delivery Fee</span>
-                <span>₹{deliveryFee.toFixed(2)}</span>
+                <div className="flex flex-col">
+                  <span>Delivery Fee</span>
+                  {deliveryDistance && !isCalculatingFee && (
+                    <span className="text-xs text-gray-500 mt-1">
+                      {deliveryDistance} • {deliveryDuration}
+                    </span>
+                  )}
+                  {feeError && (
+                    <span className="text-xs text-red-500 mt-1">
+                      Using estimated fee
+                    </span>
+                  )}
+                </div>
+                <span>
+                  {isCalculatingFee ? (
+                    <span className="text-gray-500">Calculating...</span>
+                  ) : (
+                    `₹${deliveryFee.toFixed(2)}`
+                  )}
+                </span>
               </div>
               <div className="flex justify-between text-sm text-gray-700">
                 <span>Taxes (5%)</span>

@@ -22,7 +22,12 @@ const envSchema = z.object({
   GCS_KEY_FILE: z.string().min(1, 'GCS_KEY_FILE path is required for image uploads'),
   GCS_CDN_URL: z.string().optional(),
   MAX_FILE_SIZE: z.string().default('5242880'), // 5MB
-  COST_PER_KM: z.string().default('10').transform(Number),
+  // Google Maps API
+  GOOGLE_MAPS_API_KEY: z.string().min(20, 'Google Maps API key required'),
+  // Delivery Pricing
+  COST_PER_KM: z.string().default('20').transform(Number),
+  MIN_DELIVERY_FEE: z.string().default('20').transform(Number),
+  MAX_DELIVERY_DISTANCE: z.string().default('15').transform(Number),
 });
 
 const parsed = envSchema.safeParse(process.env);

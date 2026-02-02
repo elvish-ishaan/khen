@@ -3,6 +3,7 @@ import { prisma, OrderStatus, PaymentStatus } from '@repo/db';
 import { AuthenticatedRequest } from '../types';
 import { createOrderSchema, reorderSchema } from '../validators/order.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
+import { calculateDeliveryFee } from '../services/delivery-fee.service';
 
 const generateOrderNumber = (): string => {
   const timestamp = Date.now().toString();
@@ -148,9 +149,26 @@ export const createOrderHandler = asyncHandler(
       );
     }
 
-    const deliveryFee = cart.restaurant.deliveryFee;
+    // Validate address has coordinates for delivery fee calculation
+    if (!address.latitude || !address.longitude) {
+      throw new AppError(
+        400,
+        'Delivery address must have valid coordinates. Please update your address with a location.'
+      );
+    }
+
+    // Calculate delivery fee based on Google Maps route distance
+    const { deliveryFee, distanceKm, durationMinutes } = await calculateDeliveryFee(
+      cart.restaurant.latitude,
+      cart.restaurant.longitude,
+      address.latitude,
+      address.longitude
+    );
+
     const tax = subtotal * 0.05; // 5% tax
     const total = subtotal + deliveryFee + tax;
+
+    console.log(`📦 Order calculation - Distance: ${distanceKm}km, Fee: ₹${deliveryFee}, Total: ₹${total}`);
 
     // Create order
     const order = await prisma.order.create({
@@ -162,6 +180,8 @@ export const createOrderHandler = asyncHandler(
         status: OrderStatus.PENDING,
         subtotal,
         deliveryFee,
+        deliveryDistance: distanceKm,
+        deliveryDuration: durationMinutes,
         tax,
         total,
         paymentMethod,

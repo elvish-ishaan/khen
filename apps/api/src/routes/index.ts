@@ -7,6 +7,7 @@ import paymentRoutes from './payment.routes';
 import userRoutes from './user.routes';
 import addressRoutes from './address.routes';
 import reviewRoutes from './review.routes';
+import deliveryRoutes from './delivery.routes';
 import restaurantAuthRoutes from './restaurant-auth.routes';
 import onboardingRoutes from './onboarding.routes';
 import restaurantManageRoutes from './restaurant-manage.routes';
@@ -25,6 +26,7 @@ router.use('/payments', paymentRoutes);
 router.use('/users', userRoutes);
 router.use('/addresses', addressRoutes);
 router.use('/reviews', reviewRoutes);
+router.use('/delivery', deliveryRoutes);
 
 // Restaurant-facing routes
 router.use('/restaurant-auth', restaurantAuthRoutes);

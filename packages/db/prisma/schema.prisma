@@ -308,6 +308,8 @@ model Order {
   status            OrderStatus @default(PENDING)
   subtotal          Float
   deliveryFee       Float
+  deliveryDistance  Float? // in kilometers
+  deliveryDuration  Int? // in minutes
   tax               Float
   discount          Float       @default(0)
   total             Float

@@ -30,6 +30,18 @@ export interface UpdateCartItemRequest {
   quantity: number;
 }
 
+export interface CalculateDeliveryFeeRequest {
+  addressId: string;
+}
+
+export interface CalculateDeliveryFeeResponse {
+  deliveryFee: number;
+  distanceKm: number;
+  durationMinutes: number;
+  distanceText: string;
+  durationText: string;
+}
+
 export const cartApi = {
   getCart: () => {
     return apiClient.get<{
@@ -53,5 +65,9 @@ export const cartApi = {
 
   clearCart: () => {
     return apiClient.delete('/cart');
+  },
+
+  calculateDeliveryFee: (data: CalculateDeliveryFeeRequest) => {
+    return apiClient.post<CalculateDeliveryFeeResponse>('/delivery/calculate-fee', data);
   },
 };

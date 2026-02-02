@@ -16,7 +16,8 @@
       "Bash(pnpm generate:*)",
       "Bash(npx tsc:*)",
       "Bash(pnpm --filter user add:*)",
-      "Bash(pnpm --filter api add:*)"
+      "Bash(pnpm --filter api add:*)",
+      "Bash(pnpm db:generate:*)"
     ]
   }
 }
