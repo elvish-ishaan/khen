@@ -10,10 +10,17 @@ import { logisticsApi } from '@/lib/api/logistics.api';
 export default function DashboardPage() {
   const router = useRouter();
   const { personnel, fetchMe } = useAuthStore();
-  const { startDuty, endDuty, isOnDuty } = useDeliveryStore();
+  const { startDuty, endDuty, isOnDuty, initializeDutyStatus } = useDeliveryStore();
   const { startTracking, stopTracking, error: locationError, clearError: clearLocationError } = useLocationStore();
   const [stats, setStats] = useState<any>(null);
   const [dutyError, setDutyError] = useState<string | null>(null);
+
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
 
   useEffect(() => {
     fetchMe();
@@ -24,6 +31,13 @@ export default function DashboardPage() {
       loadDashboardStats();
     }
   }, [personnel]);
+
+  // Sync duty status from personnel to delivery store
+  useEffect(() => {
+    if (personnel?.isOnDuty !== undefined) {
+      initializeDutyStatus(personnel.isOnDuty);
+    }
+  }, [personnel?.isOnDuty, initializeDutyStatus]);
 
   const loadDashboardStats = async () => {
     try {
@@ -148,7 +162,7 @@ export default function DashboardPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h4 className="text-sm font-medium text-gray-600">Today's Earnings</h4>
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                ₹{stats.today?.earnings || 0}
+                ₹{formatCurrency(stats.today?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
                 {stats.today?.deliveries || 0} deliveries
@@ -158,7 +172,7 @@ export default function DashboardPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h4 className="text-sm font-medium text-gray-600">Weekly Earnings</h4>
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                ₹{stats.weekly?.earnings || 0}
+                ₹{formatCurrency(stats.weekly?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
                 {stats.weekly?.deliveries || 0} deliveries
@@ -168,7 +182,7 @@ export default function DashboardPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h4 className="text-sm font-medium text-gray-600">Monthly Earnings</h4>
               <p className="mt-2 text-3xl font-bold text-gray-900">
-                ₹{stats.monthly?.earnings || 0}
+                ₹{formatCurrency(stats.monthly?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
                 {stats.monthly?.deliveries || 0} deliveries
@@ -178,7 +192,7 @@ export default function DashboardPage() {
             <div className="bg-white p-6 rounded-lg shadow">
               <h4 className="text-sm font-medium text-gray-600">Pending Balance</h4>
               <p className="mt-2 text-3xl font-bold text-green-600">
-                ₹{stats.pendingBalance || 0}
+                ₹{formatCurrency(stats.pendingBalance || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">Available for withdrawal</p>
             </div>

@@ -25,7 +25,7 @@ export const getDashboardStatsHandler = asyncHandler(
         where: {
           personnelId: req.personnel.id,
           status: 'DELIVERED',
-          deliveryTime: {
+          updatedAt: {
             gte: today,
           },
         },
@@ -49,7 +49,7 @@ export const getDashboardStatsHandler = asyncHandler(
         where: {
           personnelId: req.personnel.id,
           status: 'DELIVERED',
-          deliveryTime: {
+          updatedAt: {
             gte: thisWeek,
           },
         },
@@ -73,7 +73,7 @@ export const getDashboardStatsHandler = asyncHandler(
         where: {
           personnelId: req.personnel.id,
           status: 'DELIVERED',
-          deliveryTime: {
+          updatedAt: {
             gte: thisMonth,
           },
         },

@@ -19,6 +19,7 @@ interface DeliveryState {
   // Actions
   startDuty: () => Promise<void>;
   endDuty: () => Promise<void>;
+  initializeDutyStatus: (isOnDuty: boolean) => void;
   fetchActiveDeliveries: () => Promise<void>;
   acceptOrder: (orderId: string) => Promise<void>;
   markPickedUp: (deliveryId: string) => Promise<void>;
@@ -64,6 +65,10 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
       });
       throw error;
     }
+  },
+
+  initializeDutyStatus: (isOnDuty: boolean) => {
+    set({ isOnDuty });
   },
 
   fetchActiveDeliveries: async () => {

@@ -14,9 +14,9 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { href: '/orders', label: 'Orders', icon: '📋' },
-    { href: '/menu', label: 'Menu', icon: '🍽️' },
-    { href: '/settings', label: 'Settings', icon: '⚙️' },
+    { href: '/dashboard/orders', label: 'Orders', icon: '📋' },
+    { href: '/dashboard/menu', label: 'Menu', icon: '🍽️' },
+    { href: '/dashboard/settings', label: 'Settings', icon: '⚙️' },
   ];
 
   const isActive = (href: string) => {

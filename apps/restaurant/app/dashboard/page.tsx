@@ -212,7 +212,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
-          onClick={() => router.push('/orders')}
+          onClick={() => router.push('/dashboard/orders')}
           className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
         >
           <div className="text-2xl mb-2">📋</div>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
         </button>
 
         <button
-          onClick={() => router.push('/menu')}
+          onClick={() => router.push('/dashboard/menu')}
           className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
         >
           <div className="text-2xl mb-2">🍽️</div>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         </button>
 
         <button
-          onClick={() => router.push('/settings')}
+          onClick={() => router.push('/dashboard/settings')}
           className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
         >
           <div className="text-2xl mb-2">⚙️</div>

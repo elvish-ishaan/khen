@@ -80,7 +80,7 @@ export default function OrderDetailPage() {
   return (
     <div>
       <button
-        onClick={() => router.push('/orders')}
+        onClick={() => router.push('/dashboard/orders')}
         className="mb-6 text-gray-600 hover:text-gray-900 font-medium"
       >
         ← Back to Orders

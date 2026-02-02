@@ -22,7 +22,10 @@
       "Bash(npx prisma generate)",
       "Bash(find \"C:\\\\Users\\\\hp\\\\projects\\\\khen\\\\apps\\\\user\\\\app\\\\\\(main\\)\" -type f -name \"*.tsx\")",
       "Bash(docker-compose restart:*)",
-      "Bash(npx prisma db execute:*)"
+      "Bash(npx prisma db execute:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(pnpm --filter logistics tsc:*)"
     ]
   }
 }
