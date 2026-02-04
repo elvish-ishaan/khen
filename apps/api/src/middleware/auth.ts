@@ -16,6 +16,11 @@ export const authenticate = async (
     }
 
     const decoded = verifyToken(token);
+
+    if (!decoded.userId) {
+      throw new AppError(401, 'Invalid token payload');
+    }
+
     req.user = {
       id: decoded.userId,
       phone: decoded.phone,

@@ -29,7 +29,7 @@ export const sendOtp = async (phone: string): Promise<boolean> => {
       return false;
     }
 
-    const data = await response.json();
+    const data = await response.json() as SendOtpResponse;
     return data.type === 'success';
   } catch (error) {
     console.error('Error sending OTP:', error);
@@ -60,7 +60,7 @@ export const verifyOtp = async (phone: string, otp: string): Promise<boolean> =>
       return false;
     }
 
-    const data = await response.json();
+    const data = await response.json() as SendOtpResponse;
     return data.type === 'success';
   } catch (error) {
     console.error('Error verifying OTP:', error);

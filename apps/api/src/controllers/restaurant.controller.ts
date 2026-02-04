@@ -234,9 +234,9 @@ export const searchRestaurantsHandler = asyncHandler(
 
 export const getRestaurantBySlugHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { slug } = req.params;
+    const slug = req.params.slug as string;
 
-    const restaurant = await prisma.restaurant.findUnique({
+    const restaurant = await prisma.restaurant.findFirst({
       where: { slug, isActive: true, isAcceptingOrders: true },
       include: {
         categories: {
@@ -265,9 +265,9 @@ export const getRestaurantBySlugHandler = asyncHandler(
 
 export const getRestaurantMenuHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { slug } = req.params;
+    const slug = req.params.slug as string;
 
-    const restaurant = await prisma.restaurant.findUnique({
+    const restaurant = await prisma.restaurant.findFirst({
       where: { slug, isActive: true, isAcceptingOrders: true },
       select: {
         id: true,

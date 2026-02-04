@@ -309,7 +309,7 @@ export const updateCategoryHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not created yet');
     }
 
-    const { categoryId } = req.params;
+    const categoryId = req.params.categoryId as string;
     const data = updateCategorySchema.parse(req.body);
 
     // Verify category belongs to this restaurant
@@ -344,7 +344,7 @@ export const deleteCategoryHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not created yet');
     }
 
-    const { categoryId } = req.params;
+    const categoryId = req.params.categoryId as string;
 
     // Verify category belongs to this restaurant
     const category = await prisma.category.findFirst({
@@ -430,7 +430,7 @@ export const updateMenuItemHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not created yet');
     }
 
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
 
     // Parse FormData - convert strings to proper types (only include provided fields)
     const parsedBody: any = {};
@@ -481,7 +481,7 @@ export const deleteMenuItemHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not created yet');
     }
 
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
 
     // Verify menu item belongs to this restaurant
     const menuItem = await prisma.menuItem.findFirst({

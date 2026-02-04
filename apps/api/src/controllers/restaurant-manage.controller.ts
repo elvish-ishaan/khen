@@ -176,7 +176,7 @@ export const getOrderByIdHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not found');
     }
 
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
 
     const order = await prisma.order.findFirst({
       where: {
@@ -219,7 +219,7 @@ export const updateOrderStatusHandler = asyncHandler(
       throw new AppError(400, 'Restaurant not found');
     }
 
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
     const { status } = updateOrderStatusSchema.parse(req.body);
 
     // Verify order belongs to this restaurant

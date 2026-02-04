@@ -60,7 +60,7 @@ export const getOrderByIdHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const order = await prisma.order.findFirst({
       where: {
@@ -235,7 +235,7 @@ export const reorderHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { addressId } = reorderSchema.parse(req.body);
 
     // Get original order

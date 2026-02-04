@@ -323,7 +323,7 @@ export const markDeliveredHandler = asyncHandler(
         }),
         tx.deliveryEarning.create({
           data: {
-            personnelId: req.personnel.id,
+            personnelId: req.personnel!.id,
             orderId: delivery.orderId,
             amount: delivery.earnings,
             distance: delivery.distance || 0,

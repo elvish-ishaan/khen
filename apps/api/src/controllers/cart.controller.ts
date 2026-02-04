@@ -176,7 +176,7 @@ export const updateCartItemHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
     const { quantity } = updateCartItemSchema.parse(req.body);
 
     // Verify cart item belongs to user
@@ -216,7 +216,7 @@ export const removeCartItemHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { itemId } = req.params;
+    const itemId = req.params.itemId as string;
 
     // Verify cart item belongs to user
     const cartItem = await prisma.cartItem.findFirst({

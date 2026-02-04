@@ -1,4 +1,4 @@
-import { Client } from '@googlemaps/google-maps-services-js';
+import { Client, TravelMode } from '@googlemaps/google-maps-services-js';
 import { env } from '../config/env';
 import { calculateDistance } from './location.service';
 
@@ -25,7 +25,7 @@ class GoogleMapsService {
         params: {
           origins: [`${origin.lat},${origin.lng}`],
           destinations: [`${destination.lat},${destination.lng}`],
-          mode: 'driving',
+          mode: TravelMode.driving,
           key: env.GOOGLE_MAPS_API_KEY,
         },
         timeout: 5000,

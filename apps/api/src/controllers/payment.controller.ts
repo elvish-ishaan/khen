@@ -149,7 +149,7 @@ export const getPaymentStatusHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { orderId } = req.params;
+    const orderId = req.params.orderId as string;
 
     const order = await prisma.order.findFirst({
       where: {

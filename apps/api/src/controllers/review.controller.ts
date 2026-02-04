@@ -76,7 +76,7 @@ export const createReviewHandler = asyncHandler(
 
 export const getRestaurantReviewsHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
-    const { restaurantId } = req.params;
+    const restaurantId = req.params.restaurantId as string;
 
     const reviews = await prisma.review.findMany({
       where: {

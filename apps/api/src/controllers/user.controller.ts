@@ -109,7 +109,7 @@ export const addFavoriteHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { restaurantId } = req.params;
+    const restaurantId = req.params.restaurantId as string;
 
     // Check if restaurant exists
     const restaurant = await prisma.restaurant.findUnique({
@@ -157,7 +157,7 @@ export const removeFavoriteHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { restaurantId } = req.params;
+    const restaurantId = req.params.restaurantId as string;
 
     await prisma.favoriteRestaurant.deleteMany({
       where: {

@@ -69,7 +69,7 @@ export const updateAddressHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
     const updates = updateAddressSchema.parse(req.body);
 
     // Verify address belongs to user
@@ -117,7 +117,7 @@ export const deleteAddressHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     // Verify address belongs to user
     const address = await prisma.address.findFirst({
@@ -148,7 +148,7 @@ export const setDefaultAddressHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     // Verify address belongs to user
     const address = await prisma.address.findFirst({

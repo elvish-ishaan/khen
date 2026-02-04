@@ -19,7 +19,7 @@ export const authenticateRestaurant = async (
     const decoded = verifyToken(token);
 
     // Verify this is a restaurant token
-    if (decoded.role !== 'restaurant') {
+    if (decoded.role !== 'restaurant' || !decoded.ownerId) {
       throw new AppError(401, 'Invalid authentication credentials');
     }
 
