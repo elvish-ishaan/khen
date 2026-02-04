@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, type ApiResponse } from './client';
 
 export interface RestaurantOwner {
   id: string;
@@ -22,25 +22,25 @@ export interface VerifyOtpRequest {
 }
 
 export const authApi = {
-  sendOtp: async (data: SendOtpRequest) => {
+  sendOtp: async (data: SendOtpRequest): Promise<ApiResponse<{ phone: string; expiresIn: number }>> => {
     return apiClient.post<{ phone: string; expiresIn: number }>(
       '/restaurant-auth/send-otp',
       data
     );
   },
 
-  verifyOtp: async (data: VerifyOtpRequest) => {
+  verifyOtp: async (data: VerifyOtpRequest): Promise<ApiResponse<{ owner: RestaurantOwner }>> => {
     return apiClient.post<{ owner: RestaurantOwner }>(
       '/restaurant-auth/verify-otp',
       data
     );
   },
 
-  logout: async () => {
+  logout: async (): Promise<ApiResponse> => {
     return apiClient.post('/restaurant-auth/logout');
   },
 
-  getMe: async () => {
+  getMe: async (): Promise<ApiResponse<{ owner: RestaurantOwner }>> => {
     return apiClient.get<{ owner: RestaurantOwner }>('/restaurant-auth/me');
   },
 };

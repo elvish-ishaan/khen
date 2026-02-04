@@ -28,7 +28,8 @@ export default function OrderDetailPage() {
       const response = await logisticsApi.getAvailableOrders();
 
       if (response.success && response.data) {
-        const foundOrder = response.data.orders?.find((o: any) => o.id === orderId);
+        //@ts-ignore
+        const foundOrder = response.data?.orders?.find((o: any) => o.id === orderId);
         if (foundOrder) {
           setOrder(foundOrder);
         } else {

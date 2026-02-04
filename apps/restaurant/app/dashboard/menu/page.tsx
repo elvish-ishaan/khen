@@ -7,7 +7,7 @@ import type { Category, MenuItem } from '@/lib/api/restaurant.api';
 
 export default function MenuManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null | undefined>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -35,8 +35,8 @@ export default function MenuManagementPage() {
       const response = await restaurantApi.getMenu();
       if (response.success && response.data?.categories) {
         setCategories(response.data.categories);
-        if (response.data.categories.length > 0 && !selectedCategory) {
-          setSelectedCategory(response.data.categories[0].id);
+        if (response.data.categories?.length > 0 && !selectedCategory) {
+          setSelectedCategory(response.data.categories[0]?.id);
         }
       }
     } catch (err) {

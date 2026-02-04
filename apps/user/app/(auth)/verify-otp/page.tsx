@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
@@ -115,6 +115,7 @@ export default function VerifyOtpPage() {
   };
 
   return (
+    <Suspense fallback={<span>loading...</span>}>
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
@@ -193,5 +194,6 @@ export default function VerifyOtpPage() {
         </div>
       </div>
     </div>
+    </Suspense>
   );
 }

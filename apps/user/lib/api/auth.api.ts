@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, type ApiResponse } from './client';
 
 export interface SendOtpRequest {
   phone: string;
@@ -20,19 +20,19 @@ export interface User {
 }
 
 export const authApi = {
-  sendOtp: (data: SendOtpRequest) => {
+  sendOtp: (data: SendOtpRequest): Promise<ApiResponse> => {
     return apiClient.post('/auth/send-otp', data);
   },
 
-  verifyOtp: (data: VerifyOtpRequest) => {
+  verifyOtp: (data: VerifyOtpRequest): Promise<ApiResponse<{ user: User }>> => {
     return apiClient.post<{ user: User }>('/auth/verify-otp', data);
   },
 
-  logout: () => {
+  logout: (): Promise<ApiResponse> => {
     return apiClient.post('/auth/logout');
   },
 
-  getMe: () => {
+  getMe: (): Promise<ApiResponse<{ user: User }>> => {
     return apiClient.get<{ user: User }>('/auth/me');
   },
 };

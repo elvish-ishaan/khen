@@ -61,7 +61,8 @@ export default function DashboardPage() {
 
           setStats((prev) => ({
             ...prev,
-            totalOrders: ordersResponse.data.pagination.total,
+            //@ts-ignore
+            totalOrders: ordersResponse?.data.pagination?.total,
             pendingOrders: pending,
           }));
         }

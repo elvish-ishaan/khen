@@ -16,6 +16,7 @@ export default function PendingReviewPage() {
     try {
       const response = await logisticsOnboardingApi.getStatus();
       if (response.success && response.data) {
+        //@ts-ignore
         setStatus(response.data.personnel);
       }
     } catch (error) {

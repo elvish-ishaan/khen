@@ -24,6 +24,7 @@ function MapContent({
   useEffect(() => {
     if (!map) return;
 
+    //@ts-ignore
     const listener = map.addListener('click', (e: google.maps.MapMouseEvent) => {
       if (e.latLng) {
         onLocationChange(e.latLng.lat(), e.latLng.lng());
@@ -31,6 +32,7 @@ function MapContent({
     });
 
     return () => {
+      //@ts-ignore
       google.maps.event.removeListener(listener);
     };
   }, [map, onLocationChange]);

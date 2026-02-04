@@ -50,6 +50,7 @@ export interface Category {
 
 export interface RestaurantDetail extends Restaurant {
   categories: Category[];
+  coverImageUrl?: string
 }
 
 export const restaurantsApi = {

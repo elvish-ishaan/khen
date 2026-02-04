@@ -28,7 +28,8 @@
       "Bash(pnpm --filter logistics tsc:*)",
       "Bash(pnpm --filter api typecheck:*)",
       "Bash(pnpm --filter user typecheck:*)",
-      "Bash(pnpm --filter logistics typecheck:*)"
+      "Bash(pnpm --filter logistics typecheck:*)",
+      "Bash(pnpm tsc:*)"
     ]
   }
 }

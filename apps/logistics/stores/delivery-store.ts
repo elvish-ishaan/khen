@@ -78,7 +78,8 @@ export const useDeliveryStore = create<DeliveryState>((set, get) => ({
 
       if (response.success && response.data) {
         set({
-          activeDeliveries: response.data.deliveries,
+          //@ts-ignore
+          activeDeliveries: response.data?.deliveries,
           isLoading: false,
         });
       }

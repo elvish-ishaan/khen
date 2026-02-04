@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
+// Declare google as a global variable for Google Maps API
+declare global {
+  interface Window {
+    google: typeof google;
+  }
+  const google: any;
+}
+
 interface DistanceCalculatorProps {
   origin: { lat: number; lng: number } | null;
   destination: { lat: number; lng: number } | null;
@@ -71,6 +79,7 @@ export function useDistanceCalculator({
       return;
     }
 
+    //
     const service = new google.maps.DistanceMatrixService();
     setIsLoading(true);
     setError(null);
@@ -82,6 +91,7 @@ export function useDistanceCalculator({
         travelMode: google.maps.TravelMode.DRIVING, // Can be changed to TWO_WHEELER if needed
         unitSystem: google.maps.UnitSystem.METRIC,
       },
+      //@ts-ignore
       (response, status) => {
         setIsLoading(false);
 

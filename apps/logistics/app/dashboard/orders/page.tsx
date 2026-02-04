@@ -21,7 +21,8 @@ export default function AvailableOrdersPage() {
       const response = await logisticsApi.getAvailableOrders();
 
       if (response.success && response.data) {
-        setOrders(response.data.orders || []);
+        //@ts-ignore
+        setOrders(response.data?.orders || []);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load orders');

@@ -19,7 +19,7 @@ export default function CheckoutPage() {
   const { cart, subtotal, fetchCart } = useCartStore();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null | undefined>(null);
   const [paymentMethod, setPaymentMethod] = useState<'RAZORPAY' | 'CASH_ON_DELIVERY'>('RAZORPAY');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -54,8 +54,8 @@ export default function CheckoutPage() {
         const defaultAddress = response.data.addresses.find((a) => a.isDefault);
         if (defaultAddress) {
           setSelectedAddressId(defaultAddress.id);
-        } else if (response.data.addresses.length > 0) {
-          setSelectedAddressId(response.data.addresses[0].id);
+        } else if (response.data.addresses?.length > 0) {
+          setSelectedAddressId(response.data.addresses[0]?.id);
         }
       }
     } catch (err) {
