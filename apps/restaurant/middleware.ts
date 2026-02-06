@@ -9,12 +9,16 @@ export function middleware(request: NextRequest) {
   const publicPaths = ['/login', '/verify-otp'];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
-  // If authenticated and on root or public path, redirect to dashboard
-  if (hasToken && (pathname === '/' || isPublicPath)) {
+  // Onboarding paths - require auth but are accessible during onboarding
+  const onboardingPaths = ['/documents', '/bank-details', '/restaurant-info', '/menu', '/location'];
+  const isOnboardingPath = onboardingPaths.some((path) => pathname.startsWith(path));
+
+  // If authenticated and on login page or root, redirect to dashboard
+  if (hasToken && (pathname === '/' || pathname.startsWith('/login'))) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // If not authenticated and trying to access protected route (including root), redirect to login
+  // If not authenticated and trying to access protected route, redirect to login
   if (!hasToken && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
