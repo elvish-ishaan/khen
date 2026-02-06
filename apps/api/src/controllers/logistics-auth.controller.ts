@@ -123,12 +123,19 @@ export const verifyOtpHandler = asyncHandler(
     });
 
     // Set cookie
-    res.cookie('logistics_auth_token', token, {
+    const cookieOptions: any = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: getTokenExpiry(),
-    });
+      path: '/',
+    };
+
+    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    res.cookie('logistics_auth_token', token, cookieOptions);
 
     res.json({
       success: true,
@@ -148,11 +155,18 @@ export const verifyOtpHandler = asyncHandler(
 
 export const logoutHandler = asyncHandler(
   async (req: LogisticsAuthenticatedRequest, res: Response) => {
-    res.clearCookie('logistics_auth_token', {
+    const cookieOptions: any = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    });
+      path: '/',
+    };
+
+    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    res.clearCookie('logistics_auth_token', cookieOptions);
 
     res.json({
       success: true,
