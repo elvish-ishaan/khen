@@ -3,7 +3,6 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import path from 'path';
-import { corsMiddleware } from './middleware/cors';
 import { errorHandler } from './middleware/error-handler';
 import { generalLimiter } from './middleware/rate-limiter';
 import routes from './routes';
@@ -12,7 +11,6 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
-app.use(corsMiddleware);
 
 // Request logging
 app.use(morgan('dev'));
