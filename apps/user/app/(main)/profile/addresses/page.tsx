@@ -133,9 +133,9 @@ export default function AddressesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Addresses</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Addresses</h1>
         {!showForm && (
           <button
             onClick={() => {
@@ -143,7 +143,7 @@ export default function AddressesPage() {
               setEditingId(null);
               setShowForm(true);
             }}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium"
+            className="bg-yellow-500 text-gray-900 px-4 sm:px-6 py-2 rounded-md hover:bg-yellow-600 font-medium text-sm sm:text-base whitespace-nowrap"
           >
             + Add Address
           </button>
@@ -169,7 +169,7 @@ export default function AddressesPage() {
                   value={formData.label}
                   onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                   placeholder="Home, Work, etc."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
 
@@ -186,7 +186,7 @@ export default function AddressesPage() {
                     setFormData({ ...formData, postalCode: e.target.value.replace(/\D/g, '') })
                   }
                   placeholder="400001"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
             </div>
@@ -201,7 +201,7 @@ export default function AddressesPage() {
                 value={formData.addressLine1}
                 onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
                 placeholder="Flat, House no, Building, Company"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
 
@@ -214,7 +214,7 @@ export default function AddressesPage() {
                 value={formData.addressLine2}
                 onChange={(e) => setFormData({ ...formData, addressLine2: e.target.value })}
                 placeholder="Area, Street, Sector, Village"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
 
@@ -227,7 +227,7 @@ export default function AddressesPage() {
                 value={formData.landmark}
                 onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
                 placeholder="Nearby landmark"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
 
@@ -242,7 +242,7 @@ export default function AddressesPage() {
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   placeholder="Mumbai"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
 
@@ -256,7 +256,7 @@ export default function AddressesPage() {
                   value={formData.state}
                   onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                   placeholder="Maharashtra"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
             </div>
@@ -280,7 +280,7 @@ export default function AddressesPage() {
               <button
                 type="button"
                 onClick={() => setShowLocationPicker(true)}
-                className="w-full md:w-auto bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center justify-center gap-2"
+                className="w-full md:w-auto bg-yellow-50 text-yellow-600 border border-yellow-200 px-4 py-2 rounded-md hover:bg-yellow-100 flex items-center justify-center gap-2"
               >
                 <svg
                   className="w-5 h-5"
@@ -317,7 +317,7 @@ export default function AddressesPage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium"
+                className="bg-yellow-500 text-gray-900 px-6 py-2 rounded-md hover:bg-yellow-600 font-medium"
               >
                 {editingId ? 'Update Address' : 'Save Address'}
               </button>
@@ -358,7 +358,7 @@ export default function AddressesPage() {
                       </span>
                     )}
                     {address.latitude && address.longitude ? (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                      <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
                         Location Set
                       </span>
                     ) : (
@@ -387,7 +387,7 @@ export default function AddressesPage() {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => handleEdit(address)}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
                   >
                     Edit
                   </button>

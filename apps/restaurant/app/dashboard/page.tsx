@@ -153,7 +153,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold">Recent Orders</h2>
           <button
             onClick={() => router.push('/orders')}
-            className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+            className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
           >
             View All →
           </button>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
             {recentOrders.map((order) => (
               <div
                 key={order.id}
-                className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-colors cursor-pointer"
+                className="border border-gray-200 rounded-lg p-4 hover:border-yellow-300 transition-colors cursor-pointer"
                 onClick={() => router.push(`/orders/${order.id}`)}
               >
                 <div className="flex justify-between items-start">

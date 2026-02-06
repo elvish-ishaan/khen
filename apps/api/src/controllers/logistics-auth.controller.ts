@@ -126,7 +126,7 @@ export const verifyOtpHandler = asyncHandler(
     res.cookie('logistics_auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: getTokenExpiry(),
     });
 
@@ -148,7 +148,11 @@ export const verifyOtpHandler = asyncHandler(
 
 export const logoutHandler = asyncHandler(
   async (req: LogisticsAuthenticatedRequest, res: Response) => {
-    res.clearCookie('logistics_auth_token');
+    res.clearCookie('logistics_auth_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
 
     res.json({
       success: true,

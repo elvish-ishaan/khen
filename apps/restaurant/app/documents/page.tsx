@@ -94,10 +94,11 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div>
-      <Stepper currentStep={1} />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Stepper currentStep={1} />
 
-      <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Upload Business Documents</h1>
         <p className="text-gray-600 mb-6">
           Please upload the required documents to verify your restaurant
@@ -113,7 +114,7 @@ export default function DocumentsPage() {
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => handleFileChange(e, setFssaiFile)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               required
             />
             {fssaiFile && (
@@ -124,7 +125,7 @@ export default function DocumentsPage() {
               value={fssaiNumber}
               onChange={(e) => setFssaiNumber(e.target.value)}
               placeholder="FSSAI License Number (optional)"
-              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
             />
           </div>
 
@@ -137,7 +138,7 @@ export default function DocumentsPage() {
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => handleFileChange(e, setPanFile)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               required
             />
             {panFile && (
@@ -149,7 +150,7 @@ export default function DocumentsPage() {
               onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
               placeholder="PAN Number (optional)"
               maxLength={10}
-              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none uppercase"
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none uppercase"
             />
           </div>
 
@@ -168,7 +169,7 @@ export default function DocumentsPage() {
               }}
               placeholder="123456789012"
               maxLength={12}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
             <p className="mt-1 text-xs text-gray-500">Enter 12-digit Aadhar number</p>
@@ -177,7 +178,7 @@ export default function DocumentsPage() {
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => handleFileChange(e, setAadharFile)}
-              className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />
             {aadharFile && (
               <p className="mt-1 text-sm text-green-600">✓ {aadharFile.name}</p>
@@ -195,13 +196,13 @@ export default function DocumentsPage() {
               onChange={(e) => setGstinNumber(e.target.value.toUpperCase())}
               placeholder="22AAAAA0000A1Z5"
               maxLength={15}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none uppercase"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none uppercase"
             />
             <input
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => handleFileChange(e, setGstinFile)}
-              className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />
             {gstinFile && (
               <p className="mt-1 text-sm text-green-600">✓ {gstinFile.name}</p>
@@ -218,12 +219,13 @@ export default function DocumentsPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? 'Uploading...' : 'Continue to Bank Details'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

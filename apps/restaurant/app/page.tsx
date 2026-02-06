@@ -1,22 +1,5 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
 export default function HomePage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if we have auth cookie
-    const hasAuthCookie = document.cookie.includes('restaurant_auth_token');
-
-    if (hasAuthCookie) {
-      router.replace('/dashboard');
-    } else {
-      router.replace('/login');
-    }
-  }, [router]);
-
+  // Middleware handles all routing - this is just a loading state
   return (
     <div className="flex items-center justify-center min-h-screen">
       <p className="text-gray-500">Loading...</p>

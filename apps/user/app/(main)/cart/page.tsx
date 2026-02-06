@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Trash2 } from 'lucide-react';
 import { useCartStore } from '@/stores/cart-store';
 
 export default function CartPage() {
@@ -37,17 +38,17 @@ export default function CartPage() {
 
   if (!cart || itemCount === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
             Your cart is empty
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
             Add items from restaurants to get started
           </p>
           <Link
             href="/"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 font-medium"
+            className="inline-block bg-yellow-500 text-gray-900 px-6 py-3 rounded-md hover:bg-yellow-600 font-medium"
           >
             Browse Restaurants
           </Link>
@@ -61,12 +62,12 @@ export default function CartPage() {
   const total = subtotal + deliveryFee + tax;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Your Cart</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Cart</h1>
         <button
           onClick={clearCart}
-          className="text-red-600 hover:text-red-700 text-sm font-medium"
+          className="text-red-600 hover:text-red-700 text-xs sm:text-sm font-medium"
         >
           Clear Cart
         </button>
@@ -116,11 +117,18 @@ export default function CartPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() =>
-                      updateQuantity(item.id, Math.max(1, item.quantity - 1))
+                      item.quantity === 1
+                        ? removeItem(item.id)
+                        : updateQuantity(item.id, item.quantity - 1)
                     }
-                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 hover:border-red-400 hover:text-red-600 transition-colors"
+                    title={item.quantity === 1 ? 'Remove item' : 'Decrease quantity'}
                   >
-                    -
+                    {item.quantity === 1 ? (
+                      <Trash2 className="w-4 h-4" />
+                    ) : (
+                      '-'
+                    )}
                   </button>
                   <span className="font-medium">{item.quantity}</span>
                   <button
@@ -186,7 +194,7 @@ export default function CartPage() {
             <button
               onClick={() => router.push('/checkout')}
               disabled={subtotal < cart.restaurant.minOrderAmount}
-              className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="w-full bg-yellow-500 text-gray-900 py-3 rounded-md hover:bg-yellow-600 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Proceed to Checkout
             </button>

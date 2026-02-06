@@ -109,10 +109,11 @@ export default function RestaurantInfoPage() {
   };
 
   return (
-    <div>
-      <Stepper currentStep={3} />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Stepper currentStep={3} />
 
-      <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Restaurant Information</h1>
         <p className="text-gray-600 mb-6">
           Tell us about your restaurant
@@ -129,7 +130,7 @@ export default function RestaurantInfoPage() {
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Enter restaurant name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -144,7 +145,7 @@ export default function RestaurantInfoPage() {
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Describe your restaurant..."
               rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
             />
           </div>
 
@@ -162,7 +163,7 @@ export default function RestaurantInfoPage() {
                     px-4 py-2 rounded-lg text-sm font-medium transition-colors
                     ${
                       formData.cuisineType.includes(cuisine)
-                        ? 'bg-primary-600 text-white'
+                        ? 'bg-yellow-500 text-gray-900'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }
                   `}
@@ -184,7 +185,7 @@ export default function RestaurantInfoPage() {
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="9876543210"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -199,7 +200,7 @@ export default function RestaurantInfoPage() {
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="restaurant@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               />
             </div>
           </div>
@@ -214,7 +215,7 @@ export default function RestaurantInfoPage() {
                 type="time"
                 value={formData.opensAt}
                 onChange={(e) => handleChange('opensAt', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -228,7 +229,7 @@ export default function RestaurantInfoPage() {
                 type="time"
                 value={formData.closesAt}
                 onChange={(e) => handleChange('closesAt', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -245,7 +246,7 @@ export default function RestaurantInfoPage() {
                 min="0"
                 value={formData.minOrderAmount}
                 onChange={(e) => handleChange('minOrderAmount', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               />
             </div>
 
@@ -259,7 +260,7 @@ export default function RestaurantInfoPage() {
                 min="0"
                 value={formData.deliveryFee}
                 onChange={(e) => handleChange('deliveryFee', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               />
             </div>
 
@@ -273,7 +274,7 @@ export default function RestaurantInfoPage() {
                 min="10"
                 value={formData.estimatedDeliveryTime}
                 onChange={(e) => handleChange('estimatedDeliveryTime', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -287,7 +288,7 @@ export default function RestaurantInfoPage() {
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             />
             {coverImagePreview && (
               <div className="mt-4">
@@ -317,12 +318,13 @@ export default function RestaurantInfoPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? 'Saving...' : 'Continue to Menu'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

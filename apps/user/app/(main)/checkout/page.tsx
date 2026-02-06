@@ -177,7 +177,7 @@ export default function CheckoutPage() {
           },
         },
         theme: {
-          color: '#2563EB',
+          color: '#EAB308',
         },
       };
 
@@ -191,14 +191,14 @@ export default function CheckoutPage() {
 
   if (!cart) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
             Your cart is empty
           </h2>
           <button
             onClick={() => router.push('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700"
+            className="bg-yellow-500 text-gray-900 px-6 py-3 rounded-md hover:bg-yellow-600"
           >
             Browse Restaurants
           </button>
@@ -211,8 +211,8 @@ export default function CheckoutPage() {
   const total = subtotal + deliveryFee + tax;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8">Checkout</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Checkout Form */}
@@ -225,7 +225,7 @@ export default function CheckoutPage() {
               </h2>
               <button
                 onClick={() => router.push('/profile/addresses?redirect=/checkout')}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
               >
                 + Add New
               </button>
@@ -236,7 +236,7 @@ export default function CheckoutPage() {
                 <p className="text-gray-600 mb-4">No addresses found</p>
                 <button
                   onClick={() => router.push('/profile/addresses?redirect=/checkout')}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  className="bg-yellow-500 text-gray-900 px-4 py-2 rounded-md hover:bg-yellow-600"
                 >
                   Add Address
                 </button>
@@ -248,7 +248,7 @@ export default function CheckoutPage() {
                     key={address.id}
                     className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
                       selectedAddressId === address.id
-                        ? 'border-blue-600 bg-blue-50'
+                        ? 'border-yellow-500 bg-yellow-50'
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
@@ -282,6 +282,13 @@ export default function CheckoutPage() {
                     </div>
                   </label>
                 ))}
+              </div>
+            )}
+
+            {/* Validation Message */}
+            {addresses.length > 0 && !selectedAddressId && (
+              <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md text-sm">
+                Please select a delivery address to continue
               </div>
             )}
           </div>
@@ -341,7 +348,7 @@ export default function CheckoutPage() {
               onChange={(e) => setDeliveryInstructions(e.target.value)}
               placeholder="e.g., Ring the doorbell, Call on arrival, etc."
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             />
           </div>
 
@@ -402,7 +409,7 @@ export default function CheckoutPage() {
             <button
               onClick={handlePlaceOrder}
               disabled={isLoading || !selectedAddressId}
-              className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="w-full bg-yellow-500 text-gray-900 py-3 rounded-md hover:bg-yellow-600 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Processing...' : 'Place Order'}
             </button>

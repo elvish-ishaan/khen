@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
@@ -9,13 +9,14 @@ export default function VerifyOtpPage() {
   const router = useRouter();
   const { setOwner } = useAuthStore();
   const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     // Get phone from sessionStorage
@@ -41,21 +42,58 @@ export default function VerifyOtpPage() {
     return () => clearInterval(timer);
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
     setError('');
 
-    if (otp.length !== 6) {
+    // Auto-focus next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-submit when all fields are filled
+    if (newOtp.every((digit) => digit !== '') && index === 5) {
+      handleSubmit(newOtp.join(''));
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+    if (!/^\d+$/.test(pastedData)) return;
+
+    const newOtp = pastedData.split('').concat(Array(6 - pastedData.length).fill(''));
+    setOtp(newOtp.slice(0, 6));
+
+    if (pastedData.length === 6) {
+      handleSubmit(pastedData);
+    }
+  };
+
+  const handleSubmit = async (otpValue?: string) => {
+    const otpCode = otpValue || otp.join('');
+    if (otpCode.length !== 6) {
       setError('Please enter a valid 6-digit OTP');
       return;
     }
 
+    setError('');
     setIsLoading(true);
 
     try {
       const response = await authApi.verifyOtp({
         phone,
-        otp,
+        otp: otpCode,
         name: name || undefined,
         email: email || undefined,
       });
@@ -85,9 +123,13 @@ export default function VerifyOtpPage() {
         }
       } else {
         setError(response.error || 'Invalid OTP');
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
       }
     } catch (err) {
       setError('Something went wrong. Please try again.');
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
     } finally {
       setIsLoading(false);
     }
@@ -123,46 +165,49 @@ export default function VerifyOtpPage() {
     }
   };
 
-  const handleOtpChange = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    setOtp(numericValue);
-    setError('');
-  };
-
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Verify OTP
-        </h1>
-        <p className="text-gray-600">
-          Enter the 6-digit code sent to
-        </p>
-        <p className="text-primary-600 font-medium">+91 {phone}</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">
+              <span className="text-2xl font-bold text-gray-900">K</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Verify OTP
+            </h1>
+            <p className="text-gray-600">
+              Enter the 6-digit code sent to
+            </p>
+            <p className="text-yellow-600 font-medium">+91 {phone}</p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
-            OTP
-          </label>
-          <input
-            id="otp"
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            value={otp}
-            onChange={(e) => handleOtpChange(e.target.value)}
-            placeholder="123456"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl tracking-widest focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-            required
-            disabled={isLoading}
-            autoFocus
-          />
-          <p className="mt-1 text-xs text-gray-500 text-center">
-            Development Mode: Use 123456
-          </p>
-        </div>
+          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                Enter OTP
+              </label>
+              <div className="flex gap-2 justify-center" onPaste={handlePaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => { inputRefs.current[index] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
+                    disabled={isLoading}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-gray-500 text-center">
+                Development Mode: Use 123456
+              </p>
+            </div>
 
         <div className="grid grid-cols-1 gap-4">
           <div>
@@ -175,7 +220,7 @@ export default function VerifyOtpPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Restaurant Owner Name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               disabled={isLoading}
             />
           </div>
@@ -190,7 +235,7 @@ export default function VerifyOtpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="owner@restaurant.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               disabled={isLoading}
             />
           </div>
@@ -234,6 +279,8 @@ export default function VerifyOtpPage() {
         >
           ← Change phone number
         </button>
+      </div>
+        </div>
       </div>
     </div>
   );

@@ -136,7 +136,7 @@ export const verifyOtpHandler = asyncHandler(
     res.cookie('restaurant_auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: getTokenExpiry(),
     });
 
@@ -159,7 +159,11 @@ export const verifyOtpHandler = asyncHandler(
 
 export const logoutHandler = asyncHandler(
   async (req: RestaurantAuthenticatedRequest, res: Response) => {
-    res.clearCookie('restaurant_auth_token');
+    res.clearCookie('restaurant_auth_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
 
     res.json({
       success: true,

@@ -19,6 +19,11 @@ export interface User {
   createdAt: string;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+}
+
 export const authApi = {
   sendOtp: (data: SendOtpRequest): Promise<ApiResponse> => {
     return apiClient.post('/auth/send-otp', data);
@@ -34,5 +39,9 @@ export const authApi = {
 
   getMe: (): Promise<ApiResponse<{ user: User }>> => {
     return apiClient.get<{ user: User }>('/auth/me');
+  },
+
+  updateProfile: (data: UpdateProfileRequest): Promise<ApiResponse<{ user: User }>> => {
+    return apiClient.patch<{ user: User }>('/users/profile', data);
   },
 };

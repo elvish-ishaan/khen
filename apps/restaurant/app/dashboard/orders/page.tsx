@@ -84,7 +84,7 @@ export default function OrdersPage() {
               px-4 py-2 rounded-lg font-medium text-sm transition-colors
               ${
                 selectedStatus === status
-                  ? 'bg-primary-600 text-white'
+                  ? 'bg-yellow-500 text-gray-900'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }
             `}
@@ -138,7 +138,7 @@ export default function OrdersPage() {
                       <select
                         value={order.status}
                         onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none text-sm"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none text-sm"
                       >
                         <option value="PENDING">Pending</option>
                         <option value="CONFIRMED">Confirmed</option>
@@ -156,7 +156,7 @@ export default function OrdersPage() {
                   {/* View Details */}
                   <button
                     onClick={() => router.push(`/dashboard/orders/${order.id}`)}
-                    className="lg:w-auto bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
+                    className="lg:w-auto bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium"
                   >
                     View Details
                   </button>

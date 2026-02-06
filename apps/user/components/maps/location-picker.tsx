@@ -163,7 +163,7 @@ export function LocationPicker({
             className="absolute top-4 right-4 bg-white shadow-md px-4 py-2 rounded-md hover:bg-gray-50 flex items-center gap-2"
           >
             <svg
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5 text-yellow-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -210,7 +210,7 @@ export function LocationPicker({
           </button>
           <button
             onClick={handleConfirm}
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-6 py-2 bg-yellow-500 text-gray-900 rounded-md hover:bg-yellow-600"
           >
             Confirm Location
           </button>

@@ -31,7 +31,7 @@ export function Stepper({ currentStep }: StepperProps) {
                     step.number < currentStep
                       ? 'bg-green-500 text-white'
                       : step.number === currentStep
-                      ? 'bg-primary-600 text-white'
+                      ? 'bg-yellow-500 text-gray-900'
                       : 'bg-gray-200 text-gray-500'
                   }
                 `}
@@ -51,7 +51,7 @@ export function Stepper({ currentStep }: StepperProps) {
               <p
                 className={`
                   mt-2 text-xs font-medium text-center
-                  ${step.number === currentStep ? 'text-primary-600' : 'text-gray-500'}
+                  ${step.number === currentStep ? 'text-yellow-600' : 'text-gray-500'}
                 `}
               >
                 {step.title}

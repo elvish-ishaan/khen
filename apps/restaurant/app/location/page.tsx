@@ -95,8 +95,9 @@ export default function LocationPage() {
   };
 
   return (
-    <div>
-      <Stepper currentStep={5} />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Stepper currentStep={5} />
 
       <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Restaurant Location</h1>
@@ -115,7 +116,7 @@ export default function LocationPage() {
               value={formData.addressLine1}
               onChange={(e) => handleChange('addressLine1', e.target.value)}
               placeholder="Building name, street name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -130,7 +131,7 @@ export default function LocationPage() {
               value={formData.addressLine2}
               onChange={(e) => handleChange('addressLine2', e.target.value)}
               placeholder="Landmark, area (optional)"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
             />
           </div>
 
@@ -145,7 +146,7 @@ export default function LocationPage() {
                 value={formData.city}
                 onChange={(e) => handleChange('city', e.target.value)}
                 placeholder="City"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -160,7 +161,7 @@ export default function LocationPage() {
                 value={formData.state}
                 onChange={(e) => handleChange('state', e.target.value)}
                 placeholder="State"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -180,7 +181,7 @@ export default function LocationPage() {
                   handleChange('postalCode', value);
                 }}
                 placeholder="123456"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -213,7 +214,7 @@ export default function LocationPage() {
                   value={formData.latitude}
                   onChange={(e) => handleChange('latitude', Number(e.target.value))}
                   placeholder="0.000000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   required
                 />
               </div>
@@ -229,7 +230,7 @@ export default function LocationPage() {
                   value={formData.longitude}
                   onChange={(e) => handleChange('longitude', Number(e.target.value))}
                   placeholder="0.000000"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   required
                 />
               </div>
@@ -261,12 +262,13 @@ export default function LocationPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? 'Completing...' : 'Complete Onboarding 🎉'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

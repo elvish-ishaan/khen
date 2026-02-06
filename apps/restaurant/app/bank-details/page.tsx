@@ -58,10 +58,11 @@ export default function BankDetailsPage() {
   };
 
   return (
-    <div>
-      <Stepper currentStep={2} />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Stepper currentStep={2} />
 
-      <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Bank Account Details</h1>
         <p className="text-gray-600 mb-6">
           Enter your bank account information for receiving payments
@@ -78,7 +79,7 @@ export default function BankDetailsPage() {
               value={formData.accountTitle}
               onChange={(e) => handleChange('accountTitle', e.target.value)}
               placeholder="Full name as per bank records"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -97,7 +98,7 @@ export default function BankDetailsPage() {
                 handleChange('accountNumber', value);
               }}
               placeholder="Enter account number"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -116,7 +117,7 @@ export default function BankDetailsPage() {
                 handleChange('confirmAccountNumber', value);
               }}
               placeholder="Re-enter account number"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
             {formData.confirmAccountNumber && formData.accountNumber !== formData.confirmAccountNumber && (
@@ -138,7 +139,7 @@ export default function BankDetailsPage() {
               onChange={(e) => handleChange('ifscCode', e.target.value.toUpperCase())}
               placeholder="SBIN0001234"
               maxLength={11}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none uppercase"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none uppercase"
               required
             />
             <p className="mt-1 text-xs text-gray-500">
@@ -156,7 +157,7 @@ export default function BankDetailsPage() {
               value={formData.branchName}
               onChange={(e) => handleChange('branchName', e.target.value)}
               placeholder="Enter branch name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -178,12 +179,13 @@ export default function BankDetailsPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? 'Saving...' : 'Continue to Restaurant Info'}
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

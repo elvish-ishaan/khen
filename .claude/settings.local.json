@@ -29,7 +29,12 @@
       "Bash(pnpm --filter api typecheck:*)",
       "Bash(pnpm --filter user typecheck:*)",
       "Bash(pnpm --filter logistics typecheck:*)",
-      "Bash(pnpm tsc:*)"
+      "Bash(pnpm tsc:*)",
+      "Bash(find:*)",
+      "Bash(pnpm --filter api run build:*)",
+      "Bash(Select-String -Pattern \"primary-\")",
+      "Bash(Select-Object -First 20)",
+      "Bash(pnpm --filter restaurant build:*)"
     ]
   }
 }

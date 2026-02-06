@@ -41,13 +41,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-primary-600 mb-2">
-          Khen Restaurant Portal
-        </h1>
-        <p className="text-gray-600">Sign in to manage your restaurant</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">
+              <span className="text-2xl font-bold text-gray-900">K</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Restaurant Portal
+            </h1>
+            <p className="text-gray-600">Sign in to manage your restaurant</p>
+          </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -70,7 +75,7 @@ export default function LoginPage() {
                 setError('');
               }}
               placeholder="9876543210"
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
               required
               disabled={isLoading}
             />
@@ -89,7 +94,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isLoading || phone.length !== 10}
-          className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-yellow-500 text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? 'Sending OTP...' : 'Send OTP'}
         </button>
@@ -103,12 +108,14 @@ export default function LoginPage() {
         <p>
           Customer? Visit{' '}
           <a
-            href="http://localhost:3000"
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            href={process.env.NEXT_PUBLIC_USER_APP_URL || 'http://localhost:3000'}
+            className="text-yellow-600 hover:text-yellow-700 font-medium"
           >
             User App
           </a>
         </p>
+      </div>
+        </div>
       </div>
     </div>
   );

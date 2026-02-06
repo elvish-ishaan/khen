@@ -9,7 +9,10 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().default('30d'),
-  CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  CORS_ORIGINS: z
+    .string()
+    .default('http://localhost:3000,http://localhost:3001,http://localhost:3002')
+    .transform((val) => val.split(',').map((origin) => origin.trim())),
   MSG91_AUTH_KEY: z.string().optional(),
   MSG91_TEMPLATE_ID: z.string().optional(),
   MSG91_SENDER_ID: z.string().default('KHENFD'),

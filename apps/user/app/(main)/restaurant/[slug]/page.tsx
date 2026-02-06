@@ -96,13 +96,13 @@ export default function RestaurantPage() {
         </div>
       )}
 
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
           {restaurant.name}
         </h1>
 
         {restaurant.description && (
-          <p className="text-gray-600 mb-4">{restaurant.description}</p>
+          <p className="text-sm sm:text-base text-gray-600 mb-4">{restaurant.description}</p>
         )}
 
         <div className="flex flex-wrap gap-2 mb-4">
@@ -116,14 +116,14 @@ export default function RestaurantPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
           <div className="flex items-center gap-1">
-            <span className="text-yellow-500 text-lg">★</span>
+            <span className="text-yellow-500 text-base sm:text-lg">★</span>
             <span className="font-semibold">
               {restaurant.rating.toFixed(1)}
             </span>
             <span className="text-gray-500">
-              ({restaurant.totalReviews} reviews)
+              ({restaurant.totalReviews})
             </span>
           </div>
 
@@ -132,7 +132,7 @@ export default function RestaurantPage() {
           </div>
 
           <div className="text-gray-600">
-            Min order ₹{restaurant.minOrderAmount}
+            Min ₹{restaurant.minOrderAmount}
           </div>
 
           <div className="text-gray-600">
@@ -140,21 +140,21 @@ export default function RestaurantPage() {
           </div>
         </div>
 
-        <div className="mt-4 text-sm text-gray-600">
+        <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-600">
           Open: {restaurant.opensAt} - {restaurant.closesAt}
         </div>
       </div>
 
       {/* Menu */}
-      <div className="space-y-8">
+      <div className="space-y-6 sm:space-y-8">
         {restaurant.categories.map((category) => (
           <div key={category.id}>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
               {category.name}
             </h2>
 
             {category.description && (
-              <p className="text-gray-600 mb-4">{category.description}</p>
+              <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">{category.description}</p>
             )}
 
             <div className="grid gap-4">
@@ -205,7 +205,7 @@ export default function RestaurantPage() {
                     <button
                       onClick={() => handleAddToCart(item.id)}
                       disabled={!item.isAvailable}
-                      className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+                      className="bg-yellow-500 text-gray-900 px-6 py-2 rounded-md hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
                     >
                       {item.isAvailable ? 'Add' : 'Unavailable'}
                     </button>
@@ -218,8 +218,8 @@ export default function RestaurantPage() {
       </div>
 
       {/* Reviews Section */}
-      <div className="mt-12 pt-8 border-t">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
           Customer Reviews
         </h2>
         <ReviewsList

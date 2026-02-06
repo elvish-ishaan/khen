@@ -39,7 +39,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900">Khen</h1>
+          <div className="inline-block px-6 py-2 bg-yellow-500 rounded-full mb-4">
+            <h1 className="text-4xl font-bold text-gray-900">Khen</h1>
+          </div>
           <p className="mt-2 text-gray-600">Food delivery made simple</p>
         </div>
 
@@ -66,7 +68,7 @@ export default function LoginPage() {
                   pattern="[0-9]{10}"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                  className="block w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="block w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                   placeholder="9876543210"
                   disabled={isLoading}
                 />
@@ -85,7 +87,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading || phone.length !== 10}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Sending OTP...' : 'Send OTP'}
             </button>

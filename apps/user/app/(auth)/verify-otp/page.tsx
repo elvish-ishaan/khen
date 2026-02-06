@@ -12,6 +12,7 @@ export default function VerifyOtpPage() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resendTimer, setResendTimer] = useState(30);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { setUser } = useAuthStore();
 
@@ -23,6 +24,17 @@ export default function VerifyOtpPage() {
     }
     setPhone(storedPhone);
   }, [router]);
+
+  // Countdown timer for resend OTP
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [resendTimer]);
 
   const handleOtpChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -95,6 +107,8 @@ export default function VerifyOtpPage() {
   };
 
   const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+
     setError('');
     setIsLoading(true);
 
@@ -104,6 +118,7 @@ export default function VerifyOtpPage() {
       if (response.success) {
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
+        setResendTimer(30); // Reset timer
       } else {
         setError(response.error || 'Failed to resend OTP');
       }
@@ -119,7 +134,9 @@ export default function VerifyOtpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900">Khen</h1>
+          <div className="inline-block px-6 py-2 bg-yellow-500 rounded-full mb-4">
+            <h1 className="text-4xl font-bold text-gray-900">Khen</h1>
+          </div>
           <p className="mt-2 text-gray-600">Food delivery made simple</p>
         </div>
 
@@ -127,7 +144,7 @@ export default function VerifyOtpPage() {
           <div className="mb-6">
             <button
               onClick={() => router.push('/login')}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
             >
               ← Change number
             </button>
@@ -156,7 +173,7 @@ export default function VerifyOtpPage() {
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   disabled={isLoading}
-                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 />
               ))}
             </div>
@@ -171,7 +188,7 @@ export default function VerifyOtpPage() {
               type="button"
               onClick={() => handleSubmit()}
               disabled={isLoading || otp.some((digit) => digit === '')}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Verifying...' : 'Verify OTP'}
             </button>
@@ -180,10 +197,10 @@ export default function VerifyOtpPage() {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                disabled={isLoading}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium disabled:opacity-50"
+                disabled={isLoading || resendTimer > 0}
+                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Resend OTP
+                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
               </button>
             </div>
           </div>

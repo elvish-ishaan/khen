@@ -73,19 +73,19 @@ export default function HomePage() {
 
       {/* Location Not Yet Granted Banner */}
       {!coordinates && !locationError && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-blue-900">
+              <h3 className="font-medium text-yellow-900">
                 Enable location to find nearby restaurants
               </h3>
-              <p className="text-sm text-blue-700 mt-1">
+              <p className="text-sm text-yellow-700 mt-1">
                 We'll show you restaurants within 20km of your location
               </p>
             </div>
             <button
               onClick={requestLocation}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="bg-yellow-500 text-gray-900 px-4 py-2 rounded-md hover:bg-yellow-600"
             >
               Enable Location
             </button>
@@ -94,11 +94,11 @@ export default function HomePage() {
       )}
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {coordinates ? 'Restaurants within 20km' : 'All Restaurants'}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           {coordinates
             ? 'Showing restaurants near your location'
             : 'Discover delicious food from restaurants'}

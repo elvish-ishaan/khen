@@ -130,10 +130,11 @@ export default function MenuPage() {
   const selectedCategoryData = categories.find((c) => c.id === selectedCategory);
 
   return (
-    <div>
-      <Stepper currentStep={4} />
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-2xl mx-auto">
+        <Stepper currentStep={4} />
 
-      <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-2">Build Your Menu</h1>
         <p className="text-gray-600 mb-6">
           Add categories and menu items
@@ -159,14 +160,14 @@ export default function MenuPage() {
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder="Category name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-primary-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-yellow-500 outline-none"
                   required
                 />
                 <div className="flex gap-2">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 bg-primary-600 text-white py-2 rounded-lg text-sm"
+                    className="flex-1 bg-yellow-500 text-gray-900 py-2 rounded-lg text-sm"
                   >
                     Add
                   </button>
@@ -190,7 +191,7 @@ export default function MenuPage() {
                     w-full text-left px-4 py-3 rounded-lg transition-colors
                     ${
                       selectedCategory === category.id
-                        ? 'bg-primary-600 text-white'
+                        ? 'bg-yellow-500 text-gray-900'
                         : 'bg-gray-100 hover:bg-gray-200'
                     }
                   `}
@@ -232,7 +233,7 @@ export default function MenuPage() {
                         value={itemData.name}
                         onChange={(e) => setItemData({ ...itemData, name: e.target.value })}
                         placeholder="Item name"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                         required
                       />
                       <textarea
@@ -240,7 +241,7 @@ export default function MenuPage() {
                         onChange={(e) => setItemData({ ...itemData, description: e.target.value })}
                         placeholder="Description (optional)"
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                       />
                       <input
                         type="number"
@@ -249,7 +250,7 @@ export default function MenuPage() {
                         value={itemData.price}
                         onChange={(e) => setItemData({ ...itemData, price: Number(e.target.value) })}
                         placeholder="Price (₹)"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                         required
                       />
                       <div className="flex items-center gap-4">
@@ -282,7 +283,7 @@ export default function MenuPage() {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className="flex-1 bg-primary-600 text-white py-2 rounded-lg"
+                          className="flex-1 bg-yellow-500 text-gray-900 py-2 rounded-lg"
                         >
                           Add Item
                         </button>
@@ -343,10 +344,11 @@ export default function MenuPage() {
           </button>
           <button
             onClick={handleContinue}
-            className="bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700"
+            className="bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-yellow-600"
           >
             Continue to Location
           </button>
+        </div>
         </div>
       </div>
     </div>

@@ -300,7 +300,7 @@ export default function MenuManagementPage() {
               <h2 className="font-semibold text-lg">Categories</h2>
               <button
                 onClick={() => setShowCategoryForm(!showCategoryForm)}
-                className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
               >
                 + Add
               </button>
@@ -316,7 +316,7 @@ export default function MenuManagementPage() {
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder="Category name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-primary-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-yellow-500 outline-none"
                   required
                 />
                 <textarea
@@ -324,13 +324,13 @@ export default function MenuManagementPage() {
                   onChange={(e) => setCategoryDescription(e.target.value)}
                   placeholder="Description (optional)"
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-primary-500 outline-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2 focus:ring-2 focus:ring-yellow-500 outline-none"
                 />
                 <div className="flex gap-2">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex-1 bg-primary-600 text-white py-2 rounded-lg text-sm hover:bg-primary-700 disabled:opacity-50"
+                    className="flex-1 bg-yellow-500 text-gray-900 py-2 rounded-lg text-sm hover:bg-yellow-600 disabled:opacity-50"
                   >
                     {editingCategory ? 'Update' : 'Add'}
                   </button>
@@ -353,7 +353,7 @@ export default function MenuManagementPage() {
                     border rounded-lg transition-colors
                     ${
                       selectedCategory === category.id
-                        ? 'bg-primary-600 text-white border-primary-600'
+                        ? 'bg-yellow-500 text-gray-900 border-yellow-500'
                         : 'bg-white border-gray-200 hover:border-gray-300'
                     }
                   `}
@@ -363,17 +363,17 @@ export default function MenuManagementPage() {
                     className="w-full text-left px-4 py-3"
                   >
                     <div className="font-medium">{category.name}</div>
-                    <div className={`text-sm ${selectedCategory === category.id ? 'text-primary-100' : 'text-gray-500'}`}>
+                    <div className={`text-sm ${selectedCategory === category.id ? 'text-yellow-100' : 'text-gray-500'}`}>
                       {category.items?.length || 0} items
                     </div>
                   </button>
-                  <div className={`px-4 pb-3 flex gap-2 ${selectedCategory === category.id ? 'border-t border-primary-500 pt-2' : ''}`}>
+                  <div className={`px-4 pb-3 flex gap-2 ${selectedCategory === category.id ? 'border-t border-yellow-500 pt-2' : ''}`}>
                     <button
                       onClick={() => startEditCategory(category)}
                       className={`text-xs font-medium ${
                         selectedCategory === category.id
                           ? 'text-white hover:underline'
-                          : 'text-primary-600 hover:text-primary-700'
+                          : 'text-yellow-600 hover:text-yellow-700'
                       }`}
                     >
                       Edit
@@ -408,7 +408,7 @@ export default function MenuManagementPage() {
                   <h2 className="font-semibold text-lg">{selectedCategoryData?.name} Items</h2>
                   <button
                     onClick={() => setShowItemForm(!showItemForm)}
-                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                    className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
                   >
                     + Add Item
                   </button>
@@ -425,7 +425,7 @@ export default function MenuManagementPage() {
                         value={itemData.name}
                         onChange={(e) => setItemData({ ...itemData, name: e.target.value })}
                         placeholder="Item name"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                         required
                       />
                       <textarea
@@ -433,7 +433,7 @@ export default function MenuManagementPage() {
                         onChange={(e) => setItemData({ ...itemData, description: e.target.value })}
                         placeholder="Description (optional)"
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                       />
                       <input
                         type="number"
@@ -442,7 +442,7 @@ export default function MenuManagementPage() {
                         value={itemData.price}
                         onChange={(e) => setItemData({ ...itemData, price: Number(e.target.value) })}
                         placeholder="Price (₹)"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none"
                         required
                       />
                       <div className="flex items-center gap-4">
@@ -451,7 +451,7 @@ export default function MenuManagementPage() {
                             type="radio"
                             checked={itemData.isVeg}
                             onChange={() => setItemData({ ...itemData, isVeg: true })}
-                            className="text-primary-600"
+                            className="text-yellow-600"
                           />
                           <span className="text-sm">🟢 Veg</span>
                         </label>
@@ -460,7 +460,7 @@ export default function MenuManagementPage() {
                             type="radio"
                             checked={!itemData.isVeg}
                             onChange={() => setItemData({ ...itemData, isVeg: false })}
-                            className="text-primary-600"
+                            className="text-yellow-600"
                           />
                           <span className="text-sm">🔴 Non-Veg</span>
                         </label>
@@ -471,7 +471,7 @@ export default function MenuManagementPage() {
                           id="isAvailable"
                           checked={itemData.isAvailable}
                           onChange={(e) => setItemData({ ...itemData, isAvailable: e.target.checked })}
-                          className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                          className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                         />
                         <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
                           Available for ordering
@@ -495,7 +495,7 @@ export default function MenuManagementPage() {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className="flex-1 bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                          className="flex-1 bg-yellow-500 text-gray-900 py-2 rounded-lg hover:bg-yellow-600 disabled:opacity-50"
                         >
                           {editingItem ? 'Update Item' : 'Add Item'}
                         </button>
@@ -528,7 +528,7 @@ export default function MenuManagementPage() {
                           {item.description && (
                             <p className="text-sm text-gray-600 mb-1">{item.description}</p>
                           )}
-                          <p className="text-primary-600 font-semibold">₹{item.price}</p>
+                          <p className="text-yellow-600 font-semibold">₹{item.price}</p>
                         </div>
                         {item.imageUrl && (
                           <img
@@ -541,7 +541,7 @@ export default function MenuManagementPage() {
                       <div className="mt-3 flex gap-2">
                         <button
                           onClick={() => startEditItem(item)}
-                          className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                          className="text-sm font-medium text-yellow-600 hover:text-yellow-700"
                         >
                           Edit
                         </button>

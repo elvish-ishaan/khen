@@ -20,15 +20,17 @@ export default function ProfilePage() {
     setSuccess('');
 
     try {
-      const response = await authApi.getMe();
-      // Note: You'll need to create a updateProfile endpoint in the auth API
-      // For now, this is a placeholder
-
-      setSuccess('Profile updated successfully');
-      setIsEditing(false);
+      const response = await authApi.updateProfile({
+        name: name || undefined,
+        email: email || undefined,
+      });
 
       if (response.success && response.data?.user) {
         setUser(response.data.user);
+        setSuccess('Profile updated successfully');
+        setIsEditing(false);
+      } else {
+        setError(response.error || 'Failed to update profile');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
@@ -38,8 +40,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8">Profile</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Form */}
@@ -52,7 +54,7 @@ export default function ProfilePage() {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-yellow-600 hover:text-yellow-700 font-medium"
                 >
                   Edit
                 </button>
@@ -96,7 +98,7 @@ export default function ProfilePage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your name"
                 />
               </div>
@@ -110,7 +112,7 @@ export default function ProfilePage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={!isEditing}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email"
                 />
               </div>
@@ -120,7 +122,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium disabled:bg-gray-300"
+                    className="bg-yellow-500 text-gray-900 px-6 py-2 rounded-md hover:bg-yellow-600 font-medium disabled:bg-gray-300"
                   >
                     {isLoading ? 'Saving...' : 'Save Changes'}
                   </button>

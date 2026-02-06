@@ -9,14 +9,14 @@ export function middleware(request: NextRequest) {
   const publicPaths = ['/login', '/verify-otp'];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
-  // If no token and trying to access protected route, redirect to login
-  if (!hasToken && !isPublicPath && pathname !== '/') {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // If authenticated and on root or public path, redirect to dashboard
+  if (hasToken && (pathname === '/' || isPublicPath)) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // If has token and trying to access auth pages, redirect to dashboard
-  if (hasToken && isPublicPath) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // If not authenticated and trying to access protected route (including root), redirect to login
+  if (!hasToken && !isPublicPath) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();

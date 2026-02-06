@@ -167,7 +167,7 @@ export default function SettingsPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   required
                 />
               </div>
@@ -180,7 +180,7 @@ export default function SettingsPage() {
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                 />
               </div>
 
@@ -198,7 +198,7 @@ export default function SettingsPage() {
                         px-4 py-2 rounded-lg text-sm font-medium transition-colors
                         ${
                           formData.cuisineType.includes(cuisine)
-                            ? 'bg-primary-600 text-white'
+                            ? 'bg-yellow-500 text-gray-900'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }
                       `}
@@ -218,7 +218,7 @@ export default function SettingsPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                     required
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function SettingsPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   />
                 </div>
               </div>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
                     type="time"
                     value={formData.opensAt}
                     onChange={(e) => handleChange('opensAt', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                     required
                   />
                 </div>
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                     type="time"
                     value={formData.closesAt}
                     onChange={(e) => handleChange('closesAt', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                     required
                   />
                 </div>
@@ -274,7 +274,7 @@ export default function SettingsPage() {
                     min="0"
                     value={formData.minOrderAmount}
                     onChange={(e) => handleChange('minOrderAmount', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   />
                 </div>
 
@@ -287,7 +287,7 @@ export default function SettingsPage() {
                     min="0"
                     value={formData.deliveryFee}
                     onChange={(e) => handleChange('deliveryFee', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                   />
                 </div>
 
@@ -300,7 +300,7 @@ export default function SettingsPage() {
                     min="10"
                     value={formData.estimatedDeliveryTime}
                     onChange={(e) => handleChange('estimatedDeliveryTime', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
                     required
                   />
                 </div>
@@ -328,7 +328,7 @@ export default function SettingsPage() {
                     id="isActive"
                     checked={formData.isActive}
                     onChange={(e) => handleChange('isActive', e.target.checked)}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    className="w-4 h-4 text-yellow-500 border-gray-300 rounded focus:ring-yellow-500"
                   />
                   <label htmlFor="isActive" className="ml-2 text-sm font-medium text-gray-700">
                     Restaurant is active (Account status)
@@ -367,7 +367,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
+                className="w-full bg-yellow-500 text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 disabled:opacity-50 transition-colors"
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>

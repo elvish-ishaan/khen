@@ -108,7 +108,7 @@ export function ReviewForm({
             placeholder="Share your experience with this restaurant..."
             rows={4}
             maxLength={500}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
           />
           <p className="text-sm text-gray-500 mt-1">
             {comment.length}/500 characters
@@ -126,7 +126,7 @@ export function ReviewForm({
         <button
           type="submit"
           disabled={isSubmitting || rating === 0}
-          className="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
+          className="w-full bg-yellow-500 text-gray-900 px-6 py-3 rounded-md hover:bg-yellow-600 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Review'}
         </button>

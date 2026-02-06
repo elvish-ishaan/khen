@@ -34,7 +34,7 @@ export default function DashboardLayout({
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-8">
               <Link href="/dashboard" className="flex items-center">
-                <h1 className="text-xl font-bold text-primary-600">Khen Restaurant</h1>
+                <h1 className="text-xl font-bold text-yellow-600">Khen Restaurant</h1>
               </Link>
 
               <div className="hidden md:flex items-center space-x-1">
@@ -46,8 +46,8 @@ export default function DashboardLayout({
                       px-4 py-2 rounded-lg font-medium text-sm transition-colors
                       ${
                         isActive(item.href)
-                          ? 'bg-primary-50 text-primary-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'bg-yellow-50 text-yellow-700'
+                          : 'text-gray-700 hover:bg-yellow-50 hover:text-yellow-600'
                       }
                     `}
                   >
@@ -87,8 +87,8 @@ export default function DashboardLayout({
                   px-3 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap
                   ${
                     isActive(item.href)
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-yellow-50 text-yellow-700'
+                      : 'text-gray-700 hover:bg-yellow-50 hover:text-yellow-600'
                   }
                 `}
               >
