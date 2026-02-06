@@ -5,9 +5,13 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { errorHandler } from './middleware/error-handler';
 import { generalLimiter } from './middleware/rate-limiter';
+import { corsMiddleware } from './middleware/cors';
 import routes from './routes';
 
 const app = express();
+
+// CORS middleware (must be before routes)
+app.use(corsMiddleware);
 
 // Security middleware
 app.use(helmet());

@@ -108,18 +108,20 @@ export default function VerifyOtpPage() {
         // Redirect based on onboarding status
         const status = response.data.owner.onboardingStatus;
 
+        // Use window.location.href to force a full page reload
+        // This ensures the cookie is properly sent with the next request
         if (status === 'COMPLETED') {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         } else if (status === 'PENDING_DOCUMENTS') {
-          router.push('/documents');
+          window.location.href = '/documents';
         } else if (status === 'PENDING_BANK_DETAILS') {
-          router.push('/bank-details');
+          window.location.href = '/bank-details';
         } else if (status === 'PENDING_MENU') {
-          router.push('/restaurant-info');
+          window.location.href = '/restaurant-info';
         } else if (status === 'PENDING_LOCATION') {
-          router.push('/menu');
+          window.location.href = '/menu';
         } else {
-          router.push('/documents'); // Default to first step
+          window.location.href = '/documents'; // Default to first step
         }
       } else {
         setError(response.error || 'Invalid OTP');
