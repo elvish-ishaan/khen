@@ -5,6 +5,7 @@ import { sendOtpSchema, verifyOtpSchema } from '../validators/auth.validator';
 import { sendOtp, verifyOtp } from '../services/msg91.service';
 import { generateToken, getTokenExpiry } from '../services/jwt.service';
 import { AppError, asyncHandler } from '../middleware/error-handler';
+import { env } from '../config/env';
 
 export const sendOtpHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
@@ -124,14 +125,15 @@ export const verifyOtpHandler = asyncHandler(
     // Set cookie
     const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'lax' : 'lax', // Use 'lax' for same-site subdomains
       maxAge: getTokenExpiry(),
       path: '/',
     };
 
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    // Set cookie domain for subdomain sharing (e.g., .dryink.space)
+    if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
+      cookieOptions.domain = env.COOKIE_DOMAIN;
     }
 
     res.cookie('auth_token', token, cookieOptions);
@@ -155,13 +157,13 @@ export const logoutHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'lax' : 'lax',
       path: '/',
     };
 
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
+      cookieOptions.domain = env.COOKIE_DOMAIN;
     }
 
     res.clearCookie('auth_token', cookieOptions);

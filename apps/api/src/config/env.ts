@@ -13,6 +13,7 @@ const envSchema = z.object({
     .string()
     .default('http://localhost:3000,http://localhost:3001,http://localhost:3002')
     .transform((val) => val.split(',').map((origin) => origin.trim())),
+  COOKIE_DOMAIN: z.string().optional(), // e.g., .dryink.space for subdomain sharing
   MSG91_AUTH_KEY: z.string().optional(),
   MSG91_TEMPLATE_ID: z.string().optional(),
   MSG91_SENDER_ID: z.string().default('KHENFD'),

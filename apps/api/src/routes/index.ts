@@ -14,6 +14,7 @@ import restaurantManageRoutes from './restaurant-manage.routes';
 import logisticsAuthRoutes from './logistics-auth.routes';
 import logisticsOnboardingRoutes from './logistics-onboarding.routes';
 import logisticsRoutes from './logistics.routes';
+import testRoutes from './test.routes'; // DELETE after debugging
 
 const router = Router();
 
@@ -37,5 +38,8 @@ router.use('/restaurant-manage', restaurantManageRoutes);
 router.use('/logistics-auth', logisticsAuthRoutes);
 router.use('/logistics-onboarding', logisticsOnboardingRoutes);
 router.use('/logistics', logisticsRoutes);
+
+// Debug routes - DELETE after debugging
+router.use('/test', testRoutes);
 
 export default router;

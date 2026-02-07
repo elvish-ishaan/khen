@@ -14,6 +14,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const authToken = request.cookies.get('auth_token');
 
+  // Debug logging (remove after fixing)
+  if (pathname.startsWith('/cart') || pathname.startsWith('/orders') || pathname.startsWith('/profile')) {
+    console.log('🔍 Middleware Debug:', {
+      pathname,
+      hasAuthToken: !!authToken,
+      allCookies: request.cookies.getAll().map(c => ({ name: c.name, hasValue: !!c.value })),
+    });
+  }
+
   // Check if the current path is protected
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
@@ -24,6 +33,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect to login if accessing protected route without auth
   if (isProtectedRoute && !authToken) {
+    console.log('⚠️ Redirecting to login - no auth token found');
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
