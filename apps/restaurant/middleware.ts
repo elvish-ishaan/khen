@@ -13,9 +13,9 @@ export function middleware(request: NextRequest) {
   const onboardingPaths = ['/documents', '/bank-details', '/restaurant-info', '/menu', '/location'];
   const isOnboardingPath = onboardingPaths.some((path) => pathname.startsWith(path));
 
-  // If authenticated and on login page or root, redirect to dashboard
-  if (hasToken && (pathname === '/' || pathname.startsWith('/login'))) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // If authenticated and on login page, redirect to root (root page handles smart redirect)
+  if (hasToken && pathname.startsWith('/login')) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // If not authenticated and trying to access protected route, redirect to login

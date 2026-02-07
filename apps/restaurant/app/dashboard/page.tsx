@@ -89,7 +89,20 @@ export default function DashboardPage() {
   // Redirect if onboarding not complete
   useEffect(() => {
     if (owner && owner.onboardingStatus !== 'COMPLETED') {
-      router.push('/documents');
+      const status = owner.onboardingStatus;
+
+      // Redirect to appropriate onboarding step
+      if (status === 'PENDING_DOCUMENTS') {
+        router.push('/documents');
+      } else if (status === 'PENDING_BANK_DETAILS') {
+        router.push('/bank-details');
+      } else if (status === 'PENDING_MENU') {
+        router.push('/restaurant-info');
+      } else if (status === 'PENDING_LOCATION') {
+        router.push('/menu');
+      } else {
+        router.push('/documents'); // Default to first step
+      }
     }
   }, [owner, router]);
 

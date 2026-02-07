@@ -74,7 +74,7 @@ export default function DeliveryDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACCEPTED':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-primary';
       case 'PICKED_UP':
         return 'bg-purple-100 text-purple-800';
       case 'IN_TRANSIT':
@@ -85,7 +85,7 @@ export default function DeliveryDetailPage() {
   };
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       <button
         onClick={() => router.push('/dashboard/deliveries')}
         className="mb-6 text-gray-600 hover:text-gray-900 font-medium"
@@ -93,11 +93,11 @@ export default function DeliveryDetailPage() {
         ← Back to Active Deliveries
       </button>
 
-      <div className="bg-white rounded-lg shadow-md p-8">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8 pb-6 border-b">
+        <div className="flex flex-col sm:flex-row justify-between items-start mb-6 sm:mb-8 pb-4 sm:pb-6 border-b gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
               Order #{delivery.order.orderNumber}
             </h1>
             <span
@@ -108,15 +108,15 @@ export default function DeliveryDetailPage() {
               {delivery.status.replace('_', ' ')}
             </span>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-green-600">₹{delivery.earnings}</div>
-            <div className="text-sm text-gray-500">Your earnings</div>
+          <div className="text-left sm:text-right">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">₹{delivery.earnings}</div>
+            <div className="text-xs sm:text-sm text-gray-500">Your earnings</div>
           </div>
         </div>
 
         {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center justify-between overflow-x-auto">
             <div className="flex flex-col items-center flex-1">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -178,8 +178,8 @@ export default function DeliveryDetailPage() {
         )}
 
         {/* Restaurant Info */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Pickup Location</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Pickup Location</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="font-semibold text-lg mb-2">
               {delivery.order.restaurant.name}
@@ -189,7 +189,7 @@ export default function DeliveryDetailPage() {
             {delivery.order.restaurant.phone && (
               <a
                 href={`tel:${delivery.order.restaurant.phone}`}
-                className="inline-block mt-2 text-blue-600 hover:text-blue-700"
+                className="inline-block mt-2 text-primary hover:text-blue-700"
               >
                 📞 {delivery.order.restaurant.phone}
               </a>
@@ -198,8 +198,8 @@ export default function DeliveryDetailPage() {
         </div>
 
         {/* Delivery Address */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Delivery Location</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Delivery Location</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-900">{delivery.order.address.addressLine1}</p>
             {delivery.order.address.addressLine2 && (
@@ -218,9 +218,9 @@ export default function DeliveryDetailPage() {
         </div>
 
         {/* Customer Contact - Only visible after pickup */}
-        <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-bold mb-4">Customer Contact</h2>
+        <div className="mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Customer Contact</h2>
 
             {/* Debug info */}
             <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
@@ -247,7 +247,7 @@ export default function DeliveryDetailPage() {
                     <span className="text-sm font-medium text-gray-700">Phone:</span>
                     <a
                       href={`tel:${delivery.order.user.phone}`}
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                      className="text-sm text-primary hover:text-primary hover:underline"
                     >
                       {delivery.order.user.phone}
                     </a>
@@ -280,8 +280,8 @@ export default function DeliveryDetailPage() {
         </div>
 
         {/* Order Items */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Order Items</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Order Items</h2>
           <div className="space-y-3">
             {delivery.order.items?.map((item: any) => (
               <div

@@ -71,7 +71,7 @@ export default function OrderDetailPage() {
           <div className="text-gray-500 mb-4">{error || 'Order not found'}</div>
           <button
             onClick={() => router.push('/dashboard/orders')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
           >
             Back to Available Orders
           </button>
@@ -81,7 +81,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       <button
         onClick={() => router.push('/dashboard/orders')}
         className="mb-6 text-gray-600 hover:text-gray-900 font-medium"
@@ -95,15 +95,15 @@ export default function OrderDetailPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-8">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8 pb-6 border-b">
+        <div className="flex flex-col sm:flex-row justify-between items-start mb-6 sm:mb-8 pb-4 sm:pb-6 border-b gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Order #{order.orderNumber}</h1>
-            <p className="text-gray-600">Ready for pickup</p>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Order #{order.orderNumber}</h1>
+            <p className="text-sm sm:text-base text-gray-600">Ready for pickup</p>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-green-600">
+          <div className="text-left sm:text-right">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">
               ₹{order.estimatedEarnings?.toFixed(2) || 0}
             </div>
             <div className="text-sm text-gray-500">Estimated earnings</div>
@@ -111,10 +111,10 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Distance Info */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-sm text-blue-600 mb-1">Distance to Restaurant</div>
-            <div className="text-2xl font-bold text-blue-900">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-accent p-4 rounded-lg">
+            <div className="text-sm text-primary mb-1">Distance to Restaurant</div>
+            <div className="text-2xl font-bold text-primary">
               {order.distanceToRestaurant?.toFixed(1)} km
             </div>
           </div>
@@ -130,8 +130,8 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Restaurant Info */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Pickup Location</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Pickup Location</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="font-semibold text-lg mb-2">{order.restaurant.name}</div>
             <p className="text-gray-600">{order.restaurant.addressLine1}</p>
@@ -145,8 +145,8 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Delivery Address */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Delivery Location</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Delivery Location</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-900">{order.address.addressLine1}</p>
             {order.address.addressLine2 && (
@@ -164,8 +164,8 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Order Items */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Order Items</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Order Items</h2>
           <div className="space-y-3">
             {order.items?.map((item: any) => (
               <div
@@ -189,8 +189,8 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Payment Info */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Payment Details</h2>
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Payment Details</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm">
               <span className="font-medium">Payment Method:</span> {order.paymentMethod}

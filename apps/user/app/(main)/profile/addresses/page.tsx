@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addressesApi, type Address } from '@/lib/api/addresses.api';
 import { LocationPicker } from '@/components/maps/location-picker';
+import { getCurrentLocationAddress } from '@/lib/utils/geocoding';
 
 export default function AddressesPage() {
   const router = useRouter();
@@ -12,6 +13,8 @@ export default function AddressesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [isUsingLocation, setIsUsingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     label: '',
@@ -98,12 +101,105 @@ export default function AddressesPage() {
     setShowForm(true);
   };
 
-  const handleLocationSelect = (lat: number, lng: number) => {
-    setFormData({
-      ...formData,
+  const handleLocationSelect = async (lat: number, lng: number) => {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+    if (!apiKey) {
+      setLocationError('Google Maps API key is not configured');
+      return;
+    }
+
+    // First set coordinates
+    setFormData((prev) => ({
+      ...prev,
       latitude: lat,
       longitude: lng,
-    });
+    }));
+
+    // Then reverse geocode to get address details
+    setIsUsingLocation(true);
+
+    try {
+      const { reverseGeocode } = await import('@/lib/utils/geocoding');
+      const result = await reverseGeocode(lat, lng, apiKey);
+
+      if (result.success && result.address) {
+        // Auto-fill form with reverse geocoded address
+        setFormData((prev) => ({
+          ...prev,
+          addressLine1: result.address!.addressLine1 || prev.addressLine1,
+          addressLine2: result.address!.addressLine2 || prev.addressLine2,
+          landmark: result.address!.landmark || prev.landmark,
+          city: result.address!.city || prev.city,
+          state: result.address!.state || prev.state,
+          postalCode: result.address!.postalCode || prev.postalCode,
+          latitude: lat,
+          longitude: lng,
+        }));
+
+        setLocationError(null);
+      } else {
+        setLocationError(result.error || 'Failed to get address details');
+      }
+    } catch (err) {
+      console.error('Error reverse geocoding:', err);
+      setLocationError('Failed to get address details. Please fill manually.');
+    } finally {
+      setIsUsingLocation(false);
+    }
+  };
+
+  const handleUseCurrentLocation = async () => {
+    setIsUsingLocation(true);
+    setLocationError(null);
+
+    // Get current location first
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setIsUsingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        // Set initial coordinates and open map picker
+        setFormData({
+          ...formData,
+          latitude: lat,
+          longitude: lng,
+        });
+
+        setIsUsingLocation(false);
+        // Open map picker for user to adjust if needed
+        setShowLocationPicker(true);
+      },
+      (error) => {
+        let errorMessage = 'Failed to get location';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out';
+            break;
+        }
+
+        setLocationError(errorMessage);
+        setIsUsingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
   };
 
   const resetForm = () => {
@@ -118,6 +214,7 @@ export default function AddressesPage() {
       latitude: undefined,
       longitude: undefined,
     });
+    setLocationError(null);
   };
 
   if (isLoading) {
@@ -158,6 +255,108 @@ export default function AddressesPage() {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Use Current Location Button */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                    Quick Fill with Current Location
+                  </h3>
+                  <p className="text-xs text-gray-600">
+                    Automatically detect and fill your address details using your current location
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleUseCurrentLocation}
+                  disabled={isUsingLocation}
+                  className="w-full sm:w-auto bg-yellow-500 text-gray-900 px-4 py-2.5 rounded-md hover:bg-yellow-600 font-medium flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {isUsingLocation ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>Getting Location...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <span>Use Current Location</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Location Error Message */}
+              {locationError && (
+                <div className="mt-3 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-xs">
+                  <strong>Error:</strong> {locationError}
+                  <br />
+                  <span className="text-red-600">You can still enter the address manually below.</span>
+                </div>
+              )}
+
+              {/* Success indicator */}
+              {formData.latitude && formData.longitude && !locationError && !isUsingLocation && (
+                <div className="mt-3 bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded text-xs">
+                  <div className="flex items-start gap-2">
+                    <svg
+                      className="w-4 h-4 flex-shrink-0 mt-0.5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <div className="flex-1">
+                      <div className="font-medium">Location set successfully!</div>
+                      <div className="mt-1">
+                        Review and edit the auto-filled address below if needed. You can click "Use Current Location" again to adjust the map marker.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -261,58 +460,6 @@ export default function AddressesPage() {
               </div>
             </div>
 
-            {/* Location Picker Section */}
-            <div className="border-t border-gray-200 pt-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Delivery Location (Optional)
-                </label>
-                {formData.latitude && formData.longitude && (
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                    Location Set
-                  </span>
-                )}
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                Set the exact location on map for accurate delivery
-              </p>
-
-              <button
-                type="button"
-                onClick={() => setShowLocationPicker(true)}
-                className="w-full md:w-auto bg-yellow-50 text-yellow-600 border border-yellow-200 px-4 py-2 rounded-md hover:bg-yellow-100 flex items-center justify-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                {formData.latitude && formData.longitude
-                  ? 'Update Location on Map'
-                  : 'Set Location on Map'}
-              </button>
-
-              {formData.latitude && formData.longitude && (
-                <div className="mt-2 text-xs font-mono text-gray-600">
-                  <div>Lat: {formData.latitude.toFixed(6)}</div>
-                  <div>Lng: {formData.longitude.toFixed(6)}</div>
-                </div>
-              )}
-            </div>
 
             <div className="flex gap-3">
               <button
@@ -357,15 +504,6 @@ export default function AddressesPage() {
                         Default
                       </span>
                     )}
-                    {address.latitude && address.longitude ? (
-                      <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">
-                        Location Set
-                      </span>
-                    ) : (
-                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
-                        No Location
-                      </span>
-                    )}
                   </div>
                   <p className="text-gray-700">
                     {address.addressLine1}
@@ -377,11 +515,6 @@ export default function AddressesPage() {
                   <p className="text-gray-700">
                     {address.city}, {address.state} - {address.postalCode}
                   </p>
-                  {!address.latitude && !address.longitude && (
-                    <p className="text-amber-600 text-xs mt-1">
-                      Consider setting location for better delivery accuracy
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex flex-col gap-2">

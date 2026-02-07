@@ -40,15 +40,15 @@ export default function AvailableOrdersPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6 flex justify-between items-center">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Available Orders</h1>
-          <p className="mt-2 text-gray-600">Orders within 10km radius</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Available Orders</h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Orders within 10km radius</p>
         </div>
         <button
           onClick={loadOrders}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          className="w-full sm:w-auto px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         >
           Refresh
         </button>
@@ -61,7 +61,7 @@ export default function AvailableOrdersPage() {
       )}
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-12 text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             fill="none"
@@ -88,7 +88,7 @@ export default function AvailableOrdersPage() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-white rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => router.push(`/dashboard/orders/${order.id}`)}
             >
               <div className="flex justify-between items-start mb-4">
@@ -108,7 +108,7 @@ export default function AvailableOrdersPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4">
                 <div>
                   <div className="text-xs text-gray-500 mb-1">Distance to Restaurant</div>
                   <div className="font-medium">{order.distanceToRestaurant?.toFixed(1)} km</div>
@@ -138,7 +138,7 @@ export default function AvailableOrdersPage() {
                     e.stopPropagation();
                     router.push(`/dashboard/orders/${order.id}`);
                   }}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-primary text-white text-sm rounded-md hover:bg-primary/90"
                 >
                   View Details
                 </button>

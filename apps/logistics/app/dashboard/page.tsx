@@ -95,18 +95,31 @@ export default function DashboardPage() {
   }
 
   if (personnel.onboardingStatus !== 'APPROVED') {
+    // If status is PENDING, redirect to pending-review page
+    if (personnel.onboardingStatus === 'PENDING') {
+      router.push('/pending-review');
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600">Redirecting...</p>
+          </div>
+        </div>
+      );
+    }
+
+    // For NOT_STARTED or any other status, redirect to onboarding
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="max-w-md w-full p-6 sm:p-8 bg-white rounded-lg shadow-md">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
             Onboarding Required
           </h2>
-          <p className="text-gray-600 mb-6">
-            Your account is {personnel.onboardingStatus}. Please complete the onboarding process.
+          <p className="text-sm sm:text-base text-gray-600 mb-6">
+            Please complete the onboarding process to access your dashboard.
           </p>
           <button
             onClick={() => router.push('/documents')}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           >
             Continue Onboarding
           </button>
@@ -116,27 +129,26 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+    <div className="max-w-7xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Welcome, {personnel.name || 'Partner'}!
           </h1>
-          <p className="mt-2 text-gray-600">Manage your deliveries and earnings</p>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Manage your deliveries and earnings</p>
         </div>
 
         {/* Duty Toggle */}
-        <div className="mb-8 bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8 bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-semibold">Duty Status</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-base sm:text-lg font-semibold">Duty Status</h3>
+              <p className="text-xs sm:text-sm text-gray-600">
                 {isOnDuty ? 'You are currently on duty' : 'You are currently off duty'}
               </p>
             </div>
             <button
               onClick={handleDutyToggle}
-              className={`px-6 py-2 rounded-md font-medium ${
+              className={`w-full sm:w-auto px-6 py-2 rounded-md font-medium ${
                 isOnDuty
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-green-600 text-white hover:bg-green-700'
@@ -158,10 +170,10 @@ export default function DashboardPage() {
 
         {/* Stats Grid */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-sm font-medium text-gray-600">Today's Earnings</h4>
-              <p className="mt-2 text-3xl font-bold text-gray-900">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+              <h4 className="text-xs sm:text-sm font-medium text-gray-600">Today's Earnings</h4>
+              <p className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">
                 ₹{formatCurrency(stats.today?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
@@ -169,9 +181,9 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-sm font-medium text-gray-600">Weekly Earnings</h4>
-              <p className="mt-2 text-3xl font-bold text-gray-900">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+              <h4 className="text-xs sm:text-sm font-medium text-gray-600">Weekly Earnings</h4>
+              <p className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">
                 ₹{formatCurrency(stats.weekly?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
@@ -179,9 +191,9 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-sm font-medium text-gray-600">Monthly Earnings</h4>
-              <p className="mt-2 text-3xl font-bold text-gray-900">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+              <h4 className="text-xs sm:text-sm font-medium text-gray-600">Monthly Earnings</h4>
+              <p className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">
                 ₹{formatCurrency(stats.monthly?.earnings || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">
@@ -189,9 +201,9 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h4 className="text-sm font-medium text-gray-600">Pending Balance</h4>
-              <p className="mt-2 text-3xl font-bold text-green-600">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+              <h4 className="text-xs sm:text-sm font-medium text-gray-600">Pending Balance</h4>
+              <p className="mt-2 text-2xl sm:text-3xl font-bold text-green-600">
                 ₹{formatCurrency(stats.pendingBalance || 0)}
               </p>
               <p className="mt-1 text-sm text-gray-600">Available for withdrawal</p>
@@ -200,10 +212,10 @@ export default function DashboardPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <button
             onClick={() => router.push('/dashboard/orders')}
-            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
           >
             <h3 className="text-lg font-semibold text-gray-900">Available Orders</h3>
             <p className="mt-2 text-sm text-gray-600">
@@ -213,7 +225,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/dashboard/deliveries')}
-            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
           >
             <h3 className="text-lg font-semibold text-gray-900">Active Deliveries</h3>
             <p className="mt-2 text-sm text-gray-600">
@@ -223,7 +235,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/dashboard/earnings')}
-            className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
+            className="bg-white p-4 sm:p-6 rounded-lg shadow hover:shadow-lg transition-shadow text-left"
           >
             <h3 className="text-lg font-semibold text-gray-900">Earnings</h3>
             <p className="mt-2 text-sm text-gray-600">
@@ -231,7 +243,6 @@ export default function DashboardPage() {
             </p>
           </button>
         </div>
-      </div>
     </div>
   );
 }

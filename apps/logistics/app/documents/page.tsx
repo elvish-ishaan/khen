@@ -36,20 +36,20 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Document Verification</h1>
-            <p className="mt-2 text-gray-600">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Document Verification</h1>
+            <p className="mt-2 text-sm sm:text-base text-gray-600">
               Please provide your Aadhar card, driving license, and vehicle details
             </p>
-            <div className="mt-4 flex items-center">
+            <div className="mt-4 hidden sm:flex items-center">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center">
                   1
                 </div>
-                <span className="ml-2 font-medium text-blue-600">Documents</span>
+                <span className="ml-2 font-medium text-primary">Documents</span>
               </div>
               <div className="mx-4 flex-1 border-t-2 border-gray-300"></div>
               <div className="flex items-center">
@@ -68,7 +68,7 @@ export default function DocumentsPage() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
                 {error}
@@ -86,7 +86,7 @@ export default function DocumentsPage() {
                   <input
                     type="text"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter 12-digit Aadhar number"
                     value={formData.aadharNumber}
                     onChange={(e) =>
@@ -102,7 +102,7 @@ export default function DocumentsPage() {
                   <input
                     type="url"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="https://example.com/aadhar.jpg"
                     value={formData.aadharFileUrl}
                     onChange={(e) => setFormData({ ...formData, aadharFileUrl: e.target.value })}
@@ -125,7 +125,7 @@ export default function DocumentsPage() {
                   <input
                     type="text"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="Enter driving license number"
                     value={formData.dlNumber}
                     onChange={(e) => setFormData({ ...formData, dlNumber: e.target.value })}
@@ -138,7 +138,7 @@ export default function DocumentsPage() {
                   <input
                     type="url"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="https://example.com/dl.jpg"
                     value={formData.dlFileUrl}
                     onChange={(e) => setFormData({ ...formData, dlFileUrl: e.target.value })}
@@ -160,7 +160,7 @@ export default function DocumentsPage() {
                   </label>
                   <select
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     value={formData.vehicleType}
                     onChange={(e) => setFormData({ ...formData, vehicleType: e.target.value })}
                   >
@@ -177,7 +177,7 @@ export default function DocumentsPage() {
                   <input
                     type="text"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                     placeholder="e.g., MH01AB1234"
                     value={formData.vehicleNumber}
                     onChange={(e) =>
@@ -191,7 +191,7 @@ export default function DocumentsPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Submitting...' : 'Continue to Bank Details'}
             </button>

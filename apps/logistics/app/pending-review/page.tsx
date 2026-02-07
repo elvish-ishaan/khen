@@ -25,11 +25,11 @@ export default function PendingReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
               <svg
                 className="w-8 h-8 text-yellow-600"
                 fill="none"
@@ -44,14 +44,14 @@ export default function PendingReviewPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Application Under Review</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Application Under Review</h1>
+            <p className="mt-2 text-sm sm:text-base text-gray-600">
               Your application is being reviewed by our team
             </p>
           </div>
 
           <div className="border-t border-gray-200 pt-6">
-            <div className="flex items-center mb-6">
+            <div className="hidden sm:flex items-center mb-6">
               <div className="flex items-center">
                 <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center">
                   ✓
@@ -158,11 +158,20 @@ export default function PendingReviewPage() {
               </div>
             </div>
 
+            <div className="mt-6 bg-gray-50 border border-gray-200 rounded-md p-4 text-center">
+              <p className="text-sm text-gray-700 font-medium">
+                Dashboard access will be enabled once your application is approved
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                You will receive a notification when your account is activated
+              </p>
+            </div>
+
             <button
-              onClick={() => router.push('/dashboard')}
-              className="mt-6 w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              onClick={() => router.push('/login')}
+              className="mt-4 w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              Go to Dashboard
+              Back to Login
             </button>
           </div>
         </div>
