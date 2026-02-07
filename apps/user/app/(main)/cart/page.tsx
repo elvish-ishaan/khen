@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Trash2 } from 'lucide-react';
+import { ShoppingCart, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/stores/cart-store';
 
 export default function CartPage() {
@@ -15,7 +15,6 @@ export default function CartPage() {
     fetchCart,
     updateQuantity,
     removeItem,
-    clearCart,
     isLoading,
   } = useCartStore();
 
@@ -25,9 +24,9 @@ export default function CartPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4" />
+      <div className="min-h-screen bg-white px-4 py-8">
+        <div className="animate-pulse space-y-4 max-w-lg mx-auto">
+          <div className="h-8 bg-gray-200 rounded w-1/2" />
           {[...Array(3)].map((_, i) => (
             <div key={i} className="h-24 bg-gray-200 rounded" />
           ))}
@@ -38,17 +37,20 @@ export default function CartPage() {
 
   if (!cart || itemCount === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
-        <div className="text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+      <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-400 px-4 py-12 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <ShoppingBag className="w-16 h-16 text-yellow-500" />
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-3">
             Your cart is empty
           </h2>
-          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
-            Add items from restaurants to get started
+          <p className="text-white/90 mb-8 text-lg">
+            Add delicious items to get started!
           </p>
           <Link
             href="/"
-            className="inline-block bg-yellow-500 text-gray-900 px-6 py-3 rounded-md hover:bg-yellow-600 font-medium"
+            className="inline-block bg-white text-yellow-600 px-8 py-4 rounded-full hover:bg-yellow-50 font-bold text-lg shadow-xl transition-all hover:scale-105"
           >
             Browse Restaurants
           </Link>
@@ -58,112 +60,92 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Your Cart</h1>
-        <button
-          onClick={clearCart}
-          className="text-red-600 hover:text-red-700 text-xs sm:text-sm font-medium"
-        >
-          Clear Cart
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        {/* Restaurant Info */}
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <Link
-            href={`/restaurant/${cart.restaurant.slug}`}
-            className="flex items-center gap-4 hover:opacity-80"
-          >
-            {cart.restaurant.imageUrl && (
-              <img
-                src={cart.restaurant.imageUrl}
-                alt={cart.restaurant.name}
-                className="w-16 h-16 object-cover rounded-lg"
-              />
-            )}
-            <div>
-              <h3 className="font-semibold text-gray-900">
-                {cart.restaurant.name}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {cart.restaurant.estimatedDeliveryTime} mins
-              </p>
-            </div>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-24">
+        {/* Item Count */}
+        <p className="text-gray-700 text-lg mb-6">
+          You have <span className="font-bold text-gray-900">{itemCount}</span>{' '}
+          {itemCount === 1 ? 'item' : 'items'} in the cart
+        </p>
 
         {/* Cart Items */}
-        {cart.items.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-lg shadow-md p-4 flex gap-4"
-          >
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 mb-1">
-                {item.menuItem.name}
-              </h3>
-              <p className="text-gray-600 mb-2">
-                ₹{item.menuItem.price} × {item.quantity}
-              </p>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() =>
-                    item.quantity === 1
-                      ? removeItem(item.id)
-                      : updateQuantity(item.id, item.quantity - 1)
-                  }
-                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 hover:border-red-400 hover:text-red-600 transition-colors"
-                  title={item.quantity === 1 ? 'Remove item' : 'Decrease quantity'}
-                >
-                  {item.quantity === 1 ? (
-                    <Trash2 className="w-4 h-4" />
+        <div className="space-y-4 mb-6">
+          {cart.items.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex gap-4 items-center">
+                {/* Item Image */}
+                <div className="flex-shrink-0">
+                  {item.menuItem.imageUrl ? (
+                    <img
+                      src={item.menuItem.imageUrl}
+                      alt={item.menuItem.name}
+                      className="w-20 h-20 object-cover rounded-xl"
+                    />
                   ) : (
-                    '-'
+                    <div className="w-20 h-20 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <ShoppingBag className="w-8 h-8 text-gray-400" />
+                    </div>
                   )}
-                </button>
-                <span className="font-medium">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                >
-                  +
-                </button>
+                </div>
+
+                {/* Item Details */}
+                <div className="flex-1">
+                  <h3 className="text-gray-900 font-semibold text-base mb-1">
+                    {item.menuItem.name}
+                  </h3>
+                  <p className="text-gray-900 font-bold text-lg">
+                    ₹{item.menuItem.price.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* Quantity Controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      item.quantity === 1
+                        ? removeItem(item.id)
+                        : updateQuantity(item.id, item.quantity - 1)
+                    }
+                    className="bg-yellow-100 text-yellow-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-yellow-200 transition-all font-bold border border-yellow-300"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="text-gray-900 font-bold min-w-[24px] text-center">
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    className="bg-yellow-100 text-yellow-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-yellow-200 transition-all font-bold border border-yellow-300"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
+          ))}
+        </div>
 
-            <div className="flex flex-col items-end justify-between">
-              <button
-                onClick={() => removeItem(item.id)}
-                className="text-red-600 hover:text-red-700 text-sm"
-              >
-                Remove
-              </button>
-              <p className="font-bold text-gray-900">
-                ₹{(item.menuItem.price * item.quantity).toFixed(2)}
-              </p>
-            </div>
+        {/* Minimum Order Warning */}
+        {subtotal < cart.restaurant.minOrderAmount && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl text-sm mb-4 text-center">
+            Add ₹{(cart.restaurant.minOrderAmount - subtotal).toFixed(2)} more to meet minimum order amount
           </div>
-        ))}
+        )}
 
-        {/* Checkout Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {subtotal < cart.restaurant.minOrderAmount && (
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-md text-sm mb-4">
-              Add ₹{(cart.restaurant.minOrderAmount - subtotal).toFixed(2)} more to
-              meet minimum order
-            </div>
-          )}
-
-          <button
-            onClick={() => router.push('/checkout')}
-            disabled={subtotal < cart.restaurant.minOrderAmount}
-            className="w-full bg-yellow-500 text-gray-900 py-3 rounded-md hover:bg-yellow-600 font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            Proceed to Checkout
-          </button>
+        {/* Checkout Button - Fixed at bottom */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+          <div className="max-w-2xl mx-auto">
+            <button
+              onClick={() => router.push('/checkout')}
+              disabled={subtotal < cart.restaurant.minOrderAmount}
+              className="w-full bg-yellow-500 text-gray-900 py-4 rounded-full hover:bg-yellow-600 font-bold text-lg shadow-lg transition-all hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:text-gray-600"
+            >
+              Checkout
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -35,7 +35,8 @@
       "Bash(Select-String -Pattern \"primary-\")",
       "Bash(Select-Object -First 20)",
       "Bash(pnpm --filter restaurant build:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(pnpm --filter user run build)"
     ]
   }
 }

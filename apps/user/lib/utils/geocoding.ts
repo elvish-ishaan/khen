@@ -142,7 +142,7 @@ export async function reverseGeocode(
     // Step 3: Find state index in addressParts
     let stateIndex = -1;
     if (addressData.state) {
-      stateIndex = addressParts.findIndex(p => p === addressData.state);
+      stateIndex = addressParts.findIndex((p: string) => p === addressData.state);
     }
 
     // Step 4: Extract landmark (parts that start with "near", "near to", "opposite", etc.)
@@ -174,7 +174,7 @@ export async function reverseGeocode(
     // Step 6: Find city index
     let cityIndex = -1;
     if (addressData.city) {
-      cityIndex = addressParts.findIndex(p => p === addressData.city);
+      cityIndex = addressParts.findIndex((p: string) => p === addressData.city);
     }
 
     // Step 7: Extract addressLine1 and addressLine2
