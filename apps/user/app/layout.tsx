@@ -20,10 +20,10 @@ export const metadata: Metadata = {
 	title: 'Daavat - Food Delivery',
 	description: 'Order food from your favorite restaurants with Daavat',
 	manifest: '/manifest.webmanifest',
-	themeColor: '#000000',
+	themeColor: '#f59e0b',
 	appleWebApp: {
 		capable: true,
-		statusBarStyle: 'default',
+		statusBarStyle: 'black-translucent',
 		title: 'Daavat',
 	},
 	formatDetection: {
