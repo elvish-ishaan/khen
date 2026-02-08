@@ -4,8 +4,8 @@
   "description": "Order food from your favorite restaurants with Daavat",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#faa60a",
+  "theme_color": "#faa60a",
   "orientation": "portrait",
   "icons": [
     {
