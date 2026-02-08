@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Phone, ArrowRight } from 'lucide-react';
 import { authApi } from '@/lib/api/auth.api';
+import { Button } from '@/components/ui/button';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,14 +43,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 to-white px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">
-              <span className="text-2xl font-bold text-gray-900">K</span>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mb-4 shadow-lg">
+              <span className="text-3xl font-bold text-white">K</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Restaurant Portal
             </h1>
             <p className="text-gray-600">Sign in to manage your restaurant</p>
@@ -91,13 +93,18 @@ export default function LoginPage() {
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
-          disabled={isLoading || phone.length !== 10}
-          className="w-full bg-yellow-500 text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          variant="primary"
+          size="lg"
+          icon={ArrowRight}
+          iconPosition="right"
+          disabled={phone.length !== 10}
+          isLoading={isLoading}
+          className="w-full"
         >
-          {isLoading ? 'Sending OTP...' : 'Send OTP'}
-        </button>
+          Send OTP
+        </Button>
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>Development Mode: OTP will be 123456</p>

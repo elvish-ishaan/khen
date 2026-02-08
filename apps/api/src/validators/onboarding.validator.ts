@@ -24,11 +24,6 @@ export const restaurantInfoSchema = z.object({
   cuisineType: z.array(z.string()).min(1, 'Select at least one cuisine type'),
   phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
   email: z.string().email().optional(),
-  opensAt: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)'),
-  closesAt: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)'),
-  minOrderAmount: z.number().min(0).optional(),
-  deliveryFee: z.number().min(0).optional(),
-  estimatedDeliveryTime: z.number().int().min(10, 'Minimum 10 minutes'),
 });
 
 export const addCategorySchema = z.object({

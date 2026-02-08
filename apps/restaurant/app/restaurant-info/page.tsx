@@ -32,11 +32,6 @@ export default function RestaurantInfoPage() {
     cuisineType: [] as string[],
     phone: '',
     email: '',
-    opensAt: '09:00',
-    closesAt: '22:00',
-    minOrderAmount: 0,
-    deliveryFee: 0,
-    estimatedDeliveryTime: 30,
   });
 
   const handleChange = (field: string, value: any) => {
@@ -84,11 +79,6 @@ export default function RestaurantInfoPage() {
       submitData.append('cuisineType', JSON.stringify(formData.cuisineType));
       submitData.append('phone', formData.phone);
       if (formData.email) submitData.append('email', formData.email);
-      submitData.append('opensAt', formData.opensAt);
-      submitData.append('closesAt', formData.closesAt);
-      submitData.append('minOrderAmount', formData.minOrderAmount.toString());
-      submitData.append('deliveryFee', formData.deliveryFee.toString());
-      submitData.append('estimatedDeliveryTime', formData.estimatedDeliveryTime.toString());
 
       if (coverImage) {
         submitData.append('coverImage', coverImage);
@@ -201,81 +191,6 @@ export default function RestaurantInfoPage() {
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="restaurant@example.com"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="opensAt" className="block text-sm font-medium text-gray-700 mb-2">
-                Opening Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="opensAt"
-                type="time"
-                value={formData.opensAt}
-                onChange={(e) => handleChange('opensAt', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="closesAt" className="block text-sm font-medium text-gray-700 mb-2">
-                Closing Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="closesAt"
-                type="time"
-                value={formData.closesAt}
-                onChange={(e) => handleChange('closesAt', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="minOrderAmount" className="block text-sm font-medium text-gray-700 mb-2">
-                Min Order (₹)
-              </label>
-              <input
-                id="minOrderAmount"
-                type="number"
-                min="0"
-                value={formData.minOrderAmount}
-                onChange={(e) => handleChange('minOrderAmount', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="deliveryFee" className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Fee (₹)
-              </label>
-              <input
-                id="deliveryFee"
-                type="number"
-                min="0"
-                value={formData.deliveryFee}
-                onChange={(e) => handleChange('deliveryFee', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="estimatedDeliveryTime" className="block text-sm font-medium text-gray-700 mb-2">
-                Delivery Time (min) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="estimatedDeliveryTime"
-                type="number"
-                min="10"
-                value={formData.estimatedDeliveryTime}
-                onChange={(e) => handleChange('estimatedDeliveryTime', Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                required
               />
             </div>
           </div>

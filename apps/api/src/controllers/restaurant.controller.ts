@@ -42,6 +42,24 @@ export const getRestaurantsHandler = asyncHandler(
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
+        {
+          categories: {
+            some: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+        },
+        {
+          categories: {
+            some: {
+              items: {
+                some: {
+                  name: { contains: search, mode: 'insensitive' },
+                },
+              },
+            },
+          },
+        },
       ];
     }
 
@@ -58,15 +76,13 @@ export const getRestaurantsHandler = asyncHandler(
         description: true,
         cuisineType: true,
         imageUrl: true,
+        coverImageUrl: true,
         rating: true,
         totalReviews: true,
-        minOrderAmount: true,
-        deliveryFee: true,
-        estimatedDeliveryTime: true,
+        totalCompletedOrders: true,
         latitude: true,
         longitude: true,
-        opensAt: true,
-        closesAt: true,
+        isAcceptingOrders: true,
       },
       skip: fetchSkip,
       take: fetchLimit,
@@ -148,7 +164,7 @@ export const searchRestaurantsHandler = asyncHandler(
     const { q, latitude, longitude } = restaurantSearchSchema.parse(req.query);
     const radius = 20; // Default 20km radius for search
 
-    // Search in restaurants and menu items
+    // Search in restaurants, categories, and menu items
     const restaurants = await prisma.restaurant.findMany({
       where: {
         isActive: true,
@@ -156,6 +172,13 @@ export const searchRestaurantsHandler = asyncHandler(
         OR: [
           { name: { contains: q, mode: 'insensitive' } },
           { description: { contains: q, mode: 'insensitive' } },
+          {
+            categories: {
+              some: {
+                name: { contains: q, mode: 'insensitive' },
+              },
+            },
+          },
           {
             categories: {
               some: {
@@ -176,12 +199,13 @@ export const searchRestaurantsHandler = asyncHandler(
         description: true,
         cuisineType: true,
         imageUrl: true,
+        coverImageUrl: true,
         rating: true,
         totalReviews: true,
-        deliveryFee: true,
-        estimatedDeliveryTime: true,
+        totalCompletedOrders: true,
         latitude: true,
         longitude: true,
+        isAcceptingOrders: true,
       },
       take: 100, // Fetch more to account for radius filtering
     });

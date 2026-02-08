@@ -105,9 +105,9 @@ function RestaurantRecommendCard({ restaurant }: { restaurant: Restaurant }) {
       <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all group">
         {/* Image with Discount Badge */}
         <div className="relative h-32 bg-gray-200">
-          {restaurant.imageUrl ? (
+          {(restaurant.coverImageUrl || restaurant.imageUrl) ? (
             <img
-              src={restaurant.imageUrl}
+              src={restaurant.coverImageUrl || restaurant.imageUrl || ''}
               alt={restaurant.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             />
@@ -154,12 +154,16 @@ function RestaurantRecommendCard({ restaurant }: { restaurant: Restaurant }) {
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="text-xs text-gray-600">
-              {restaurant.estimatedDeliveryTime} mins
-            </div>
-            <div className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-              ₹{restaurant.minOrderAmount}
-            </div>
+            {restaurant.estimatedDeliveryTime && (
+              <div className="text-xs text-gray-600">
+                {restaurant.estimatedDeliveryTime} mins
+              </div>
+            )}
+            {restaurant.minOrderAmount !== undefined && (
+              <div className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                ₹{restaurant.minOrderAmount}
+              </div>
+            )}
           </div>
 
           {restaurant.distance && (

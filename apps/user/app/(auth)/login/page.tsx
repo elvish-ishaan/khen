@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { authApi } from '@/lib/api/auth.api';
 
 export default function LoginPage() {
@@ -39,8 +40,15 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="inline-block px-6 py-2 bg-yellow-500 rounded-full mb-4">
-            <h1 className="text-4xl font-bold text-gray-900">Khen</h1>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
+              alt="Daavat Logo"
+              width={180}
+              height={70}
+              className="h-16 w-auto object-contain"
+              priority
+            />
           </div>
           <p className="mt-2 text-gray-600">Food delivery made simple</p>
         </div>

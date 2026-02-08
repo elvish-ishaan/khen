@@ -7,18 +7,20 @@ export interface Restaurant {
   description: string | null;
   cuisineType: string[];
   imageUrl: string | null;
+  coverImageUrl?: string | null;
   rating: number;
   totalReviews: number;
   totalCompletedOrders: number;
-  minOrderAmount: number;
-  deliveryFee: number;
-  estimatedDeliveryTime: number;
   latitude: number;
   longitude: number;
-  opensAt: string;
-  closesAt: string;
   isAcceptingOrders: boolean;
   distance?: number;
+  // Legacy fields (removed from new restaurants)
+  minOrderAmount?: number;
+  deliveryFee?: number;
+  estimatedDeliveryTime?: number;
+  opensAt?: string;
+  closesAt?: string;
 }
 
 export interface RestaurantListParams {

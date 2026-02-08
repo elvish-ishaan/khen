@@ -48,10 +48,10 @@ export function RestaurantCard({ restaurant, isFavorite: initialFavorite = false
   return (
     <Link href={`/restaurant/${restaurant.slug}`}>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all hover:border-yellow-500 hover:border-2 border-2 border-transparent">
-        {restaurant.imageUrl && (
+        {(restaurant.coverImageUrl || restaurant.imageUrl) && (
           <div className="relative h-48 bg-gray-200">
             <img
-              src={restaurant.imageUrl}
+              src={restaurant.coverImageUrl || restaurant.imageUrl || ''}
               alt={restaurant.name}
               className="w-full h-full object-cover"
             />
@@ -109,19 +109,27 @@ export function RestaurantCard({ restaurant, isFavorite: initialFavorite = false
               </span>
             </div>
 
-            <div className="text-gray-600">
-              {restaurant.estimatedDeliveryTime} mins
-            </div>
+            {restaurant.estimatedDeliveryTime && (
+              <div className="text-gray-600">
+                {restaurant.estimatedDeliveryTime} mins
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
-            <div className="text-gray-600">
-              Min ₹{restaurant.minOrderAmount}
+          {(restaurant.minOrderAmount || restaurant.deliveryFee) && (
+            <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t">
+              {restaurant.minOrderAmount !== undefined && (
+                <div className="text-gray-600">
+                  Min ₹{restaurant.minOrderAmount}
+                </div>
+              )}
+              {restaurant.deliveryFee !== undefined && (
+                <div className="text-gray-600">
+                  Delivery ₹{restaurant.deliveryFee}
+                </div>
+              )}
             </div>
-            <div className="text-gray-600">
-              Delivery ₹{restaurant.deliveryFee}
-            </div>
-          </div>
+          )}
 
           <div className="text-xs text-gray-500 mt-2 pt-2 border-t">
             {restaurant.totalCompletedOrders}{' '}

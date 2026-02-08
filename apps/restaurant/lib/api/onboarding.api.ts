@@ -23,11 +23,6 @@ export interface RestaurantInfoRequest {
   cuisineType: string[];
   phone: string;
   email?: string;
-  opensAt: string;
-  closesAt: string;
-  minOrderAmount?: number;
-  deliveryFee?: number;
-  estimatedDeliveryTime: number;
 }
 
 export interface CategoryRequest {

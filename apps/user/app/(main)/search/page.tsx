@@ -247,9 +247,9 @@ function RestaurantSearchCard({ restaurant }: { restaurant: Restaurant }) {
       <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all group border border-gray-100">
         {/* Restaurant Image */}
         <div className="relative h-40 bg-gray-200">
-          {restaurant.imageUrl ? (
+          {(restaurant.coverImageUrl || restaurant.imageUrl) ? (
             <img
-              src={restaurant.imageUrl}
+              src={restaurant.coverImageUrl || restaurant.imageUrl || ''}
               alt={restaurant.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
             />
@@ -299,9 +299,11 @@ function RestaurantSearchCard({ restaurant }: { restaurant: Restaurant }) {
               </span>
             </div>
 
-            <div className="text-gray-600">
-              {restaurant.estimatedDeliveryTime} mins
-            </div>
+            {restaurant.estimatedDeliveryTime && (
+              <div className="text-gray-600">
+                {restaurant.estimatedDeliveryTime} mins
+              </div>
+            )}
           </div>
 
           {restaurant.distance && (

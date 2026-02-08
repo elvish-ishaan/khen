@@ -80,8 +80,8 @@ export default function CheckoutPage() {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to calculate delivery fee';
       setFeeError(errorMsg);
-      // Fallback to static fee
-      setDeliveryFee(cart?.restaurant.deliveryFee || 0);
+      // Fallback to 0 since static fee is no longer used
+      setDeliveryFee(0);
       setDeliveryDistance('');
       setDeliveryDuration('');
     } finally {
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: amount * 100,
         currency: 'INR',
-        name: 'Khen Food Delivery',
+        name: 'Daavat Food Delivery',
         description: `Order #${order.orderNumber}`,
         order_id: razorpayOrderId,
         handler: async (response: any) => {

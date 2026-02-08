@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { User, Store, Info, Save, LogOut, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { restaurantApi } from '@/lib/api/restaurant.api';
+import { Button } from '@/components/ui/button';
 
 const cuisineOptions = [
   'Indian',
@@ -32,11 +34,6 @@ export default function SettingsPage() {
     cuisineType: [] as string[],
     phone: '',
     email: '',
-    opensAt: '',
-    closesAt: '',
-    minOrderAmount: 0,
-    deliveryFee: 0,
-    estimatedDeliveryTime: 0,
     isActive: true,
     isAcceptingOrders: true,
   });
@@ -56,14 +53,6 @@ export default function SettingsPage() {
             cuisineType: rest.cuisineType || [],
             phone: rest.phone || '',
             email: rest.email || '',
-            opensAt: rest.opensAt || '',
-            closesAt: rest.closesAt || '',
-            //@ts-ignore
-            minOrderAmount: rest.minOrderAmount || 0,
-            //@ts-ignore
-            deliveryFee: rest.deliveryFee || 0,
-            //@ts-ignore
-            estimatedDeliveryTime: rest.estimatedDeliveryTime || 0,
             isActive: rest.isActive ?? true,
             isAcceptingOrders: rest.isAcceptingOrders ?? true,
           });
@@ -106,11 +95,6 @@ export default function SettingsPage() {
       submitData.append('cuisineType', JSON.stringify(formData.cuisineType));
       submitData.append('phone', formData.phone);
       if (formData.email) submitData.append('email', formData.email);
-      submitData.append('opensAt', formData.opensAt);
-      submitData.append('closesAt', formData.closesAt);
-      submitData.append('minOrderAmount', formData.minOrderAmount.toString());
-      submitData.append('deliveryFee', formData.deliveryFee.toString());
-      submitData.append('estimatedDeliveryTime', formData.estimatedDeliveryTime.toString());
       submitData.append('isActive', formData.isActive.toString());
       submitData.append('isAcceptingOrders', formData.isAcceptingOrders.toString());
 
@@ -155,8 +139,11 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Settings */}
         <div className="lg:col-span-2">
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-6">Restaurant Profile</h2>
+          <div className="bg-white p-8 rounded-xl shadow-md">
+            <div className="flex items-center gap-2 mb-6">
+              <Store className="w-6 h-6 text-yellow-600" />
+              <h2 className="text-2xl font-bold text-gray-900">Restaurant Profile</h2>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -236,76 +223,6 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Opening Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.opensAt}
-                    onChange={(e) => handleChange('opensAt', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Closing Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.closesAt}
-                    onChange={(e) => handleChange('closesAt', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Min Order (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.minOrderAmount}
-                    onChange={(e) => handleChange('minOrderAmount', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Fee (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.deliveryFee}
-                    onChange={(e) => handleChange('deliveryFee', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Time (min)
-                  </label>
-                  <input
-                    type="number"
-                    min="10"
-                    value={formData.estimatedDeliveryTime}
-                    onChange={(e) => handleChange('estimatedDeliveryTime', Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Update Cover Image
@@ -314,10 +231,13 @@ export default function SettingsPage() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100 cursor-pointer"
                 />
                 {coverImage && (
-                  <p className="mt-2 text-sm text-green-600">✓ New image selected</p>
+                  <p className="mt-2 flex items-center gap-1 text-sm text-green-600 font-medium">
+                    <CheckCircle className="w-4 h-4" />
+                    New image selected
+                  </p>
                 )}
               </div>
 
@@ -364,46 +284,57 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <button
+              <Button
                 type="submit"
-                disabled={isSaving}
-                className="w-full bg-yellow-500 text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-yellow-600 disabled:opacity-50 transition-colors"
+                variant="primary"
+                size="lg"
+                icon={Save}
+                isLoading={isSaving}
+                className="w-full"
               >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
+                Save Changes
+              </Button>
             </form>
           </div>
         </div>
 
         {/* Account Section */}
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Account</h2>
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="w-5 h-5 text-gray-600" />
+              <h2 className="text-xl font-bold text-gray-900">Account</h2>
+            </div>
             <div className="space-y-3 text-sm">
               <div>
                 <span className="text-gray-600">Owner:</span>
-                <p className="font-medium">{owner?.name || 'Not set'}</p>
+                <p className="font-medium text-gray-900">{owner?.name || 'Not set'}</p>
               </div>
               <div>
                 <span className="text-gray-600">Phone:</span>
-                <p className="font-medium">{owner?.phone}</p>
+                <p className="font-medium text-gray-900">{owner?.phone}</p>
               </div>
               <div>
                 <span className="text-gray-600">Email:</span>
-                <p className="font-medium">{owner?.email || 'Not set'}</p>
+                <p className="font-medium text-gray-900">{owner?.email || 'Not set'}</p>
               </div>
             </div>
 
-            <button
+            <Button
+              variant="danger"
+              icon={LogOut}
               onClick={handleLogout}
-              className="mt-6 w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+              className="mt-6 w-full"
             >
               Logout
-            </button>
+            </Button>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold mb-4">Restaurant Info</h2>
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <div className="flex items-center gap-2 mb-4">
+              <Info className="w-5 h-5 text-gray-600" />
+              <h2 className="text-xl font-bold text-gray-900">Restaurant Info</h2>
+            </div>
             <div className="space-y-2 text-sm">
               <div>
                 <span className="text-gray-600">Restaurant ID:</span>

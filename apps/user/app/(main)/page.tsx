@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Search, Bell, User, ChevronRight, Menu, X, Home, ShoppingBag, LogOut } from 'lucide-react';
 import { restaurantsApi, type Restaurant } from '@/lib/api/restaurants.api';
 import { useLocationStore } from '@/stores/location-store';
@@ -93,8 +94,15 @@ export default function HomePage() {
       <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 px-4 pt-4 pb-8 rounded-b-[2rem] shadow-lg relative">
         {/* Logo and Menu Button */}
         <div className="flex items-center justify-between mb-4">
-          <Link href="/" className="text-2xl md:text-3xl font-bold text-white">
-            Khen
+          <Link href="/" className="flex items-center">
+            <Image
+              src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
+              alt="Daavat Logo"
+              width={120}
+              height={32}
+              className="h-10 md:h-12 w-auto object-contain"
+              priority
+            />
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

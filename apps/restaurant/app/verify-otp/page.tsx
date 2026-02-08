@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { authApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
+import { Button } from '@/components/ui/button';
 
 export default function VerifyOtpPage() {
   const router = useRouter();
@@ -168,20 +170,20 @@ export default function VerifyOtpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 to-white px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white p-8 rounded-lg shadow-md">
+        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-500 rounded-full mb-4">
-              <span className="text-2xl font-bold text-gray-900">K</span>
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mb-4 shadow-lg">
+              <span className="text-3xl font-bold text-white">K</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Verify OTP
             </h1>
             <p className="text-gray-600">
               Enter the 6-digit code sent to
             </p>
-            <p className="text-yellow-600 font-medium">+91 {phone}</p>
+            <p className="text-yellow-600 font-semibold mt-1">+91 {phone}</p>
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
@@ -249,38 +251,45 @@ export default function VerifyOtpPage() {
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
-          disabled={isLoading || otp.length !== 6}
-          className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          variant="primary"
+          size="lg"
+          icon={CheckCircle}
+          iconPosition="right"
+          disabled={otp.join('').length !== 6}
+          isLoading={isLoading}
+          className="w-full"
         >
-          {isLoading ? 'Verifying...' : 'Verify & Continue'}
-        </button>
+          Verify & Continue
+        </Button>
 
         <div className="text-center">
           {canResend ? (
             <button
               type="button"
               onClick={handleResendOtp}
-              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm transition-colors"
             >
               Resend OTP
             </button>
           ) : (
             <p className="text-gray-500 text-sm">
-              Resend OTP in {countdown}s
+              Resend OTP in <span className="font-semibold text-gray-700">{countdown}s</span>
             </p>
           )}
         </div>
       </form>
 
       <div className="mt-6 text-center">
-        <button
+        <Button
+          variant="ghost"
+          icon={ArrowLeft}
           onClick={() => router.push('/login')}
-          className="text-gray-600 hover:text-gray-900 text-sm"
+          className="text-sm"
         >
-          ← Change phone number
-        </button>
+          Change phone number
+        </Button>
       </div>
         </div>
       </div>

@@ -36,3 +36,11 @@ npm-debug.log*
 *.pem
 
 /apps/api/project-e18b5d64-9994-48d1-9b3-ccfe0f9ab8f8.json
+
+# PWA
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/sw.js.map
+**/public/workbox-*.js.map
+**/public/worker-*.js.map

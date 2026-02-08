@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { TrendingUp, Clock, DollarSign, Utensils, Package, Settings } from 'lucide-react';
 import { restaurantApi } from '@/lib/api/restaurant.api';
 import { useAuthStore } from '@/stores/auth-store';
 import { AcceptingOrdersToggle } from '@/components/accepting-orders-toggle';
+import { StatsCard } from '@/components/stats-card';
+import { OrderCard } from '@/components/order-card';
+import { EmptyState } from '@/components/empty-state';
+import { StatsGridSkeleton, OrderListSkeleton } from '@/components/loading-skeleton';
 
 interface Stats {
   totalOrders: number;
@@ -106,10 +111,22 @@ export default function DashboardPage() {
     }
   }, [owner, router]);
 
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
+      <div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{getGreeting()}!</h1>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+        <StatsGridSkeleton />
       </div>
     );
   }
@@ -117,7 +134,9 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {getGreeting()}, {restaurant?.name || 'Chef'}!
+        </h1>
         <p className="text-gray-600">Welcome back! Here's your restaurant overview.</p>
       </div>
 
@@ -134,121 +153,102 @@ export default function DashboardPage() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
-          <h2 className="text-gray-500 text-sm font-medium mb-1">Total Orders</h2>
-          <p className="text-3xl font-bold text-gray-900">{stats.totalOrders}</p>
-          <p className="text-xs text-gray-500 mt-2">All time</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
-          <h2 className="text-gray-500 text-sm font-medium mb-1">Pending Orders</h2>
-          <p className="text-3xl font-bold text-gray-900">{stats.pendingOrders}</p>
-          <p className="text-xs text-gray-500 mt-2">Needs attention</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
-          <h2 className="text-gray-500 text-sm font-medium mb-1">Revenue Today</h2>
-          <p className="text-3xl font-bold text-gray-900">₹{stats.revenueToday}</p>
-          <p className="text-xs text-gray-500 mt-2">Last 24 hours</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
-          <h2 className="text-gray-500 text-sm font-medium mb-1">Menu Items</h2>
-          <p className="text-3xl font-bold text-gray-900">{stats.activeMenuItems}</p>
-          <p className="text-xs text-gray-500 mt-2">Active items</p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatsCard
+          title="Total Orders"
+          value={stats.totalOrders}
+          subtitle="All time"
+          icon={TrendingUp}
+          color="blue"
+        />
+        <StatsCard
+          title="Pending Orders"
+          value={stats.pendingOrders}
+          subtitle="Needs attention"
+          icon={Clock}
+          color="yellow"
+        />
+        <StatsCard
+          title="Revenue Today"
+          value={`₹${stats.revenueToday}`}
+          subtitle="Last 24 hours"
+          icon={DollarSign}
+          color="green"
+        />
+        <StatsCard
+          title="Menu Items"
+          value={stats.activeMenuItems}
+          subtitle="Active items"
+          icon={Utensils}
+          color="purple"
+        />
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Recent Orders</h2>
-          <button
-            onClick={() => router.push('/orders')}
-            className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
-          >
-            View All →
-          </button>
+          <h2 className="text-2xl font-bold text-gray-900">Recent Orders</h2>
+          {recentOrders.length > 0 && (
+            <button
+              onClick={() => router.push('/dashboard/orders')}
+              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
+            >
+              View All →
+            </button>
+          )}
         </div>
 
         {recentOrders.length > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {recentOrders.map((order) => (
-              <div
+              <OrderCard
                 key={order.id}
-                className="border border-gray-200 rounded-lg p-4 hover:border-yellow-300 transition-colors cursor-pointer"
-                onClick={() => router.push(`/orders/${order.id}`)}
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="font-semibold text-lg">#{order.orderNumber}</div>
-                    <div className="text-sm text-gray-600 mt-1">
-                      {order.user.name || order.user.phone}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {new Date(order.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-lg">₹{order.total}</div>
-                    <div
-                      className={`
-                        mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium
-                        ${
-                          order.status === 'PENDING'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : order.status === 'CONFIRMED'
-                            ? 'bg-blue-100 text-blue-800'
-                            : order.status === 'PREPARING'
-                            ? 'bg-purple-100 text-purple-800'
-                            : order.status === 'DELIVERED'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }
-                      `}
-                    >
-                      {order.status}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                order={order}
+                onViewDetails={(id) => router.push(`/dashboard/orders/${id}`)}
+              />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            <p className="text-lg mb-2">No orders yet</p>
-            <p className="text-sm">Orders will appear here once customers start ordering</p>
-          </div>
+          <EmptyState
+            icon={Package}
+            title="No orders yet"
+            description="Orders will appear here once customers start ordering from your restaurant."
+          />
         )}
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <button
           onClick={() => router.push('/dashboard/orders')}
-          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="text-2xl mb-2">📋</div>
-          <h3 className="font-semibold mb-1">Manage Orders</h3>
+          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+            <Package className="w-6 h-6" />
+          </div>
+          <h3 className="font-bold text-lg mb-1">Manage Orders</h3>
           <p className="text-sm text-gray-600">View and update order status</p>
         </button>
 
         <button
           onClick={() => router.push('/dashboard/menu')}
-          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="text-2xl mb-2">🍽️</div>
-          <h3 className="font-semibold mb-1">Edit Menu</h3>
+          <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
+            <Utensils className="w-6 h-6" />
+          </div>
+          <h3 className="font-bold text-lg mb-1">Edit Menu</h3>
           <p className="text-sm text-gray-600">Add or update menu items</p>
         </button>
 
         <button
           onClick={() => router.push('/dashboard/settings')}
-          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-left"
+          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="text-2xl mb-2">⚙️</div>
-          <h3 className="font-semibold mb-1">Settings</h3>
+          <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-yellow-200 transition-colors">
+            <Settings className="w-6 h-6" />
+          </div>
+          <h3 className="font-bold text-lg mb-1">Settings</h3>
           <p className="text-sm text-gray-600">Update restaurant details</p>
         </button>
       </div>

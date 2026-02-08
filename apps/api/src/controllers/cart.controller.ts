@@ -21,9 +21,6 @@ export const getCartHandler = asyncHandler(
             slug: true,
             name: true,
             imageUrl: true,
-            deliveryFee: true,
-            minOrderAmount: true,
-            estimatedDeliveryTime: true,
           },
         },
         items: {

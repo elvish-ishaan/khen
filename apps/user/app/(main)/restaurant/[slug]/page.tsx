@@ -96,7 +96,7 @@ export default function RestaurantPage() {
       {restaurant.coverImageUrl && (
         <div className="relative h-48 sm:h-64 overflow-hidden">
           <img
-            src={restaurant.coverImageUrl}
+            src={restaurant.coverImageUrl || ''}
             alt={restaurant.name}
             className="w-full h-full object-cover"
           />

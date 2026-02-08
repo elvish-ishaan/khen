@@ -128,20 +128,12 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Minimum Order Warning */}
-        {subtotal < cart.restaurant.minOrderAmount && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl text-sm mb-4 text-center">
-            Add ₹{(cart.restaurant.minOrderAmount - subtotal).toFixed(2)} more to meet minimum order amount
-          </div>
-        )}
-
         {/* Checkout Button - Fixed at bottom */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
           <div className="max-w-2xl mx-auto">
             <button
               onClick={() => router.push('/checkout')}
-              disabled={subtotal < cart.restaurant.minOrderAmount}
-              className="w-full bg-yellow-500 text-gray-900 py-4 rounded-full hover:bg-yellow-600 font-bold text-lg shadow-lg transition-all hover:scale-105 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:text-gray-600"
+              className="w-full bg-yellow-500 text-gray-900 py-4 rounded-full hover:bg-yellow-600 font-bold text-lg shadow-lg transition-all hover:scale-105"
             >
               Checkout
             </button>

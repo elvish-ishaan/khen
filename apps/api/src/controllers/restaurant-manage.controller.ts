@@ -56,11 +56,6 @@ export const updateProfileHandler = asyncHandler(
     if (req.body.cuisineType) parsedBody.cuisineType = JSON.parse(req.body.cuisineType);
     if (req.body.phone) parsedBody.phone = req.body.phone;
     if (req.body.email) parsedBody.email = req.body.email;
-    if (req.body.opensAt) parsedBody.opensAt = req.body.opensAt;
-    if (req.body.closesAt) parsedBody.closesAt = req.body.closesAt;
-    if (req.body.minOrderAmount !== undefined) parsedBody.minOrderAmount = Number(req.body.minOrderAmount);
-    if (req.body.deliveryFee !== undefined) parsedBody.deliveryFee = Number(req.body.deliveryFee);
-    if (req.body.estimatedDeliveryTime !== undefined) parsedBody.estimatedDeliveryTime = Number(req.body.estimatedDeliveryTime);
     if (req.body.isActive !== undefined) parsedBody.isActive = req.body.isActive === 'true';
     if (req.body.isAcceptingOrders !== undefined) parsedBody.isAcceptingOrders = req.body.isAcceptingOrders === 'true';
 

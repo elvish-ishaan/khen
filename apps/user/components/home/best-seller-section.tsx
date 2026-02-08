@@ -50,9 +50,9 @@ export function BestSellerSection({ restaurants, isLoading }: BestSellerSectionP
             className="flex-shrink-0 group"
           >
             <div className="relative w-36 h-36 rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-all">
-              {restaurant.imageUrl ? (
+              {(restaurant.coverImageUrl || restaurant.imageUrl) ? (
                 <img
-                  src={restaurant.imageUrl}
+                  src={restaurant.coverImageUrl || restaurant.imageUrl || ''}
                   alt={restaurant.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -61,9 +61,11 @@ export function BestSellerSection({ restaurants, isLoading }: BestSellerSectionP
               )}
 
               {/* Price Tag */}
-              <div className="absolute bottom-2 left-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                ₹{restaurant.minOrderAmount}
-              </div>
+              {restaurant.minOrderAmount !== undefined && (
+                <div className="absolute bottom-2 left-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                  ₹{restaurant.minOrderAmount}
+                </div>
+              )}
 
               {/* Restaurant Name Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">

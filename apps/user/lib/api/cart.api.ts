@@ -15,7 +15,7 @@ export interface Cart {
   restaurantId: string;
   restaurant: Pick<
     Restaurant,
-    'id' | 'slug' | 'name' | 'imageUrl' | 'deliveryFee' | 'minOrderAmount' | 'estimatedDeliveryTime'
+    'id' | 'slug' | 'name' | 'imageUrl'
   >;
   items: CartItem[];
 }

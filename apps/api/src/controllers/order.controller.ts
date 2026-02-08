@@ -147,13 +147,6 @@ export const createOrderHandler = asyncHandler(
       return sum + item.menuItem.price * item.quantity;
     }, 0);
 
-    if (subtotal < cart.restaurant.minOrderAmount) {
-      throw new AppError(
-        400,
-        `Minimum order amount is ₹${cart.restaurant.minOrderAmount}`
-      );
-    }
-
     // Validate address has coordinates for delivery fee calculation
     if (!address.latitude || !address.longitude) {
       throw new AppError(
@@ -192,7 +185,7 @@ export const createOrderHandler = asyncHandler(
         paymentMethod,
         deliveryInstructions,
         estimatedDeliveryTime: new Date(
-          Date.now() + cart.restaurant.estimatedDeliveryTime * 60 * 1000
+          Date.now() + durationMinutes * 60 * 1000
         ),
         items: {
           create: cart.items.map((item) => ({

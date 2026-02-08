@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Leaf, Circle, Pencil, Trash2, Plus, Utensils, CheckCircle } from 'lucide-react';
 import { restaurantApi } from '@/lib/api/restaurant.api';
 import { onboardingApi } from '@/lib/api/onboarding.api';
 import type { Category, MenuItem } from '@/lib/api/restaurant.api';
+import { Button } from '@/components/ui/button';
 
 export default function MenuManagementPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -297,12 +299,16 @@ export default function MenuManagementPage() {
           {/* Categories Sidebar */}
           <div className="lg:col-span-1">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold text-lg">Categories</h2>
+              <div className="flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-gray-600" />
+                <h2 className="font-bold text-lg text-gray-900">Categories</h2>
+              </div>
               <button
                 onClick={() => setShowCategoryForm(!showCategoryForm)}
-                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
+                className="flex items-center gap-1 text-yellow-600 hover:text-yellow-700 text-sm font-medium transition-colors"
               >
-                + Add
+                <Plus className="w-4 h-4" />
+                Add
               </button>
             </div>
 
@@ -350,11 +356,11 @@ export default function MenuManagementPage() {
                 <div
                   key={category.id}
                   className={`
-                    border rounded-lg transition-colors
+                    rounded-lg transition-all cursor-pointer
                     ${
                       selectedCategory === category.id
-                        ? 'bg-yellow-500 text-gray-900 border-yellow-500'
-                        : 'bg-white border-gray-200 hover:border-gray-300'
+                        ? 'bg-yellow-50 border-l-4 border-yellow-500 shadow-sm'
+                        : 'bg-white border-l-4 border-transparent hover:bg-gray-50'
                     }
                   `}
                 >
@@ -362,30 +368,26 @@ export default function MenuManagementPage() {
                     onClick={() => setSelectedCategory(category.id)}
                     className="w-full text-left px-4 py-3"
                   >
-                    <div className="font-medium">{category.name}</div>
-                    <div className={`text-sm ${selectedCategory === category.id ? 'text-yellow-100' : 'text-gray-500'}`}>
+                    <div className={`font-semibold ${selectedCategory === category.id ? 'text-yellow-700' : 'text-gray-900'}`}>
+                      {category.name}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-0.5">
                       {category.items?.length || 0} items
                     </div>
                   </button>
-                  <div className={`px-4 pb-3 flex gap-2 ${selectedCategory === category.id ? 'border-t border-yellow-500 pt-2' : ''}`}>
+                  <div className="px-4 pb-3 flex gap-3 pt-2 border-t border-gray-100">
                     <button
                       onClick={() => startEditCategory(category)}
-                      className={`text-xs font-medium ${
-                        selectedCategory === category.id
-                          ? 'text-white hover:underline'
-                          : 'text-yellow-600 hover:text-yellow-700'
-                      }`}
+                      className="flex items-center gap-1 text-xs font-medium text-yellow-600 hover:text-yellow-700 transition-colors"
                     >
+                      <Pencil className="w-3 h-3" />
                       Edit
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
-                      className={`text-xs font-medium ${
-                        selectedCategory === category.id
-                          ? 'text-red-200 hover:text-white'
-                          : 'text-red-600 hover:text-red-700'
-                      }`}
+                      className="flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-700 transition-colors"
                     >
+                      <Trash2 className="w-3 h-3" />
                       Delete
                     </button>
                   </div>
@@ -405,12 +407,13 @@ export default function MenuManagementPage() {
             {selectedCategory ? (
               <>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-semibold text-lg">{selectedCategoryData?.name} Items</h2>
+                  <h2 className="font-bold text-lg text-gray-900">{selectedCategoryData?.name} Items</h2>
                   <button
                     onClick={() => setShowItemForm(!showItemForm)}
-                    className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
+                    className="flex items-center gap-1 text-yellow-600 hover:text-yellow-700 text-sm font-medium transition-colors"
                   >
-                    + Add Item
+                    <Plus className="w-4 h-4" />
+                    Add Item
                   </button>
                 </div>
 
@@ -446,23 +449,25 @@ export default function MenuManagementPage() {
                         required
                       />
                       <div className="flex items-center gap-4">
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="radio"
                             checked={itemData.isVeg}
                             onChange={() => setItemData({ ...itemData, isVeg: true })}
-                            className="text-yellow-600"
+                            className="w-4 h-4 text-green-600 focus:ring-green-500"
                           />
-                          <span className="text-sm">🟢 Veg</span>
+                          <Leaf className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-medium">Veg</span>
                         </label>
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="radio"
                             checked={!itemData.isVeg}
                             onChange={() => setItemData({ ...itemData, isVeg: false })}
-                            className="text-yellow-600"
+                            className="w-4 h-4 text-red-600 focus:ring-red-500"
                           />
-                          <span className="text-sm">🔴 Non-Veg</span>
+                          <Circle className="w-4 h-4 text-red-600 fill-red-600" />
+                          <span className="text-sm font-medium">Non-Veg</span>
                         </label>
                       </div>
                       <div className="flex items-center gap-2">
@@ -485,10 +490,13 @@ export default function MenuManagementPage() {
                           type="file"
                           accept="image/*"
                           onChange={(e) => setItemImage(e.target.files?.[0] || null)}
-                          className="w-full text-sm"
+                          className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100 cursor-pointer"
                         />
                         {itemImage && (
-                          <p className="mt-1 text-xs text-green-600">✓ New image selected</p>
+                          <p className="mt-2 flex items-center gap-1 text-xs text-green-600 font-medium">
+                            <CheckCircle className="w-4 h-4" />
+                            New image selected
+                          </p>
                         )}
                       </div>
                       <div className="flex gap-2">
@@ -513,42 +521,48 @@ export default function MenuManagementPage() {
 
                 <div className="space-y-3">
                   {selectedCategoryData?.items?.map((item) => (
-                    <div key={item.id} className="p-4 border border-gray-200 rounded-lg bg-white hover:border-gray-300 transition-colors">
-                      <div className="flex justify-between items-start">
+                    <div key={item.id} className="p-4 border border-gray-200 rounded-xl bg-white hover:border-yellow-300 hover:shadow-md transition-all">
+                      <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span>{item.isVeg ? '🟢' : '🔴'}</span>
-                            <h3 className="font-medium">{item.name}</h3>
+                            {item.isVeg ? (
+                              <Leaf className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-red-600 fill-red-600" />
+                            )}
+                            <h3 className="font-semibold text-gray-900">{item.name}</h3>
                             {!item.isAvailable && (
-                              <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
+                              <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full font-medium">
                                 Unavailable
                               </span>
                             )}
                           </div>
                           {item.description && (
-                            <p className="text-sm text-gray-600 mb-1">{item.description}</p>
+                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                           )}
-                          <p className="text-yellow-600 font-semibold">₹{item.price}</p>
+                          <p className="text-yellow-600 font-bold text-lg">₹{item.price}</p>
                         </div>
                         {item.imageUrl && (
                           <img
                             src={item.imageUrl}
                             alt={item.name}
-                            className="w-20 h-20 object-cover rounded-lg ml-4"
+                            className="w-24 h-24 object-cover rounded-lg shadow-sm"
                           />
                         )}
                       </div>
-                      <div className="mt-3 flex gap-2">
+                      <div className="mt-4 flex gap-2 pt-3 border-t border-gray-100">
                         <button
                           onClick={() => startEditItem(item)}
-                          className="text-sm font-medium text-yellow-600 hover:text-yellow-700"
+                          className="flex items-center gap-1.5 text-sm font-medium text-yellow-600 hover:text-yellow-700 transition-colors"
                         >
+                          <Pencil className="w-4 h-4" />
                           Edit
                         </button>
                         <button
                           onClick={() => handleDeleteMenuItem(item.id)}
-                          className="text-sm font-medium text-red-600 hover:text-red-700"
+                          className="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
                         >
+                          <Trash2 className="w-4 h-4" />
                           Delete
                         </button>
                       </div>

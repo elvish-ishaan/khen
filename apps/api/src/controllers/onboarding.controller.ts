@@ -181,11 +181,6 @@ export const createRestaurantHandler = asyncHandler(
       cuisineType: JSON.parse(req.body.cuisineType), // Parse JSON string to array
       phone: req.body.phone,
       email: req.body.email,
-      opensAt: req.body.opensAt,
-      closesAt: req.body.closesAt,
-      minOrderAmount: Number(req.body.minOrderAmount), // Convert string to number
-      deliveryFee: Number(req.body.deliveryFee), // Convert string to number
-      estimatedDeliveryTime: Number(req.body.estimatedDeliveryTime), // Convert string to number
     };
 
     const data = restaurantInfoSchema.parse(parsedBody);
@@ -206,11 +201,6 @@ export const createRestaurantHandler = asyncHandler(
           cuisineType: data.cuisineType,
           phone: data.phone,
           email: data.email,
-          opensAt: data.opensAt,
-          closesAt: data.closesAt,
-          minOrderAmount: data.minOrderAmount || 0,
-          deliveryFee: data.deliveryFee || 0,
-          estimatedDeliveryTime: data.estimatedDeliveryTime,
           ...(coverImageUrl && { coverImageUrl }),
         },
       });
@@ -244,11 +234,6 @@ export const createRestaurantHandler = asyncHandler(
           cuisineType: data.cuisineType,
           phone: data.phone,
           email: data.email,
-          opensAt: data.opensAt,
-          closesAt: data.closesAt,
-          minOrderAmount: data.minOrderAmount || 0,
-          deliveryFee: data.deliveryFee || 0,
-          estimatedDeliveryTime: data.estimatedDeliveryTime,
           coverImageUrl: coverImageUrl || undefined,
           // Placeholder location (will be updated in location step)
           addressLine1: 'Pending',
