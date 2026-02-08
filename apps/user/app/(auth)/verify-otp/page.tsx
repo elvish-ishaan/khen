@@ -132,24 +132,27 @@ export default function VerifyOtpPage() {
 
   return (
     <Suspense fallback={<span>loading...</span>}>
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-3 sm:px-4 py-6">
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
+        {/* Themed Logo Section */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
-              alt="Daavat Logo"
-              width={180}
-              height={70}
-              className="h-16 w-auto object-contain"
-              priority
-            />
+          <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-4 sm:mb-6">
+            <div className="flex justify-center">
+              <Image
+                src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
+                alt="Daavat Logo"
+                width={180}
+                height={70}
+                className="h-12 sm:h-16 w-auto object-contain drop-shadow-lg"
+                priority
+              />
+            </div>
           </div>
-          <p className="mt-2 text-gray-600">Food delivery made simple</p>
+          <p className="mt-2 text-sm sm:text-base text-gray-600 font-medium">Food delivery made simple</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+          <div className="mb-4 sm:mb-6">
             <button
               onClick={() => router.push('/login')}
               className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
@@ -158,15 +161,15 @@ export default function VerifyOtpPage() {
             </button>
           </div>
 
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
             Enter OTP
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 break-words">
             Sent to {phone}
           </p>
 
-          <div className="space-y-6">
-            <div className="flex gap-2 justify-center">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex gap-1.5 sm:gap-2 justify-center">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -181,7 +184,7 @@ export default function VerifyOtpPage() {
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
                   disabled={isLoading}
-                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 />
               ))}
             </div>

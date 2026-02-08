@@ -5,6 +5,7 @@ import { sendOtpSchema, verifyOtpSchema } from '../validators/restaurant-auth.va
 import { sendOtp } from '../services/msg91.service';
 import { generateToken, getTokenExpiry } from '../services/jwt.service';
 import { AppError, asyncHandler } from '../middleware/error-handler';
+import { env } from '../config/env';
 
 export const sendOtpHandler = asyncHandler(
   async (req: RestaurantAuthenticatedRequest, res: Response) => {
@@ -28,7 +29,7 @@ export const sendOtpHandler = asyncHandler(
     }
 
     // Generate 6-digit OTP (use 123456 in development for easier testing)
-    const otp = process.env.NODE_ENV === 'development'
+    const otp = env.NODE_ENV === 'development'
       ? '123456'
       : Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -135,15 +136,15 @@ export const verifyOtpHandler = asyncHandler(
     // Set cookie
     const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: getTokenExpiry(),
       path: '/',
     };
 
     // Add domain in production if configured
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
+      cookieOptions.domain = env.COOKIE_DOMAIN;
     }
 
     res.cookie('restaurant_auth_token', token, cookieOptions);
@@ -169,13 +170,13 @@ export const logoutHandler = asyncHandler(
   async (req: RestaurantAuthenticatedRequest, res: Response) => {
     const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: env.NODE_ENV === 'production',
+      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
     };
 
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
+      cookieOptions.domain = env.COOKIE_DOMAIN;
     }
 
     res.clearCookie('restaurant_auth_token', cookieOptions);

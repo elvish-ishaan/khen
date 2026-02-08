@@ -56,9 +56,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: async () => {
     try {
       await logisticsAuthApi.logout();
-      set({ personnel: null });
+      set({ personnel: null, isLoading: false, error: null });
+      // Redirect to login page after successful logout
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout error:', error);
+      set({ error: 'Logout failed', isLoading: false });
     }
   },
 

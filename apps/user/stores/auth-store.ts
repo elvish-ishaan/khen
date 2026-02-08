@@ -56,6 +56,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: false,
         error: null,
       });
+      // Redirect to login page after successful logout
+      window.location.href = '/login';
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Logout failed',

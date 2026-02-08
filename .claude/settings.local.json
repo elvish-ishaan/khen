@@ -46,7 +46,10 @@
       "Bash(pnpx prisma db execute:*)",
       "Bash(node check-images.js:*)",
       "Bash(curl:*)",
-      "Bash(pnpm run build:*)"
+      "Bash(pnpm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

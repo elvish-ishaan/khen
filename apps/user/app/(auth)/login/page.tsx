@@ -37,28 +37,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-3 sm:px-4 py-6">
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
+        {/* Themed Logo Section */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
-              alt="Daavat Logo"
-              width={180}
-              height={70}
-              className="h-16 w-auto object-contain"
-              priority
-            />
+          <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-4 sm:mb-6">
+            <div className="flex justify-center">
+              <Image
+                src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
+                alt="Daavat Logo"
+                width={180}
+                height={70}
+                className="h-12 sm:h-16 w-auto object-contain drop-shadow-lg"
+                priority
+              />
+            </div>
           </div>
-          <p className="mt-2 text-gray-600">Food delivery made simple</p>
+          <p className="mt-2 text-sm sm:text-base text-gray-600 font-medium">Food delivery made simple</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">
             Login with Phone
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                 Phone Number

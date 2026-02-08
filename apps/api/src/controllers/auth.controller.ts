@@ -155,6 +155,7 @@ export const verifyOtpHandler = asyncHandler(
 
 export const logoutHandler = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+    // Cookie options must match the ones used when setting the cookie
     const cookieOptions: any = {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
@@ -162,10 +163,12 @@ export const logoutHandler = asyncHandler(
       path: '/',
     };
 
+    // Important: domain must match the one used when setting the cookie
     if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
       cookieOptions.domain = env.COOKIE_DOMAIN;
     }
 
+    // Clear the cookie with exact same options (except maxAge/expires)
     res.clearCookie('auth_token', cookieOptions);
 
     res.json({
