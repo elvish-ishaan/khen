@@ -1,11 +1,11 @@
-# Khen - Food Delivery Platform
+# Daavat - Food Delivery Platform
 
 A modern food delivery platform built with Next.js, Express.js, and PostgreSQL.
 
 ## Project Structure
 
 ```
-khen/
+daavat/
 ├── apps/
 │   ├── api/           # Express.js backend API
 │   ├── user/          # Next.js user-facing app
@@ -22,7 +22,7 @@ khen/
 ### Backend (apps/api)
 - **Framework**: Express.js with TypeScript
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Phone OTP (MSG91), JWT sessions
+- **Authentication**: Firebase Phone Authentication, JWT sessions
 - **Payment**: Razorpay integration
 - **Validation**: Zod
 - **Security**: Helmet, CORS, Rate limiting
@@ -65,7 +65,7 @@ khen/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd khen
+   cd daavat
    ```
 
 2. **Install dependencies**
@@ -88,7 +88,7 @@ khen/
 
    Update the `.env` file with your credentials:
    - `JWT_SECRET`: Generate a secure random string (32+ characters)
-   - `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`: (Optional) MSG91 credentials
+   - `FIREBASE_SERVICE_ACCOUNT_KEY`: Path to Firebase service account JSON file
    - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`: (Optional) Razorpay credentials
 
    Create `.env.local` in `apps/user/`:
@@ -166,10 +166,11 @@ pnpm dev
 ## Development Mode Features
 
 ### Authentication (Development)
-When `MSG91_AUTH_KEY` is not configured or `NODE_ENV=development`:
-- Use any phone number to request OTP
-- Default OTP: **123456**
-- This allows testing without SMS credits
+Firebase Phone Authentication:
+- Use Firebase Console to add test phone numbers for development
+- Add test numbers in: Firebase Console → Authentication → Sign-in method → Phone → Phone numbers for testing
+- Example: +91 1234567890 → 123456
+- This allows testing without SMS charges
 
 ### Payment (Development)
 When `RAZORPAY_KEY_ID` is not configured:
@@ -179,8 +180,9 @@ When `RAZORPAY_KEY_ID` is not configured:
 ## API Endpoints
 
 ### Authentication
-- `POST /api/auth/send-otp` - Send OTP to phone
-- `POST /api/auth/verify-otp` - Verify OTP and login
+- `POST /api/auth/verify-token` - Verify Firebase ID token and login
+- `POST /api/restaurant-auth/verify-token` - Restaurant owner login
+- `POST /api/logistics-auth/verify-token` - Delivery partner login
 - `POST /api/auth/logout` - Logout user
 - `GET /api/auth/me` - Get current user
 

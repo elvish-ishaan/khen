@@ -13,8 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Khen Restaurant Portal',
-  description: 'Restaurant management portal for Khen food delivery platform',
+  title: 'Daavat Restaurant Portal',
+  description: 'Restaurant management portal for Daavat food delivery platform',
+  manifest: '/manifest.json',
+  themeColor: '#eab308',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Daavat Restaurant',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function RootLayout({

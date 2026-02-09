@@ -4,6 +4,7 @@ export type OrderStatus =
   | 'PENDING'
   | 'CONFIRMED'
   | 'PREPARING'
+  | 'READY_FOR_PICKUP'
   | 'OUT_FOR_DELIVERY'
   | 'DELIVERED'
   | 'CANCELLED';
@@ -42,6 +43,13 @@ const statusConfig: Record<OrderStatus, StatusConfig> = {
     bgColor: 'bg-purple-100',
     textColor: 'text-purple-700',
     iconColor: 'text-purple-600',
+  },
+  READY_FOR_PICKUP: {
+    label: 'Ready for Pickup',
+    icon: Package,
+    bgColor: 'bg-indigo-100',
+    textColor: 'text-indigo-700',
+    iconColor: 'text-indigo-600',
   },
   OUT_FOR_DELIVERY: {
     label: 'Out for Delivery',
@@ -83,8 +91,24 @@ const sizeStyles = {
 
 export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const config = statusConfig[status];
-  const Icon = config.icon;
   const styles = sizeStyles[size];
+
+  // Safety check: if status is invalid, show a default badge
+  if (!config) {
+    return (
+      <span
+        className={`
+          inline-flex items-center gap-1.5 rounded-full font-medium
+          bg-gray-100 text-gray-700 ${styles.container}
+        `}
+      >
+        <Clock className={`text-gray-600 ${styles.icon}`} />
+        <span>{status || 'Unknown'}</span>
+      </span>
+    );
+  }
+
+  const Icon = config.icon;
 
   return (
     <span

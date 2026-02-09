@@ -109,4 +109,29 @@ export const restaurantApi = {
       { isAcceptingOrders }
     );
   },
+
+  registerFcmToken: async (fcmToken: string) => {
+    console.log('📤 [API] Registering FCM token...');
+    console.log('📱 [API] Token (first 20 chars):', fcmToken.substring(0, 20) + '...');
+
+    const response = await apiClient.post<{ message: string }>(
+      '/restaurant-manage/fcm-token',
+      { fcmToken }
+    );
+
+    console.log('✅ [API] FCM token registration response:', response);
+    return response;
+  },
+
+  testPushNotification: async () => {
+    console.log('🧪 [API] Testing push notification...');
+
+    const response = await apiClient.post<{
+      message: string;
+      data: { messageId: string; timestamp: string };
+    }>('/restaurant-manage/test-notification');
+
+    console.log('✅ [API] Test notification response:', response);
+    return response;
+  },
 };

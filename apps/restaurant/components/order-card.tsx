@@ -8,6 +8,7 @@ export interface OrderCardProps {
     orderNumber: string;
     status: OrderStatus;
     total: number;
+    subtotal: number;
     createdAt: string;
     user: {
       name?: string;
@@ -51,61 +52,65 @@ export function OrderCard({ order, onViewDetails }: OrderCardProps) {
   const remainingCount = order.items.length - 3;
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all border-2 border-transparent hover:border-yellow-500 p-6">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">#{order.orderNumber}</h3>
-          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-            <Clock className="w-4 h-4" />
-            <span>{formatDate(order.createdAt)}</span>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all border-2 border-transparent hover:border-yellow-500 p-4 sm:p-6">
+      <div className="flex items-start justify-between gap-2 sm:gap-3 mb-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate">#{order.orderNumber}</h3>
+          <div className="flex items-center gap-1.5 sm:gap-2 mt-1 text-xs sm:text-sm text-gray-500">
+            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="truncate">{formatDate(order.createdAt)}</span>
           </div>
         </div>
-        <StatusBadge status={order.status} />
+        <div className="flex-shrink-0">
+          <StatusBadge status={order.status} size="sm" />
+        </div>
       </div>
 
       {/* Customer Info */}
-      <div className="mb-4 flex items-center gap-2">
-        <User className="w-4 h-4 text-gray-400" />
-        <div>
-          <p className="text-sm font-medium text-gray-900">
+      <div className="mb-4 flex items-center gap-2 min-w-0">
+        <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-gray-900 truncate">
             {order.user.name || 'Customer'}
           </p>
-          <p className="text-xs text-gray-500">{order.user.phone}</p>
+          <p className="text-xs text-gray-500 truncate">{order.user.phone}</p>
         </div>
       </div>
 
       {/* Order Items */}
       <div className="mb-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {displayItems.map((item, index) => (
             <span
               key={index}
-              className="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+              className="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gray-100 text-gray-700 text-xs rounded-full max-w-full truncate"
             >
-              {item.menuItem?.name || 'Item'} × {item.quantity}
+              <span className="truncate">{item.menuItem?.name || 'Item'} × {item.quantity}</span>
             </span>
           ))}
           {remainingCount > 0 && (
-            <span className="inline-flex items-center px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium">
+            <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium flex-shrink-0">
               +{remainingCount} more
             </span>
           )}
         </div>
       </div>
 
-      {/* Footer: Total and CTA */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <div>
-          <p className="text-xs text-gray-500">Total Amount</p>
-          <p className="text-xl font-bold text-gray-900">{formatCurrency(order.total)}</p>
+      {/* Footer: Earnings and CTA */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-gray-100">
+        <div className="min-w-0">
+          <p className="text-xs text-gray-500">Your Earnings</p>
+          <p className="text-lg sm:text-xl font-bold text-green-600 truncate">{formatCurrency(order.subtotal)}</p>
         </div>
         <Button
           variant="primary"
-          size="md"
+          size="sm"
           icon={Eye}
           onClick={() => onViewDetails(order.id)}
+          className="w-full sm:w-auto flex-shrink-0"
         >
-          View Details
+          <span className="sm:hidden">View</span>
+          <span className="hidden sm:inline">View Details</span>
         </Button>
       </div>
     </div>

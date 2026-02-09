@@ -11,28 +11,16 @@ export interface DeliveryPersonnel {
   isOnDuty: boolean;
 }
 
-export interface SendOtpRequest {
-  phone: string;
-}
-
-export interface VerifyOtpRequest {
-  phone: string;
-  otp: string;
+export interface VerifyTokenRequest {
+  idToken: string;
   name?: string;
   email?: string;
 }
 
 export const logisticsAuthApi = {
-  sendOtp: async (data: SendOtpRequest): Promise<ApiResponse<{ phone: string; expiresIn: number }>> => {
-    return apiClient.post<{ phone: string; expiresIn: number }>(
-      '/logistics-auth/send-otp',
-      data
-    );
-  },
-
-  verifyOtp: async (data: VerifyOtpRequest): Promise<ApiResponse<{ personnel: DeliveryPersonnel }>> => {
+  verifyToken: async (data: VerifyTokenRequest): Promise<ApiResponse<{ personnel: DeliveryPersonnel }>> => {
     return apiClient.post<{ personnel: DeliveryPersonnel }>(
-      '/logistics-auth/verify-otp',
+      '/logistics-auth/verify-token',
       data
     );
   },

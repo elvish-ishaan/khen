@@ -8,6 +8,7 @@ import {
 } from '../validators/restaurant-manage.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { getFileUrl, RequestWithFileUrl } from '../middleware/upload';
+import { sendPushNotification } from '../services/firebase.service';
 
 // Get restaurant profile
 export const getProfileHandler = asyncHandler(
@@ -236,6 +237,7 @@ export const updateOrderStatusHandler = asyncHandler(
         data: {
           status,
           ...(status === 'DELIVERED' && { deliveredAt: new Date() }),
+          ...(status === 'CANCELLED' && { cancelledAt: new Date() }),
         },
         include: {
           user: {
@@ -300,5 +302,95 @@ export const toggleAcceptingOrdersHandler = asyncHandler(
       message: `Restaurant is now ${isAcceptingOrders ? 'accepting' : 'not accepting'} orders`,
       data: { restaurant },
     });
+  }
+);
+
+// Register FCM token for push notifications
+export const registerFcmTokenHandler = asyncHandler(
+  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+    if (!req.owner) {
+      throw new AppError(401, 'Not authenticated');
+    }
+
+    console.log('🔔 [Register FCM] Owner ID:', req.owner.id);
+    console.log('📦 [Register FCM] Request body:', req.body);
+
+    const { fcmToken } = req.body;
+
+    if (!fcmToken || typeof fcmToken !== 'string') {
+      console.error('❌ [Register FCM] Invalid FCM token:', fcmToken);
+      throw new AppError(400, 'FCM token is required');
+    }
+
+    console.log('✅ [Register FCM] Token (first 20 chars):', fcmToken.substring(0, 20) + '...');
+    console.log('🔄 [Register FCM] Updating database...');
+
+    const updatedOwner = await prisma.restaurantOwner.update({
+      where: { id: req.owner.id },
+      data: { fcmToken },
+      select: { id: true, phone: true, fcmToken: true },
+    });
+
+    console.log('✅ [Register FCM] Token registered successfully for owner:', updatedOwner.id);
+    console.log('📱 [Register FCM] Token saved (first 20 chars):', updatedOwner.fcmToken?.substring(0, 20) + '...');
+
+    res.json({
+      success: true,
+      message: 'FCM token registered successfully',
+      data: {
+        tokenRegistered: true,
+        ownerId: updatedOwner.id,
+      },
+    });
+  }
+);
+
+// Test push notification endpoint (for debugging)
+export const testPushNotificationHandler = asyncHandler(
+  async (req: RestaurantAuthenticatedRequest, res: Response) => {
+    if (!req.owner) {
+      throw new AppError(401, 'Not authenticated');
+    }
+
+    console.log('🧪 [Test Notification] Testing push notification for owner:', req.owner.id);
+
+    // Get owner's FCM token
+    const owner = await prisma.restaurantOwner.findUnique({
+      where: { id: req.owner.id },
+      select: { id: true, phone: true, fcmToken: true },
+    });
+
+    if (!owner?.fcmToken) {
+      console.error('❌ [Test Notification] No FCM token found for owner');
+      throw new AppError(400, 'No FCM token registered. Please enable notifications first.');
+    }
+
+    console.log('✅ [Test Notification] FCM token found, sending test notification...');
+
+    try {
+      const messageId = await sendPushNotification(
+        owner.fcmToken,
+        '🧪 Test Notification',
+        'This is a test notification from Daavat. If you see this, push notifications are working! 🎉',
+        {
+          type: 'test',
+          timestamp: new Date().toISOString(),
+        }
+      );
+
+      console.log('✅ [Test Notification] Test notification sent successfully:', messageId);
+
+      res.json({
+        success: true,
+        message: 'Test notification sent successfully!',
+        data: {
+          messageId,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error('❌ [Test Notification] Failed to send test notification:', error);
+      throw new AppError(500, 'Failed to send test notification. Check server logs for details.');
+    }
   }
 );

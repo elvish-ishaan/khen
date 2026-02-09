@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { TrendingUp, Clock, DollarSign, Utensils, Package, Settings } from 'lucide-react';
+import { TrendingUp, Clock, DollarSign, Utensils, Package, Settings, Bell, BellOff } from 'lucide-react';
 import { restaurantApi } from '@/lib/api/restaurant.api';
 import { useAuthStore } from '@/stores/auth-store';
 import { AcceptingOrdersToggle } from '@/components/accepting-orders-toggle';
@@ -10,6 +10,9 @@ import { StatsCard } from '@/components/stats-card';
 import { OrderCard } from '@/components/order-card';
 import { EmptyState } from '@/components/empty-state';
 import { StatsGridSkeleton, OrderListSkeleton } from '@/components/loading-skeleton';
+// IMPORTANT: Import Firebase to initialize it before using FCM
+import '@/lib/firebase';
+import { requestNotificationPermission, onForegroundMessage, showNotification, isNotificationPermissionGranted } from '@/lib/fcm';
 
 interface Stats {
   totalOrders: number;
@@ -111,6 +114,81 @@ export default function DashboardPage() {
     }
   }, [owner, router]);
 
+  // Register FCM token for push notifications
+  useEffect(() => {
+    if (!owner || owner.onboardingStatus !== 'COMPLETED') {
+      return;
+    }
+
+    let unsubscribe: (() => void) | undefined;
+
+    const setupNotifications = async () => {
+      try {
+        console.log('🔔 [Dashboard] Setting up push notifications...');
+
+        // Request notification permission and get FCM token
+        const fcmToken = await requestNotificationPermission();
+
+        if (fcmToken) {
+          console.log('📱 [Dashboard] FCM token received, registering with backend...');
+
+          // Register token with backend
+          const result = await restaurantApi.registerFcmToken(fcmToken);
+
+          if (result.success) {
+            console.log('✅ [Dashboard] FCM token registered successfully with backend');
+          } else {
+            console.error('❌ [Dashboard] Failed to register FCM token:', result.error);
+          }
+
+          // Listen for foreground messages
+          console.log('👂 [Dashboard] Setting up foreground message listener...');
+          unsubscribe = onForegroundMessage((payload) => {
+            console.log('🔔 [Dashboard] Foreground notification received!');
+            console.log('📦 [Dashboard] Payload:', payload);
+
+            // Show notification
+            const title = payload.notification?.title || 'New Order!';
+            const body = payload.notification?.body || 'You have a new order';
+
+            console.log('📢 [Dashboard] Displaying notification:', title, body);
+
+            showNotification(title, {
+              body,
+              tag: payload.data?.orderId || 'order-notification',
+              data: payload.data,
+            });
+
+            // Optionally refresh orders list
+            if (payload.data?.orderId) {
+              console.log('🔔 [Dashboard] New order received:', payload.data.orderId);
+              // You could fetch new orders here or show a toast
+              // For now, just log it
+            }
+          });
+
+          console.log('✅ [Dashboard] Notification setup complete!');
+        } else {
+          console.log('⚠️ [Dashboard] Unable to get FCM token. Notifications will not work.');
+          console.log('💡 [Dashboard] Make sure you have granted notification permission in browser settings.');
+        }
+      } catch (error) {
+        console.error('❌ [Dashboard] Error setting up notifications:', error);
+        if (error instanceof Error) {
+          console.error('❌ [Dashboard] Error details:', error.message, error.stack);
+        }
+      }
+    };
+
+    setupNotifications();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [owner]);
+
   // Get greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -121,10 +199,10 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{getGreeting()}!</h1>
-          <p className="text-gray-600">Loading your dashboard...</p>
+      <div className="px-4 sm:px-0">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{getGreeting()}!</h1>
+          <p className="text-sm sm:text-base text-gray-600">Loading your dashboard...</p>
         </div>
         <StatsGridSkeleton />
       </div>
@@ -132,12 +210,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div className="px-4 sm:px-0">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           {getGreeting()}, {restaurant?.name || 'Chef'}!
         </h1>
-        <p className="text-gray-600">Welcome back! Here's your restaurant overview.</p>
+        <p className="text-sm sm:text-base text-gray-600">Welcome back! Here's your restaurant overview.</p>
       </div>
 
       {/* Order Acceptance Toggle */}
@@ -153,7 +231,7 @@ export default function DashboardPage() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <StatsCard
           title="Total Orders"
           value={stats.totalOrders}
@@ -185,13 +263,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Orders */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Recent Orders</h2>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Recent Orders</h2>
           {recentOrders.length > 0 && (
             <button
               onClick={() => router.push('/dashboard/orders')}
-              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
+              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm self-start sm:self-auto"
             >
               View All →
             </button>
@@ -199,7 +277,7 @@ export default function DashboardPage() {
         </div>
 
         {recentOrders.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {recentOrders.map((order) => (
               <OrderCard
                 key={order.id}
@@ -218,38 +296,38 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <button
           onClick={() => router.push('/dashboard/orders')}
-          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
+          className="bg-white p-5 sm:p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-            <Package className="w-6 h-6" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-blue-200 transition-colors">
+            <Package className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h3 className="font-bold text-lg mb-1">Manage Orders</h3>
-          <p className="text-sm text-gray-600">View and update order status</p>
+          <h3 className="font-bold text-base sm:text-lg mb-1">Manage Orders</h3>
+          <p className="text-xs sm:text-sm text-gray-600">View and update order status</p>
         </button>
 
         <button
           onClick={() => router.push('/dashboard/menu')}
-          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
+          className="bg-white p-5 sm:p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
-            <Utensils className="w-6 h-6" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-purple-200 transition-colors">
+            <Utensils className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h3 className="font-bold text-lg mb-1">Edit Menu</h3>
-          <p className="text-sm text-gray-600">Add or update menu items</p>
+          <h3 className="font-bold text-base sm:text-lg mb-1">Edit Menu</h3>
+          <p className="text-xs sm:text-sm text-gray-600">Add or update menu items</p>
         </button>
 
         <button
           onClick={() => router.push('/dashboard/settings')}
-          className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
+          className="bg-white p-5 sm:p-6 rounded-2xl shadow-md hover:shadow-lg hover:scale-105 transition-all text-left group"
         >
-          <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-4 group-hover:bg-yellow-200 transition-colors">
-            <Settings className="w-6 h-6" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-3 sm:mb-4 group-hover:bg-yellow-200 transition-colors">
+            <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h3 className="font-bold text-lg mb-1">Settings</h3>
-          <p className="text-sm text-gray-600">Update restaurant details</p>
+          <h3 className="font-bold text-base sm:text-lg mb-1">Settings</h3>
+          <p className="text-xs sm:text-sm text-gray-600">Update restaurant details</p>
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from '../types';
 import { createOrderSchema, reorderSchema } from '../validators/order.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { calculateDeliveryFee } from '../services/delivery-fee.service';
+import { sendPushNotification } from '../services/firebase.service';
 
 const generateOrderNumber = (): string => {
   const timestamp = Date.now().toString();
@@ -213,6 +214,44 @@ export const createOrderHandler = asyncHandler(
     await prisma.cartItem.deleteMany({
       where: { cartId: cart.id },
     });
+
+    // Send push notification to restaurant owner (non-blocking)
+    console.log('🔔 [Order] Checking for restaurant owner FCM token...');
+    const owner = await prisma.restaurantOwner.findFirst({
+      where: { restaurantId: cart.restaurantId },
+      select: { id: true, phone: true, fcmToken: true },
+    });
+
+    console.log('👤 [Order] Restaurant owner found:', owner?.id);
+    console.log('📱 [Order] FCM token present:', !!owner?.fcmToken);
+
+    if (owner?.fcmToken) {
+      console.log('✅ [Order] Sending push notification to restaurant owner...');
+      sendPushNotification(
+        owner.fcmToken,
+        'New Order!',
+        `Order #${order.orderNumber} - ₹${order.total.toFixed(2)}`,
+        {
+          orderId: order.id,
+          orderNumber: order.orderNumber,
+          total: order.total.toString(),
+          restaurantId: cart.restaurantId,
+          type: 'new_order',
+        }
+      ).catch((err) => {
+        console.error('❌ [Order] Failed to send push notification:', err);
+        if (err instanceof Error) {
+          console.error('❌ [Order] Error details:', err.message);
+        }
+      });
+    } else {
+      console.log('⚠️ [Order] No FCM token found for restaurant owner. Skipping notification.');
+      if (owner) {
+        console.log('💡 [Order] Owner exists but has no FCM token. They need to enable notifications.');
+      } else {
+        console.log('💡 [Order] No restaurant owner found for restaurantId:', cart.restaurantId);
+      }
+    }
 
     res.status(201).json({
       success: true,

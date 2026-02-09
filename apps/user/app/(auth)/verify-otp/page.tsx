@@ -1,14 +1,22 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { authApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase';
+
+// Extend Window interface
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+    confirmationResult?: any;
+  }
+}
 
 export default function VerifyOtpPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +31,13 @@ export default function VerifyOtpPage() {
       router.push('/login');
       return;
     }
+
+    // Check if confirmationResult exists
+    if (!window.confirmationResult) {
+      router.push('/login');
+      return;
+    }
+
     setPhone(storedPhone);
   }, [router]);
 
@@ -67,7 +82,7 @@ export default function VerifyOtpPage() {
     if (!/^\d+$/.test(pastedData)) return;
 
     const newOtp = pastedData.split('').concat(Array(6 - pastedData.length).fill(''));
-    setOtp(newOtp);
+    setOtp(newOtp.slice(0, 6));
 
     if (pastedData.length === 6) {
       handleSubmit(pastedData);
@@ -76,30 +91,62 @@ export default function VerifyOtpPage() {
 
   const handleSubmit = async (otpValue?: string) => {
     const otpCode = otpValue || otp.join('');
-    if (otpCode.length !== 6) return;
+    if (otpCode.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    if (!window.confirmationResult) {
+      setError('Session expired. Please restart login.');
+      return;
+    }
 
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await authApi.verifyOtp({
-        phone,
-        otp: otpCode,
-      });
+      // Verify OTP with Firebase
+      const result = await window.confirmationResult.confirm(otpCode);
+      const user = result.user;
 
-      if (response.success && response.data?.user) {
+      // Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Send token to backend
+      const response = await authApi.verifyToken({ idToken });
+
+      if (response.success && response.data) {
+        // Update auth store
         setUser(response.data.user);
-        sessionStorage.removeItem('phone');
 
-        const redirect = searchParams.get('redirect') || '/';
-        router.push(redirect);
+        // Clear session data
+        sessionStorage.removeItem('phone');
+        window.confirmationResult = undefined;
+
+        // Redirect to home or callback URL
+        const callbackUrl = sessionStorage.getItem('callbackUrl');
+        if (callbackUrl) {
+          sessionStorage.removeItem('callbackUrl');
+          window.location.href = callbackUrl;
+        } else {
+          window.location.href = '/';
+        }
       } else {
-        setError(response.error || 'Invalid OTP');
+        setError(response.error || 'Authentication failed');
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to verify OTP');
+    } catch (err: any) {
+      console.error('OTP verification error:', err);
+
+      if (err.code === 'auth/invalid-verification-code') {
+        setError('Invalid OTP. Please try again.');
+      } else if (err.code === 'auth/code-expired') {
+        setError('OTP expired. Please request a new one.');
+      } else {
+        setError('Verification failed. Please try again.');
+      }
+
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
@@ -108,33 +155,37 @@ export default function VerifyOtpPage() {
   };
 
   const handleResendOtp = async () => {
-    if (resendTimer > 0) return;
-
     setError('');
-    setIsLoading(true);
+    setResendTimer(30);
 
     try {
-      const response = await authApi.sendOtp({ phone });
-
-      if (response.success) {
-        setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0]?.focus();
-        setResendTimer(30); // Reset timer
-      } else {
-        setError(response.error || 'Failed to resend OTP');
+      // Initialize reCAPTCHA if not present
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+        });
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resend OTP');
-    } finally {
-      setIsLoading(false);
+
+      const appVerifier = window.recaptchaVerifier;
+
+      // Resend OTP via Firebase
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phone,
+        appVerifier
+      );
+
+      window.confirmationResult = confirmationResult;
+    } catch (err: any) {
+      console.error('Resend OTP error:', err);
+      setError('Failed to resend OTP. Please try again.');
+      setResendTimer(0);
     }
   };
 
   return (
-    <Suspense fallback={<span>loading...</span>}>
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-3 sm:px-4 py-6">
       <div className="max-w-md w-full space-y-6 sm:space-y-8">
-        {/* Themed Logo Section */}
         <div className="text-center">
           <div className="bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-4 sm:mb-6">
             <div className="flex justify-center">
@@ -148,80 +199,82 @@ export default function VerifyOtpPage() {
               />
             </div>
           </div>
-          <p className="mt-2 text-sm sm:text-base text-gray-600 font-medium">Food delivery made simple</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
-          <div className="mb-4 sm:mb-6">
-            <button
-              onClick={() => router.push('/login')}
-              className="text-yellow-600 hover:text-yellow-700 text-sm font-medium"
-            >
-              ← Change number
-            </button>
-          </div>
-
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
-            Enter OTP
+            Verify OTP
           </h2>
-          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 break-words">
-            Sent to {phone}
+          <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
+            Enter the code sent to {phone}
           </p>
 
-          <div className="space-y-4 sm:space-y-6">
-            <div className="flex gap-1.5 sm:gap-2 justify-center">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => {
-                    inputRefs.current[index] = el;
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={handlePaste}
-                  disabled={isLoading}
-                  className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                />
-              ))}
+          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-4 sm:space-y-6">
+            <div>
+              <div className="flex gap-2 justify-between" onPaste={handlePaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => { inputRefs.current[index] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-semibold border-2 border-gray-300 rounded-lg focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+                    disabled={isLoading}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
             </div>
 
+            {/* Invisible reCAPTCHA container for resend */}
+            <div id="recaptcha-container"></div>
+
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
+              <div className="rounded-md bg-red-50 p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-red-800">{error}</p>
               </div>
             )}
 
             <button
-              type="button"
-              onClick={() => handleSubmit()}
-              disabled={isLoading || otp.some((digit) => digit === '')}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={isLoading || otp.join('').length !== 6}
+              className="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? 'Verifying...' : 'Verify OTP'}
             </button>
 
             <div className="text-center">
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                disabled={isLoading || resendTimer > 0}
-                className="text-yellow-600 hover:text-yellow-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend OTP'}
-              </button>
+              {resendTimer > 0 ? (
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Resend OTP in{' '}
+                  <span className="font-semibold text-yellow-600">{resendTimer}s</span>
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  className="text-xs sm:text-sm font-medium text-yellow-600 hover:text-yellow-700"
+                >
+                  Resend OTP
+                </button>
+              )}
             </div>
-          </div>
+          </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Development mode: Use OTP <strong>123456</strong></p>
+          <div className="mt-4 sm:mt-6 text-center">
+            <button
+              onClick={() => router.push('/login')}
+              className="text-xs sm:text-sm text-gray-600 hover:text-gray-800"
+            >
+              ← Back to login
+            </button>
           </div>
         </div>
       </div>
     </div>
-    </Suspense>
   );
 }

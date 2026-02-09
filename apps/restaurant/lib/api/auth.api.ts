@@ -10,28 +10,16 @@ export interface RestaurantOwner {
   createdAt: string;
 }
 
-export interface SendOtpRequest {
-  phone: string;
-}
-
-export interface VerifyOtpRequest {
-  phone: string;
-  otp: string;
+export interface VerifyTokenRequest {
+  idToken: string;
   name?: string;
   email?: string;
 }
 
 export const authApi = {
-  sendOtp: async (data: SendOtpRequest): Promise<ApiResponse<{ phone: string; expiresIn: number }>> => {
-    return apiClient.post<{ phone: string; expiresIn: number }>(
-      '/restaurant-auth/send-otp',
-      data
-    );
-  },
-
-  verifyOtp: async (data: VerifyOtpRequest): Promise<ApiResponse<{ owner: RestaurantOwner }>> => {
+  verifyToken: async (data: VerifyTokenRequest): Promise<ApiResponse<{ owner: RestaurantOwner }>> => {
     return apiClient.post<{ owner: RestaurantOwner }>(
-      '/restaurant-auth/verify-otp',
+      '/restaurant-auth/verify-token',
       data
     );
   },

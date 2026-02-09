@@ -4,8 +4,8 @@ import '@workspace/ui/styles/globals.css';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Khen Logistics - Delivery Partner App',
-  description: 'Delivery partner application for Khen food delivery platform',
+  title: 'Daavat Logistics - Delivery Partner App',
+  description: 'Delivery partner application for Daavat food delivery platform',
 };
 
 export default function RootLayout({

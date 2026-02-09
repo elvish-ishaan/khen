@@ -1,12 +1,7 @@
 import { apiClient, type ApiResponse } from './client';
 
-export interface SendOtpRequest {
-  phone: string;
-}
-
-export interface VerifyOtpRequest {
-  phone: string;
-  otp: string;
+export interface VerifyTokenRequest {
+  idToken: string;
   name?: string;
   email?: string;
 }
@@ -25,12 +20,8 @@ export interface UpdateProfileRequest {
 }
 
 export const authApi = {
-  sendOtp: (data: SendOtpRequest): Promise<ApiResponse> => {
-    return apiClient.post('/auth/send-otp', data);
-  },
-
-  verifyOtp: (data: VerifyOtpRequest): Promise<ApiResponse<{ user: User }>> => {
-    return apiClient.post<{ user: User }>('/auth/verify-otp', data);
+  verifyToken: (data: VerifyTokenRequest): Promise<ApiResponse<{ user: User }>> => {
+    return apiClient.post<{ user: User }>('/auth/verify-token', data);
   },
 
   logout: (): Promise<ApiResponse> => {

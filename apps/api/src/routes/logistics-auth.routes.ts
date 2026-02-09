@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
-  sendOtpHandler,
-  verifyOtpHandler,
+  verifyFirebaseTokenHandler,
   logoutHandler,
   getMeHandler,
 } from '../controllers/logistics-auth.controller';
@@ -10,8 +9,7 @@ import { authenticateLogistics } from '../middleware/logistics-auth';
 const router = Router();
 
 // Public routes
-router.post('/send-otp', sendOtpHandler);
-router.post('/verify-otp', verifyOtpHandler);
+router.post('/verify-token', verifyFirebaseTokenHandler);
 
 // Protected routes
 router.post('/logout', authenticateLogistics, logoutHandler);

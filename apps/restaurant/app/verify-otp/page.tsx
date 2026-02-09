@@ -6,14 +6,21 @@ import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { authApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase';
+
+// Extend Window interface
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+    confirmationResult?: any;
+  }
+}
 
 export default function VerifyOtpPage() {
   const router = useRouter();
   const { setOwner } = useAuthStore();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [canResend, setCanResend] = useState(false);
@@ -27,6 +34,13 @@ export default function VerifyOtpPage() {
       router.push('/login');
       return;
     }
+
+    // Check if confirmationResult exists
+    if (!window.confirmationResult) {
+      router.push('/login');
+      return;
+    }
+
     setPhone(storedPhone);
 
     // Start countdown for resend
@@ -89,23 +103,32 @@ export default function VerifyOtpPage() {
       return;
     }
 
+    if (!window.confirmationResult) {
+      setError('Session expired. Please restart login.');
+      return;
+    }
+
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await authApi.verifyOtp({
-        phone,
-        otp: otpCode,
-        name: name || undefined,
-        email: email || undefined,
-      });
+      // Verify OTP with Firebase
+      const result = await window.confirmationResult.confirm(otpCode);
+      const user = result.user;
+
+      // Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Send token to backend
+      const response = await authApi.verifyToken({ idToken });
 
       if (response.success && response.data) {
         // Update auth store
         setOwner(response.data.owner);
 
-        // Clear phone from storage
+        // Clear session data
         sessionStorage.removeItem('restaurant_phone');
+        window.confirmationResult = undefined;
 
         // Redirect based on onboarding status
         const status = response.data.owner.onboardingStatus;
@@ -126,12 +149,21 @@ export default function VerifyOtpPage() {
           window.location.href = '/documents'; // Default to first step
         }
       } else {
-        setError(response.error || 'Invalid OTP');
+        setError(response.error || 'Authentication failed');
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
       }
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
+    } catch (err: any) {
+      console.error('OTP verification error:', err);
+
+      if (err.code === 'auth/invalid-verification-code') {
+        setError('Invalid OTP. Please try again.');
+      } else if (err.code === 'auth/code-expired') {
+        setError('OTP expired. Please request a new one.');
+      } else {
+        setError('Verification failed. Please try again.');
+      }
+
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     } finally {
@@ -145,26 +177,39 @@ export default function VerifyOtpPage() {
     setCountdown(60);
 
     try {
-      const response = await authApi.sendOtp({ phone });
-
-      if (response.success) {
-        // Restart countdown
-        const timer = setInterval(() => {
-          setCountdown((prev) => {
-            if (prev <= 1) {
-              setCanResend(true);
-              clearInterval(timer);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      } else {
-        setError(response.error || 'Failed to resend OTP');
-        setCanResend(true);
+      // Initialize reCAPTCHA if not present
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+        });
       }
-    } catch (err) {
-      setError('Failed to resend OTP');
+
+      const phoneNumber = `+91${phone}`;
+      const appVerifier = window.recaptchaVerifier;
+
+      // Resend OTP via Firebase
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+
+      window.confirmationResult = confirmationResult;
+
+      // Restart countdown
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('Resend OTP error:', err);
+      setError('Failed to resend OTP. Please try again.');
       setCanResend(true);
     }
   };
@@ -208,89 +253,57 @@ export default function VerifyOtpPage() {
                   />
                 ))}
               </div>
-              <p className="mt-2 text-xs text-gray-500 text-center">
-                Development Mode: Use 123456
-              </p>
             </div>
 
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Name (Optional)
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Restaurant Owner Name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-              disabled={isLoading}
-            />
-          </div>
+            {/* Invisible reCAPTCHA container for resend */}
+            <div id="recaptcha-container"></div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email (Optional)
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="owner@restaurant.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent outline-none"
-              disabled={isLoading}
-            />
-          </div>
-        </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          icon={CheckCircle}
-          iconPosition="right"
-          disabled={otp.join('').length !== 6}
-          isLoading={isLoading}
-          className="w-full"
-        >
-          Verify & Continue
-        </Button>
-
-        <div className="text-center">
-          {canResend ? (
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              className="text-yellow-600 hover:text-yellow-700 font-medium text-sm transition-colors"
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              icon={CheckCircle}
+              iconPosition="right"
+              disabled={otp.join('').length !== 6}
+              isLoading={isLoading}
+              className="w-full"
             >
-              Resend OTP
-            </button>
-          ) : (
-            <p className="text-gray-500 text-sm">
-              Resend OTP in <span className="font-semibold text-gray-700">{countdown}s</span>
-            </p>
-          )}
-        </div>
-      </form>
+              Verify & Continue
+            </Button>
 
-      <div className="mt-6 text-center">
-        <Button
-          variant="ghost"
-          icon={ArrowLeft}
-          onClick={() => router.push('/login')}
-          className="text-sm"
-        >
-          Change phone number
-        </Button>
-      </div>
+            <div className="text-center">
+              {canResend ? (
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  className="text-yellow-600 hover:text-yellow-700 font-medium text-sm transition-colors"
+                >
+                  Resend OTP
+                </button>
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  Resend OTP in <span className="font-semibold text-gray-700">{countdown}s</span>
+                </p>
+              )}
+            </div>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Button
+              variant="ghost"
+              icon={ArrowLeft}
+              onClick={() => router.push('/login')}
+              className="text-sm"
+            >
+              Change phone number
+            </Button>
+          </div>
         </div>
       </div>
     </div>

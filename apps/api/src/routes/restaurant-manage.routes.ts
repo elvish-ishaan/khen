@@ -7,6 +7,8 @@ import {
   getOrderByIdHandler,
   updateOrderStatusHandler,
   toggleAcceptingOrdersHandler,
+  registerFcmTokenHandler,
+  testPushNotificationHandler,
 } from '../controllers/restaurant-manage.controller';
 import { authenticateRestaurant } from '../middleware/restaurant-auth';
 import { uploadSingle, processAndUploadToGcs } from '../middleware/upload';
@@ -58,5 +60,11 @@ router.delete('/menu/items/:itemId', deleteMenuItemHandler);
 router.get('/orders', getOrdersHandler);
 router.get('/orders/:orderId', getOrderByIdHandler);
 router.put('/orders/:orderId/status', updateOrderStatusHandler);
+
+// FCM token registration
+router.post('/fcm-token', registerFcmTokenHandler);
+
+// Test push notification (for debugging)
+router.post('/test-notification', testPushNotificationHandler);
 
 export default router;

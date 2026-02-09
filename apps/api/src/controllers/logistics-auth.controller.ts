@@ -1,96 +1,26 @@
 import { Response } from 'express';
 import { prisma } from '@repo/db';
 import { LogisticsAuthenticatedRequest } from '../types';
-import { sendOtpSchema, verifyOtpSchema } from '../validators/logistics-auth.validator';
-import { sendOtp } from '../services/msg91.service';
+import { verifyFirebaseTokenSchema } from '../validators/logistics-auth.validator';
+import { verifyFirebaseIdToken } from '../services/firebase.service';
 import { generateToken, getTokenExpiry } from '../services/jwt.service';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { env } from '../config/env';
 
-export const sendOtpHandler = asyncHandler(
+export const verifyFirebaseTokenHandler = asyncHandler(
   async (req: LogisticsAuthenticatedRequest, res: Response) => {
-    const { phone } = sendOtpSchema.parse(req.body);
+    const { idToken, name, email } = verifyFirebaseTokenSchema.parse(req.body);
 
-    // Normalize phone number (add +91 if not present)
-    const normalizedPhone = phone.startsWith('+91') ? phone : `+91${phone}`;
+    // Verify Firebase ID token and extract phone number
+    const decodedToken = await verifyFirebaseIdToken(idToken);
+    const phoneNumber = decodedToken.phone_number;
 
-    // Check for recent OTP request (rate limiting)
-    const recentOtp = await prisma.otpVerification.findFirst({
-      where: {
-        phone: normalizedPhone,
-        createdAt: {
-          gte: new Date(Date.now() - 60 * 1000), // Last 1 minute
-        },
-      },
-    });
-
-    if (recentOtp) {
-      throw new AppError(429, 'Please wait before requesting another OTP');
+    if (!phoneNumber) {
+      throw new AppError(400, 'Phone number not found in Firebase token');
     }
 
-    // Generate 6-digit OTP (use 123456 in development for easier testing)
-    const otp = env.NODE_ENV === 'development'
-      ? '123456'
-      : Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Save OTP to database
-    await prisma.otpVerification.create({
-      data: {
-        phone: normalizedPhone,
-        otp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-      },
-    });
-
-    // Send OTP via MSG91
-    const sent = await sendOtp(normalizedPhone);
-
-    if (!sent) {
-      throw new AppError(500, 'Failed to send OTP');
-    }
-
-    res.json({
-      success: true,
-      message: 'OTP sent successfully',
-      data: {
-        phone: normalizedPhone,
-        expiresIn: 600, // seconds
-      },
-    });
-  }
-);
-
-export const verifyOtpHandler = asyncHandler(
-  async (req: LogisticsAuthenticatedRequest, res: Response) => {
-    const { phone, otp, name, email } = verifyOtpSchema.parse(req.body);
-
-    // Normalize phone number
-    const normalizedPhone = phone.startsWith('+91') ? phone : `+91${phone}`;
-
-    // Find valid OTP
-    const otpRecord = await prisma.otpVerification.findFirst({
-      where: {
-        phone: normalizedPhone,
-        otp,
-        expiresAt: {
-          gte: new Date(),
-        },
-        verified: false,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    if (!otpRecord) {
-      throw new AppError(400, 'Invalid or expired OTP');
-    }
-
-    // Mark OTP as verified
-    await prisma.otpVerification.update({
-      where: { id: otpRecord.id },
-      data: { verified: true },
-    });
+    // Normalize phone number (ensure +91 prefix)
+    const normalizedPhone = phoneNumber.startsWith('+91') ? phoneNumber : `+91${phoneNumber}`;
 
     // Find or create delivery personnel
     let personnel = await prisma.deliveryPersonnel.findUnique({
@@ -132,6 +62,7 @@ export const verifyOtpHandler = asyncHandler(
       path: '/',
     };
 
+    // Add domain in production if configured
     if (env.NODE_ENV === 'production' && env.COOKIE_DOMAIN) {
       cookieOptions.domain = env.COOKIE_DOMAIN;
     }
@@ -190,15 +121,14 @@ export const getMeHandler = asyncHandler(
         name: true,
         email: true,
         onboardingStatus: true,
-        vehicleType: true,
-        vehicleNumber: true,
+        isActive: true,
         isOnDuty: true,
         createdAt: true,
       },
     });
 
     if (!personnel) {
-      throw new AppError(404, 'Personnel not found');
+      throw new AppError(404, 'Delivery personnel not found');
     }
 
     res.json({

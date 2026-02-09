@@ -49,7 +49,13 @@
       "Bash(pnpm run build:*)",
       "Bash(npm run dev:*)",
       "Bash(taskkill:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(pnpm --filter logistics build:*)",
+      "Bash(if [ -f .env.local ])",
+      "Bash(then echo \"=== .env.local exists ===\")",
+      "Bash(else echo \"❌ .env.local does NOT exist - you need to create it from .env.example!\")",
+      "Bash(fi)"
     ]
   }
 }

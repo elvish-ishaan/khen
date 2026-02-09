@@ -1,6 +1,6 @@
-# CLAUDE.md - Khen Food Delivery Platform
+# CLAUDE.md - Daavat Food Delivery Platform
 
-> **Purpose**: This document provides comprehensive guidance for AI assistants (like Claude) and developers working on the Khen food delivery platform. It covers architecture, coding standards, conventions, and best practices.
+> **Purpose**: This document provides comprehensive guidance for AI assistants (like Claude) and developers working on the Daavat food delivery platform. It covers architecture, coding standards, conventions, and best practices.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@
 
 ## Project Overview
 
-**Khen** is a full-stack food delivery platform built as a monorepo using Turborepo. The platform consists of:
+**Daavat** is a full-stack food delivery platform built as a monorepo using Turborepo. The platform consists of:
 
 - **User App** (Next.js, port 3000) - Customer-facing application
 - **Restaurant App** (Next.js, port 3001) - Restaurant partner dashboard
@@ -31,7 +31,7 @@
 - **UI Package** (@workspace/ui) - Shared UI components (shadcn/ui)
 
 ### Key Features
-- Phone OTP authentication (MSG91)
+- Phone OTP authentication (Firebase)
 - Restaurant browsing with location-based filtering
 - Shopping cart and order management
 - Payment integration (Razorpay)
@@ -49,7 +49,7 @@
 ### Monorepo Structure
 
 ```
-khen/
+daavat/
 ├── apps/
 │   ├── api/                      # Express.js backend (port 4000)
 │   ├── user/                     # Customer Next.js app (port 3000)
@@ -92,7 +92,7 @@ khen/
                               │  External  │
                               │  Services  │
                               ├────────────┤
-                              │ MSG91      │
+                              │ Firebase   │
                               │ Razorpay   │
                               │ Google Maps│
                               └────────────┘
@@ -129,7 +129,7 @@ khen/
 
 **API Backend (port 4000)**
 - RESTful API for all applications
-- Authentication (JWT, OTP via MSG91)
+- Authentication (JWT, Firebase Phone Auth + Admin SDK)
 - Business logic and data validation
 - Database operations via Prisma
 - Payment processing (Razorpay)
@@ -139,11 +139,12 @@ khen/
 
 ### Authentication Flow
 
-1. User enters phone number → API sends OTP via MSG91
-2. User enters OTP → API verifies and creates/updates user
-3. API generates JWT token → Stores in httpOnly cookie
-4. Subsequent requests → JWT verified via middleware
-5. Frontend checks auth state via Zustand store
+1. User enters phone number → Firebase sends OTP via SMS
+2. User enters OTP → Firebase verifies → Returns ID token
+3. Frontend sends ID token to API → API verifies with Firebase Admin SDK
+4. API generates JWT token → Stores in httpOnly cookie
+5. Subsequent requests → JWT verified via middleware
+6. Frontend checks auth state via Zustand store
 
 ### Payment Flow
 
@@ -225,7 +226,7 @@ src/
 │   └── review.controller.ts      # Review submission
 ├── services/
 │   ├── jwt.service.ts            # JWT generation & verification
-│   ├── msg91.service.ts          # OTP sending via MSG91
+│   ├── firebase.service.ts       # Firebase Admin SDK (auth + FCM push)
 │   ├── razorpay.service.ts       # Razorpay order creation & verification
 │   └── location.service.ts       # Distance calculation (Haversine)
 ├── validators/
@@ -1059,7 +1060,7 @@ The platform uses Docker for containerized deployment with the following service
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Docker Network (khen-network)          │
+│                      Docker Network (daavat-network)          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
@@ -1137,10 +1138,10 @@ build-all.bat
 
 **Build individually:**
 ```bash
-docker build -f apps/api/Dockerfile -t khen-api:latest .
-docker build -f apps/user/Dockerfile -t khen-user:latest .
-docker build -f apps/restaurant/Dockerfile -t khen-restaurant:latest .
-docker build -f apps/logistics/Dockerfile -t khen-logistics:latest .
+docker build -f apps/api/Dockerfile -t daavat-api:latest .
+docker build -f apps/user/Dockerfile -t daavat-user:latest .
+docker build -f apps/restaurant/Dockerfile -t daavat-restaurant:latest .
+docker build -f apps/logistics/Dockerfile -t daavat-logistics:latest .
 ```
 
 ### Environment Configuration
@@ -1154,7 +1155,7 @@ cp .env.production.example .env.production
 Required environment variables:
 - Database credentials (PostgreSQL)
 - JWT secret (minimum 32 characters)
-- MSG91 API keys (OTP service)
+- Firebase service account key (authentication + FCM push notifications)
 - Razorpay keys (payment gateway)
 - Google Cloud Storage credentials
 - Google Maps API key
@@ -1168,17 +1169,17 @@ All services include Docker health checks:
 
 Check service health:
 ```bash
-docker inspect --format='{{.State.Health.Status}}' khen-api
-docker inspect --format='{{.State.Health.Status}}' khen-user
-docker inspect --format='{{.State.Health.Status}}' khen-restaurant
-docker inspect --format='{{.State.Health.Status}}' khen-logistics
+docker inspect --format='{{.State.Health.Status}}' daavat-api
+docker inspect --format='{{.State.Health.Status}}' daavat-user
+docker inspect --format='{{.State.Health.Status}}' daavat-restaurant
+docker inspect --format='{{.State.Health.Status}}' daavat-logistics
 ```
 
 ### Database Migrations
 
 Run Prisma migrations in production:
 ```bash
-docker exec khen-api pnpm --filter @repo/db prisma migrate deploy
+docker exec daavat-api pnpm --filter @repo/db prisma migrate deploy
 ```
 
 ### Monitoring
@@ -1194,7 +1195,7 @@ docker-compose -f docker-compose.production.yml logs -f api
 
 View resource usage:
 ```bash
-docker stats khen-api khen-user khen-restaurant khen-logistics khen-postgres
+docker stats daavat-api daavat-user daavat-restaurant daavat-logistics daavat-postgres
 ```
 
 ### Complete Docker Documentation
@@ -1210,8 +1211,9 @@ For comprehensive Docker deployment instructions, see:
 
 **Never commit**:
 - JWT secrets
-- API keys (MSG91, Razorpay)
+- API keys (Firebase, Razorpay, Google)
 - Database credentials
+- Firebase service account JSON files
 
 **Always set in deployment platform**:
 - `NODE_ENV=production`
@@ -1232,7 +1234,8 @@ For comprehensive Docker deployment instructions, see:
 - [ ] Environment variables configured (.env.production)
 - [ ] Database credentials secured
 - [ ] JWT secret generated (minimum 32 characters)
-- [ ] API keys configured (MSG91, Razorpay, Google)
+- [ ] API keys configured (Firebase, Razorpay, Google)
+- [ ] Firebase service account JSON file secured
 - [ ] CORS origins restricted to production domains
 - [ ] HTTPS enabled for all services
 
@@ -1405,4 +1408,4 @@ docker-compose -f docker-compose.production.yml logs -f
 
 **Last Updated**: 2026-02-02
 **Version**: 2.0.0
-**Maintainer**: Khen Development Team
+**Maintainer**: Daavat Development Team

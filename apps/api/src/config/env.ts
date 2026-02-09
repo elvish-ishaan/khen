@@ -14,9 +14,8 @@ const envSchema = z.object({
     .default('http://localhost:3000,http://localhost:3001,http://localhost:3002')
     .transform((val) => val.split(',').map((origin) => origin.trim())),
   COOKIE_DOMAIN: z.string().optional(), // e.g., .dryink.space for subdomain sharing
-  MSG91_AUTH_KEY: z.string().optional(),
-  MSG91_TEMPLATE_ID: z.string().optional(),
-  MSG91_SENDER_ID: z.string().default('KHENFD'),
+  // Firebase Admin SDK
+  FIREBASE_SERVICE_ACCOUNT_KEY: z.string().min(1, 'Firebase service account key file path required'),
   RAZORPAY_KEY_ID: z.string().optional(),
   RAZORPAY_KEY_SECRET: z.string().optional(),
   // Google Cloud Storage - REQUIRED for image uploads
@@ -32,6 +31,8 @@ const envSchema = z.object({
   COST_PER_KM: z.string().default('20').transform(Number),
   MIN_DELIVERY_FEE: z.string().default('20').transform(Number),
   MAX_DELIVERY_DISTANCE: z.string().default('15').transform(Number),
+  // Frontend URLs
+  RESTAURANT_APP_URL: z.string().url().default('http://localhost:3001'),
 });
 
 const parsed = envSchema.safeParse(process.env);

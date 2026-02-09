@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useEffect, useState, useRef } from 'react';
@@ -76,8 +77,15 @@ export function Header() {
                 <ArrowLeft className="w-5 h-5 text-white" />
               </button>
             ) : null}
-            <Link href="/dashboard" className="text-2xl font-bold text-white">
-              Khen
+            <Link href="/dashboard" className="flex items-center">
+              <Image
+                src="https://res.cloudinary.com/diqurtmad/image/upload/v1770539638/black_dawat-removebg-preview_bppqvz.png"
+                alt="Daavat Logo"
+                width={130}
+                height={45}
+                className="h-10 md:h-12 w-auto object-contain"
+                priority
+              />
             </Link>
             {pageTitle && (
               <span className="text-white text-lg font-semibold hidden sm:block">

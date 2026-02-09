@@ -1,115 +1,250 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { logisticsAuthApi } from '@/lib/api/auth.api';
 import { useAuthStore } from '@/stores/auth-store';
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase';
+
+// Extend Window interface
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+    confirmationResult?: any;
+  }
+}
 
 export default function VerifyOtpPage() {
-  const [otp, setOtp] = useState('');
-  const searchParams = useSearchParams();
-  const phone = searchParams.get('phone') || '';
   const router = useRouter();
-  const { verifyOtp, personnel, isLoading, error } = useAuthStore();
+  const { setPersonnel } = useAuthStore();
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [canResend, setCanResend] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    const storedPhone = sessionStorage.getItem('logistics_phone');
+    if (!storedPhone) {
+      router.push('/login');
+      return;
+    }
 
-    try {
-      await verifyOtp(phone, otp);
+    if (!window.confirmationResult) {
+      router.push('/login');
+      return;
+    }
 
-      // After successful verification, redirect based on onboarding status
-      // The personnel state is updated by verifyOtp, so we need to wait a bit for it to update
-      setTimeout(() => {
-        const personnelData = useAuthStore.getState().personnel;
+    setPhone(storedPhone);
 
-        if (!personnelData) {
-          // Fallback: if personnel is still null, redirect to documents
-          router.push('/documents');
-          return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          setCanResend(true);
+          clearInterval(timer);
+          return 0;
         }
+        return prev - 1;
+      });
+    }, 1000);
 
-        const status = personnelData.onboardingStatus;
+    return () => clearInterval(timer);
+  }, [router]);
 
-        // Redirect based on onboarding status
-        if (!status || status === 'NOT_STARTED') {
-          // New user - start onboarding
-          router.push('/documents');
-        } else if (status === 'PENDING') {
-          // Under review - show pending page
-          router.push('/pending-review');
-        } else if (status === 'APPROVED') {
-          // Approved - go to dashboard
-          router.push('/dashboard');
-        } else {
-          // Default fallback
-          router.push('/documents');
-        }
-      }, 100);
-    } catch (error) {
-      console.error('Failed to verify OTP:', error);
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+    setError('');
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    if (newOtp.every((digit) => digit !== '') && index === 5) {
+      handleSubmit(newOtp.join(''));
     }
   };
 
-  useEffect(() => {
-    if (!phone) {
-      router.push('/login');
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
-  }, [phone, router]);
+  };
+
+  const handleSubmit = async (otpValue?: string) => {
+    const otpCode = otpValue || otp.join('');
+    if (otpCode.length !== 6) {
+      setError('Please enter a valid 6-digit OTP');
+      return;
+    }
+
+    if (!window.confirmationResult) {
+      setError('Session expired. Please restart login.');
+      return;
+    }
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Verify OTP with Firebase
+      const result = await window.confirmationResult.confirm(otpCode);
+      const user = result.user;
+
+      // Get Firebase ID token
+      const idToken = await user.getIdToken();
+
+      // Send token to backend
+      const response = await logisticsAuthApi.verifyToken({ idToken });
+
+      if (response.success && response.data) {
+        setPersonnel(response.data.personnel);
+        sessionStorage.removeItem('logistics_phone');
+        window.confirmationResult = undefined;
+
+        // Redirect to dashboard
+        window.location.href = '/';
+      } else {
+        setError(response.error || 'Authentication failed');
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      }
+    } catch (err: any) {
+      console.error('OTP verification error:', err);
+
+      if (err.code === 'auth/invalid-verification-code') {
+        setError('Invalid OTP. Please try again.');
+      } else if (err.code === 'auth/code-expired') {
+        setError('OTP expired. Please request a new one.');
+      } else {
+        setError('Verification failed. Please try again.');
+      }
+
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setError('');
+    setCanResend(false);
+    setCountdown(60);
+
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+        });
+      }
+
+      const phoneNumber = `+91${phone}`;
+      const appVerifier = window.recaptchaVerifier;
+
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        phoneNumber,
+        appVerifier
+      );
+
+      window.confirmationResult = confirmationResult;
+
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      console.error('Resend OTP error:', err);
+      setError('Failed to resend OTP. Please try again.');
+      setCanResend(true);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-6 sm:space-y-8 p-6 sm:p-8 bg-white rounded-lg shadow-md">
-        <div>
-          <h2 className="text-center text-2xl sm:text-3xl font-bold text-gray-900">
-            Verify OTP
-          </h2>
-          <p className="mt-2 text-center text-xs sm:text-sm text-gray-600">
-            Enter the 6-digit code sent to {phone}
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Verify OTP
+        </h1>
+        <p className="text-sm text-gray-600 mb-6">
+          Enter the code sent to +91 {phone}
+        </p>
 
-        <form className="mt-6 sm:mt-8 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-6">
+          <div>
+            <div className="flex gap-2 justify-between">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => { inputRefs.current[index] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  disabled={isLoading}
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Invisible reCAPTCHA container for resend */}
+          <div id="recaptcha-container"></div>
+
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
               {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
-              OTP
-            </label>
-            <input
-              id="otp"
-              name="otp"
-              type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-center text-xl sm:text-2xl tracking-widest"
-              placeholder="000000"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-              maxLength={6}
-            />
-          </div>
-
           <button
             type="submit"
-            disabled={isLoading || otp.length !== 6}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={isLoading || otp.join('').length !== 6}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Verifying...' : 'Verify OTP'}
           </button>
 
           <div className="text-center">
-            <button
-              type="button"
-              className="text-sm text-primary hover:text-primary/80"
-              onClick={() => router.push('/login')}
-            >
-              Change phone number
-            </button>
+            {canResend ? (
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                Resend OTP
+              </button>
+            ) : (
+              <p className="text-sm text-gray-600">
+                Resend OTP in <span className="font-semibold">{countdown}s</span>
+              </p>
+            )}
           </div>
         </form>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => router.push('/login')}
+            className="text-sm text-gray-600 hover:text-gray-800"
+          >
+            ← Back to login
+          </button>
+        </div>
       </div>
     </div>
   );

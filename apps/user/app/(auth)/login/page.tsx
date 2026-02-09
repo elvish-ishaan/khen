@@ -1,15 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { authApi } from '@/lib/api/auth.api';
+import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase';
+
+// Extend Window interface for confirmation result
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+    confirmationResult?: any;
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Initialize invisible reCAPTCHA
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved - will proceed with submit
+        },
+        'expired-callback': () => {
+          setError('reCAPTCHA expired. Please try again.');
+        },
+      });
+    }
+
+    return () => {
+      // Cleanup on unmount
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = undefined;
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,18 +50,40 @@ export default function LoginPage() {
     try {
       // Normalize phone number
       const normalizedPhone = phone.startsWith('+91') ? phone : `+91${phone}`;
+      const appVerifier = window.recaptchaVerifier!;
 
-      const response = await authApi.sendOtp({ phone: normalizedPhone });
+      // Send OTP via Firebase
+      const confirmationResult = await signInWithPhoneNumber(
+        auth,
+        normalizedPhone,
+        appVerifier
+      );
 
-      if (response.success) {
-        // Store phone in session storage for OTP page
-        sessionStorage.setItem('phone', normalizedPhone);
-        router.push('/verify-otp');
+      // Store confirmation result for verification page
+      window.confirmationResult = confirmationResult;
+      sessionStorage.setItem('phone', normalizedPhone);
+
+      router.push('/verify-otp');
+    } catch (err: any) {
+      console.error('Firebase phone auth error:', err);
+
+      if (err.code === 'auth/invalid-phone-number') {
+        setError('Invalid phone number format');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many attempts. Please try again later.');
+      } else if (err.code === 'auth/quota-exceeded') {
+        setError('SMS quota exceeded. Please contact support.');
       } else {
-        setError(response.error || 'Failed to send OTP');
+        setError('Failed to send OTP. Please try again.');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send OTP');
+
+      // Reset reCAPTCHA on error
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -79,39 +132,31 @@ export default function LoginPage() {
                   pattern="[0-9]{10}"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                  className="block w-full pl-14 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  className="block w-full pl-12 pr-3 py-2 sm:py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent sm:text-base"
                   placeholder="9876543210"
                   disabled={isLoading}
                 />
               </div>
-              <p className="mt-1 text-sm text-gray-500">
-                Enter your 10-digit mobile number
-              </p>
             </div>
 
+            {/* Invisible reCAPTCHA container */}
+            <div id="recaptcha-container"></div>
+
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                {error}
+              <div className="rounded-md bg-red-50 p-3 sm:p-4">
+                <p className="text-xs sm:text-sm text-red-800">{error}</p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={isLoading || phone.length !== 10}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-900 bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {isLoading ? 'Sending OTP...' : 'Send OTP'}
             </button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Development mode: Use OTP <strong>123456</strong></p>
-          </div>
         </div>
-
-        <p className="text-center text-sm text-gray-500">
-          By continuing, you agree to our Terms of Service and Privacy Policy
-        </p>
       </div>
     </div>
   );

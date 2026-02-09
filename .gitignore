@@ -35,7 +35,8 @@ npm-debug.log*
 .DS_Store
 *.pem
 
-/apps/api/project-e18b5d64-9994-48d1-9b3-ccfe0f9ab8f8.json
+/apps/api/gcp-key.json
+/apps/api/firebase-service-account.json
 
 # PWA
 **/public/sw.js

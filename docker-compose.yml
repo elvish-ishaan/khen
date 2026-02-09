@@ -2,11 +2,11 @@
 services:
   postgres:
     image: postgres:alpine
-    container_name: khen_postgres
+    container_name: daavat_postgres
     environment:
-      POSTGRES_DB: khen_db
-      POSTGRES_USER: khen_user
-      POSTGRES_PASSWORD: khen_password
+      POSTGRES_DB: daavat_db
+      POSTGRES_USER: daavat_user
+      POSTGRES_PASSWORD: daavat_password
     ports:
       - "5432:5432"
     volumes:
