@@ -6,6 +6,9 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useDeliveryStore } from '@/stores/delivery-store';
 import { useLocationStore } from '@/stores/location-store';
 import { logisticsApi } from '@/lib/api/logistics.api';
+import '@/lib/firebase'; // Initialize Firebase before FCM
+import { requestNotificationPermission, onForegroundMessage, showNotification } from '@/lib/fcm';
+import { NotificationDiagnostics } from '@/components/notification-diagnostics';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,6 +41,67 @@ export default function DashboardPage() {
       initializeDutyStatus(personnel.isOnDuty);
     }
   }, [personnel?.isOnDuty, initializeDutyStatus]);
+
+  // FCM push notification setup - register token and listen for messages
+  useEffect(() => {
+    // Only set up FCM if personnel is approved and on duty
+    if (personnel?.onboardingStatus !== 'APPROVED' || !isOnDuty) {
+      return;
+    }
+
+    console.log('🔔 [Dashboard] Setting up FCM for delivery partner...');
+
+    let unsubscribe: (() => void) | null = null;
+
+    const setupFCM = async () => {
+      try {
+        // Request notification permission and get FCM token
+        const fcmToken = await requestNotificationPermission();
+
+        if (fcmToken) {
+          console.log('✅ [Dashboard] FCM token obtained, registering with backend...');
+
+          // Register token with backend
+          const response = await logisticsApi.updateFcmToken(fcmToken);
+
+          if (response.success) {
+            console.log('✅ [Dashboard] FCM token registered successfully');
+          } else {
+            console.error('❌ [Dashboard] Failed to register FCM token:', response.error);
+          }
+
+          // Set up foreground message listener
+          unsubscribe = onForegroundMessage((payload) => {
+            console.log('🔔 [Dashboard] Foreground message received:', payload);
+
+            // Show notification even when app is in foreground
+            const title = payload.notification?.title || 'New Order Available!';
+            const body = payload.notification?.body || 'A new order is ready for pickup nearby';
+
+            showNotification(title, {
+              body,
+              data: payload.data,
+            });
+
+            // Optional: Refresh available orders list or show a toast
+            // You can dispatch a custom event or update state here
+          });
+        }
+      } catch (error) {
+        console.error('❌ [Dashboard] FCM setup failed:', error);
+      }
+    };
+
+    setupFCM();
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        console.log('🔕 [Dashboard] Unsubscribing from FCM messages');
+        unsubscribe();
+      }
+    };
+  }, [personnel?.onboardingStatus, isOnDuty]);
 
   const loadDashboardStats = async () => {
     try {
@@ -84,48 +148,9 @@ export default function DashboardPage() {
     }
   };
 
+  // Layout already handles auth checks and redirects, so we can skip them here
   if (!personnel) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (personnel.onboardingStatus !== 'APPROVED') {
-    // If status is PENDING, redirect to pending-review page
-    if (personnel.onboardingStatus === 'PENDING') {
-      router.push('/pending-review');
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-gray-600">Redirecting...</p>
-          </div>
-        </div>
-      );
-    }
-
-    // For NOT_STARTED or any other status, redirect to onboarding
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full p-6 sm:p-8 bg-white rounded-lg shadow-md">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-            Onboarding Required
-          </h2>
-          <p className="text-sm sm:text-base text-gray-600 mb-6">
-            Please complete the onboarding process to access your dashboard.
-          </p>
-          <button
-            onClick={() => router.push('/documents')}
-            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          >
-            Continue Onboarding
-          </button>
-        </div>
-      </div>
-    );
+    return null; // Layout will show loading state
   }
 
   return (
@@ -243,6 +268,9 @@ export default function DashboardPage() {
             </p>
           </button>
         </div>
+
+        {/* Notification Diagnostics (optional helper) */}
+        <NotificationDiagnostics />
     </div>
   );
 }

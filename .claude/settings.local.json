@@ -57,7 +57,10 @@
       "Bash(else echo \"❌ .env.local does NOT exist - you need to create it from .env.example!\")",
       "Bash(fi)",
       "Bash(npm run build:*)",
-      "Bash(node -p:*)"
+      "Bash(node -p:*)",
+      "Bash(pnpm --filter @repo/db prisma format:*)",
+      "Bash(pnpm --filter api exec tsc:*)",
+      "Bash(pnpm --filter logistics exec tsc:*)"
     ]
   }
 }

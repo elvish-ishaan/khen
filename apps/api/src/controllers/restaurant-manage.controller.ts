@@ -9,6 +9,7 @@ import {
 import { AppError, asyncHandler } from '../middleware/error-handler';
 import { getFileUrl, RequestWithFileUrl } from '../middleware/upload';
 import { sendPushNotification } from '../services/firebase.service';
+import { broadcastOrderToNearbyPartners } from '../services/order-broadcast.service';
 
 // Get restaurant profile
 export const getProfileHandler = asyncHandler(
@@ -268,6 +269,28 @@ export const updateOrderStatusHandler = asyncHandler(
 
       return order;
     });
+
+    // Broadcast to nearby delivery partners when order is ready for pickup
+    if (status === 'READY_FOR_PICKUP') {
+      // Fetch restaurant coordinates
+      const restaurant = await prisma.restaurant.findUnique({
+        where: { id: req.owner.restaurantId },
+        select: {
+          latitude: true,
+          longitude: true,
+        },
+      });
+
+      if (restaurant?.latitude && restaurant?.longitude) {
+        // Fire and forget - don't block response on broadcast
+        broadcastOrderToNearbyPartners(orderId, restaurant.latitude, restaurant.longitude)
+          .catch((err) => {
+            console.error('❌ [Order Status] Failed to broadcast order to delivery partners:', err);
+          });
+      } else {
+        console.warn('⚠️ [Order Status] Restaurant location not available for broadcasting');
+      }
+    }
 
     res.json({
       success: true,
