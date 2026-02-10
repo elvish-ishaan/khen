@@ -10,6 +10,7 @@ import { StatsCard } from '@/components/stats-card';
 import { OrderCard } from '@/components/order-card';
 import { EmptyState } from '@/components/empty-state';
 import { StatsGridSkeleton, OrderListSkeleton } from '@/components/loading-skeleton';
+import { NotificationDiagnostics } from '@/components/notification-diagnostics';
 // IMPORTANT: Import Firebase to initialize it before using FCM
 import '@/lib/firebase';
 import { requestNotificationPermission, onForegroundMessage, showNotification, isNotificationPermissionGranted } from '@/lib/fcm';
@@ -330,6 +331,9 @@ export default function DashboardPage() {
           <p className="text-xs sm:text-sm text-gray-600">Update restaurant details</p>
         </button>
       </div>
+
+      {/* Notification Diagnostics - Floating button in bottom right */}
+      <NotificationDiagnostics />
     </div>
   );
 }

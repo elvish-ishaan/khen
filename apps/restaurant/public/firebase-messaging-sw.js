@@ -1,8 +1,13 @@
 // Firebase Messaging Service Worker for background push notifications
 // This file must be in the public directory and accessible at /firebase-messaging-sw.js
+// Version: 2.0 - Enhanced logging and error handling
+
+console.log('🚀 [SW] Service worker script loading...', new Date().toISOString());
 
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js');
+
+console.log('✅ [SW] Firebase scripts loaded successfully');
 
 // IMPORTANT: Replace these with your actual Firebase config values
 // These must be hardcoded because service workers can't access env variables
@@ -18,40 +23,77 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 console.log('🔥 [SW] Initializing Firebase in service worker...');
-firebase.initializeApp(firebaseConfig);
-console.log('✅ [SW] Firebase initialized successfully');
+try {
+  firebase.initializeApp(firebaseConfig);
+  console.log('✅ [SW] Firebase initialized successfully');
+} catch (error) {
+  console.error('❌ [SW] Failed to initialize Firebase:', error);
+}
 
 const messaging = firebase.messaging();
 console.log('📱 [SW] Firebase Messaging instance created');
 
+// Service worker activation
+self.addEventListener('activate', (event) => {
+  console.log('✅ [SW] Service worker activated', new Date().toISOString());
+  event.waitUntil(self.clients.claim());
+});
+
+// Service worker installation
+self.addEventListener('install', (event) => {
+  console.log('📦 [SW] Service worker installed', new Date().toISOString());
+  self.skipWaiting();
+});
+
 // Handle background messages (when app is not in focus)
 messaging.onBackgroundMessage((payload) => {
-  console.log('🔔 [SW] Received background message:', payload);
-  console.log('📦 [SW] Notification data:', JSON.stringify(payload.notification));
-  console.log('📦 [SW] Custom data:', JSON.stringify(payload.data));
+  console.log('═══════════════════════════════════════════════════');
+  console.log('🔔 [SW] BACKGROUND MESSAGE RECEIVED', new Date().toISOString());
+  console.log('═══════════════════════════════════════════════════');
+  console.log('📦 [SW] Full payload:', JSON.stringify(payload, null, 2));
+  console.log('📦 [SW] Notification object:', JSON.stringify(payload.notification, null, 2));
+  console.log('📦 [SW] Data object:', JSON.stringify(payload.data, null, 2));
 
-  const notificationTitle = payload.notification?.title || 'New Order!';
-  const notificationOptions = {
-    body: payload.notification?.body || 'You have a new order',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-192x192.png',
-    tag: payload.data?.orderId || 'order-notification',
-    data: payload.data,
-    requireInteraction: true, // Keep notification visible until user interacts
-    actions: [
-      {
-        action: 'view',
-        title: 'View Order',
-      },
-      {
-        action: 'dismiss',
-        title: 'Dismiss',
-      },
-    ],
-  };
+  try {
+    const notificationTitle = payload.notification?.title || payload.data?.title || 'New Order!';
+    const notificationBody = payload.notification?.body || payload.data?.body || 'You have a new order';
 
-  console.log('✅ [SW] Showing notification:', notificationTitle);
-  self.registration.showNotification(notificationTitle, notificationOptions);
+    const notificationOptions = {
+      body: notificationBody,
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
+      tag: payload.data?.orderId || 'order-notification',
+      data: payload.data,
+      requireInteraction: true, // Keep notification visible until user interacts
+      vibrate: [200, 100, 200], // Vibration pattern
+      timestamp: Date.now(),
+      actions: [
+        {
+          action: 'view',
+          title: 'View Order',
+          icon: '/icons/icon-192x192.png',
+        },
+        {
+          action: 'dismiss',
+          title: 'Dismiss',
+        },
+      ],
+    };
+
+    console.log('✅ [SW] Notification title:', notificationTitle);
+    console.log('✅ [SW] Notification options:', JSON.stringify(notificationOptions, null, 2));
+    console.log('🔔 [SW] Showing notification now...');
+
+    return self.registration.showNotification(notificationTitle, notificationOptions)
+      .then(() => {
+        console.log('✅ [SW] Notification displayed successfully!');
+      })
+      .catch((error) => {
+        console.error('❌ [SW] Error showing notification:', error);
+      });
+  } catch (error) {
+    console.error('❌ [SW] Error processing background message:', error);
+  }
 });
 
 // Handle notification click
