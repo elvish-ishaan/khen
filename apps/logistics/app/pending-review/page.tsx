@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/auth-store';
 import { logisticsOnboardingApi } from '@/lib/api/onboarding.api';
 
 export default function PendingReviewPage() {
   const router = useRouter();
+  const personnel = useAuthStore((state) => state.personnel);
   const [status, setStatus] = useState<any>(null);
+
+  const isRejected = personnel?.onboardingStatus === 'REJECTED';
 
   useEffect(() => {
     loadStatus();
@@ -29,25 +33,51 @@ export default function PendingReviewPage() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
           <div className="text-center mb-6 sm:mb-8">
-            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-8 h-8 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Application Under Review</h1>
-            <p className="mt-2 text-sm sm:text-base text-gray-600">
-              Your application is being reviewed by our team
-            </p>
+            {isRejected ? (
+              <>
+                <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Application Rejected</h1>
+                <p className="mt-2 text-sm sm:text-base text-gray-600">
+                  Unfortunately, your application could not be approved
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+                  <svg
+                    className="w-8 h-8 text-yellow-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Application Under Review</h1>
+                <p className="mt-2 text-sm sm:text-base text-gray-600">
+                  Your application is being reviewed by our team
+                </p>
+              </>
+            )}
           </div>
 
           <div className="border-t border-gray-200 pt-6">

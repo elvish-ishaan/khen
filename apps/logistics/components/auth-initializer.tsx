@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
+import { getRedirectPath, type OnboardingStatus } from '@/lib/onboarding-routes';
 
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const fetchMe = useAuthStore((state) => state.fetchMe);
+  const personnel = useAuthStore((state) => state.personnel);
   const isLoading = useAuthStore((state) => state.isLoading);
   const [initialized, setInitialized] = useState(false);
   const hasInitialized = useRef(false);
@@ -22,6 +27,19 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
       initAuth();
     }
   }, []); // Empty dependency array - only run once on mount
+
+  // Handle redirects based on onboarding status
+  useEffect(() => {
+    if (!initialized || isLoading) return;
+
+    const status = personnel?.onboardingStatus as OnboardingStatus | undefined;
+    const redirectPath = getRedirectPath(status, pathname);
+
+    if (redirectPath) {
+      console.log(`🔄 Redirecting from ${pathname} to ${redirectPath} (status: ${status})`);
+      router.replace(redirectPath);
+    }
+  }, [initialized, isLoading, personnel, pathname, router]);
 
   // Show loading state while checking auth
   if (!initialized || isLoading) {

@@ -23,6 +23,11 @@ export const submitDocumentsHandler = asyncHandler(
     const aadharFileUrl = uploadedFiles.aadharFile[0];
     const dlFileUrl = uploadedFiles.dlFile[0];
 
+    // Check if req.body has the required fields
+    if (!req.body || Object.keys(req.body).length === 0) {
+      throw new AppError(400, 'Form data is empty. Please ensure all fields are filled.');
+    }
+
     // Parse body data (document numbers, vehicle details)
     const { aadharNumber, dlNumber, vehicleType, vehicleNumber } =
       submitDocumentsSchema.parse(req.body);

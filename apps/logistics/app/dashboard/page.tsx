@@ -9,6 +9,7 @@ import { logisticsApi } from '@/lib/api/logistics.api';
 import '@/lib/firebase'; // Initialize Firebase before FCM
 import { requestNotificationPermission, onForegroundMessage, showNotification } from '@/lib/fcm';
 import { NotificationDiagnostics } from '@/components/notification-diagnostics';
+import { DashboardGuard } from '@/components/route-guard';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -152,7 +153,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <DashboardGuard>
+      <div className="max-w-7xl mx-auto">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Welcome, {personnel.name || 'Partner'}!
@@ -269,6 +271,7 @@ export default function DashboardPage() {
 
         {/* Notification Diagnostics (optional helper) */}
         <NotificationDiagnostics />
-    </div>
+      </div>
+    </DashboardGuard>
   );
 }

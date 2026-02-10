@@ -4,8 +4,8 @@
   "description": "Delivery partner application for Daavat food delivery platform",
   "start_url": "/dashboard",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
+  "background_color": "#0da2e7",
+  "theme_color": "#0da2e7",
   "orientation": "portrait",
   "icons": [
     {

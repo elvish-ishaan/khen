@@ -68,6 +68,12 @@ export default function DocumentsPage() {
       return;
     }
 
+    // Validate vehicle type
+    if (!formData.vehicleType || formData.vehicleType === '') {
+      setError('Please select a vehicle type');
+      return;
+    }
+
     // Validate vehicle number
     if (!validators.vehicleNumber(formData.vehicleNumber)) {
       setError(errorMessages.vehicleNumber);

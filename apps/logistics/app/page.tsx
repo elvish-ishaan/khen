@@ -31,12 +31,8 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [language, setLanguage] = useState('English');
 
-  // Redirect logged-in users to dashboard
-  useEffect(() => {
-    if (personnel) {
-      router.push('/dashboard');
-    }
-  }, [personnel, router]);
+  // AuthInitializer handles redirects based on onboarding status
+  // No redirect logic needed here
 
   const faqs = [
     {
