@@ -1,0 +1,54 @@
+{
+  "name": "Daavat Logistics - Delivery Partner",
+  "short_name": "Daavat Delivery",
+  "description": "Delivery partner application for Daavat food delivery platform",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Active Orders",
+      "short_name": "Active",
+      "description": "View your active deliveries",
+      "url": "/dashboard/deliveries",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Available Orders",
+      "short_name": "Available",
+      "description": "Browse available orders to accept",
+      "url": "/dashboard/orders",
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

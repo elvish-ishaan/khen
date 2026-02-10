@@ -60,7 +60,10 @@
       "Bash(node -p:*)",
       "Bash(pnpm --filter @repo/db prisma format:*)",
       "Bash(pnpm --filter api exec tsc:*)",
-      "Bash(pnpm --filter logistics exec tsc:*)"
+      "Bash(pnpm --filter logistics exec tsc:*)",
+      "Bash(copy:*)",
+      "Bash(copy \"C:\\\\Users\\\\hp\\\\projects\\\\khen\\\\apps\\\\user\\\\public\\\\icons\\\\icons-512x512.png\" \"C:\\\\Users\\\\hp\\\\projects\\\\khen\\\\apps\\\\logistics\\\\public\\\\icons\\\\icon-512x512.png\")",
+      "Bash(pnpm start)"
     ]
   }
 }
