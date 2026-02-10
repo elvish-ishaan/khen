@@ -20,11 +20,18 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    const defaultHeaders: HeadersInit = {};
+
+    // Don't set Content-Type for FormData (browser sets it with boundary)
+    if (!(options.body instanceof FormData)) {
+      defaultHeaders['Content-Type'] = 'application/json';
+    }
+
     const config: RequestInit = {
       ...options,
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
+        ...defaultHeaders,
         ...options.headers,
       },
     };
@@ -49,9 +56,10 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    const body = data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined);
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body,
     });
   }
 

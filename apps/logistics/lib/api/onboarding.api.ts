@@ -1,14 +1,5 @@
 import { apiClient } from './client';
 
-export interface SubmitDocumentsRequest {
-  aadharNumber: string;
-  aadharFileUrl: string;
-  dlNumber: string;
-  dlFileUrl: string;
-  vehicleType: string;
-  vehicleNumber: string;
-}
-
 export interface SubmitBankDetailsRequest {
   accountTitle: string;
   accountNumber: string;
@@ -17,10 +8,10 @@ export interface SubmitBankDetailsRequest {
 }
 
 export const logisticsOnboardingApi = {
-  submitDocuments: async (data: SubmitDocumentsRequest) => {
+  submitDocuments: async (formData: FormData) => {
     return apiClient.post<{ onboardingStatus: string }>(
       '/logistics-onboarding/documents',
-      data
+      formData
     );
   },
 

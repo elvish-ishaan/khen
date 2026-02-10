@@ -2,9 +2,7 @@ import { z } from 'zod';
 
 export const submitDocumentsSchema = z.object({
   aadharNumber: z.string().regex(/^\d{12}$/, 'Aadhar must be 12 digits'),
-  aadharFileUrl: z.string().url('Invalid Aadhar file URL'),
   dlNumber: z.string().min(8, 'Invalid driving license number'),
-  dlFileUrl: z.string().url('Invalid DL file URL'),
   vehicleType: z.string().min(2, 'Vehicle type is required'),
   vehicleNumber: z.string().min(3, 'Vehicle number is required'),
 });

@@ -13,7 +13,18 @@ export const submitDocumentsHandler = asyncHandler(
       throw new AppError(401, 'Not authenticated');
     }
 
-    const { aadharNumber, aadharFileUrl, dlNumber, dlFileUrl, vehicleType, vehicleNumber } =
+    // Extract uploaded file URLs from middleware
+    const uploadedFiles = (req as any).uploadedFiles as { [fieldname: string]: string[] };
+
+    if (!uploadedFiles || !uploadedFiles.aadharFile || !uploadedFiles.dlFile) {
+      throw new AppError(400, 'Both Aadhar and Driving License files are required');
+    }
+
+    const aadharFileUrl = uploadedFiles.aadharFile[0];
+    const dlFileUrl = uploadedFiles.dlFile[0];
+
+    // Parse body data (document numbers, vehicle details)
+    const { aadharNumber, dlNumber, vehicleType, vehicleNumber } =
       submitDocumentsSchema.parse(req.body);
 
     // Check current onboarding status

@@ -6,30 +6,80 @@ import { logisticsOnboardingApi } from '@/lib/api/onboarding.api';
 
 export default function DocumentsPage() {
   const router = useRouter();
+  const [aadharFile, setAadharFile] = useState<File | null>(null);
+  const [dlFile, setDlFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     aadharNumber: '',
-    aadharFileUrl: '',
     dlNumber: '',
-    dlFileUrl: '',
     vehicleType: '',
     vehicleNumber: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: (file: File | null) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size must be less than 5MB');
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('File must be JPG, PNG, WEBP, or PDF');
+        return;
+      }
+
+      setter(file);
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+    // Validate files are selected
+    if (!aadharFile) {
+      setError('Aadhar card image is required');
+      return;
+    }
+    if (!dlFile) {
+      setError('Driving license image is required');
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      const response = await logisticsOnboardingApi.submitDocuments(formData);
+      // Create FormData
+      const formDataToSend = new FormData();
+
+      // Append files
+      formDataToSend.append('aadharFile', aadharFile);
+      formDataToSend.append('dlFile', dlFile);
+
+      // Append text fields
+      formDataToSend.append('aadharNumber', formData.aadharNumber);
+      formDataToSend.append('dlNumber', formData.dlNumber);
+      formDataToSend.append('vehicleType', formData.vehicleType);
+      formDataToSend.append('vehicleNumber', formData.vehicleNumber);
+
+      const response = await logisticsOnboardingApi.submitDocuments(formDataToSend);
 
       if (response.success) {
         router.push('/bank-details');
+      } else {
+        setError(response.error || 'Failed to upload documents');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit documents');
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -94,21 +144,24 @@ export default function DocumentsPage() {
                     }
                     maxLength={12}
                   />
+                  <p className="mt-1 text-xs text-gray-500">Enter 12-digit Aadhar number</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Aadhar Card Image URL
+                    Aadhar Card Image <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="url"
-                    required
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => handleFileChange(e, setAadharFile)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="https://example.com/aadhar.jpg"
-                    value={formData.aadharFileUrl}
-                    onChange={(e) => setFormData({ ...formData, aadharFileUrl: e.target.value })}
+                    required
                   />
+                  {aadharFile && (
+                    <p className="mt-1 text-sm text-green-600">✓ {aadharFile.name}</p>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">
-                    For demo: Use any image URL (e.g., https://via.placeholder.com/400x200)
+                    Upload JPG, PNG, WEBP, or PDF (max 5MB)
                   </p>
                 </div>
               </div>
@@ -133,18 +186,20 @@ export default function DocumentsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    DL Image URL
+                    DL Image <span className="text-red-500">*</span>
                   </label>
                   <input
-                    type="url"
-                    required
+                    type="file"
+                    accept="image/*,.pdf"
+                    onChange={(e) => handleFileChange(e, setDlFile)}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="https://example.com/dl.jpg"
-                    value={formData.dlFileUrl}
-                    onChange={(e) => setFormData({ ...formData, dlFileUrl: e.target.value })}
+                    required
                   />
+                  {dlFile && (
+                    <p className="mt-1 text-sm text-green-600">✓ {dlFile.name}</p>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">
-                    For demo: Use any image URL (e.g., https://via.placeholder.com/400x200)
+                    Upload JPG, PNG, WEBP, or PDF (max 5MB)
                   </p>
                 </div>
               </div>
