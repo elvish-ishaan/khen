@@ -91,7 +91,7 @@ export async function broadcastOrderToNearbyPartners(
       try {
         console.log(`📱 [Broadcast] Sending to ${partner.name || 'Partner'} (${partner.id})`);
 
-        await sendPushNotification(
+        const result = await sendPushNotification(
           partner.fcmToken!,
           'New Order Available!',
           `Order #${order.orderNumber} is ready for pickup nearby - ₹${order.total.toFixed(2)}`,
@@ -102,17 +102,29 @@ export async function broadcastOrderToNearbyPartners(
           }
         );
 
-        // Track broadcast record
-        broadcastRecords.push({
-          orderId: orderId,
-          personnelId: partner.id,
-        });
+        if (result.success) {
+          // Track broadcast record only for successful notifications
+          broadcastRecords.push({
+            orderId: orderId,
+            personnelId: partner.id,
+          });
 
-        successCount++;
-        console.log(`✅ [Broadcast] Notification sent to ${partner.name || 'Partner'}`);
+          successCount++;
+          console.log(`✅ [Broadcast] Notification sent to ${partner.name || 'Partner'}`);
+        } else if (result.shouldInvalidateToken) {
+          // Clear invalid FCM token from database
+          console.warn(`⚠️ [Broadcast] Invalid token for ${partner.name || 'Partner'}. Clearing...`);
+          await prisma.deliveryPersonnel.update({
+            where: { id: partner.id },
+            data: { fcmToken: null },
+          });
+          console.log(`✅ [Broadcast] Invalid token cleared for ${partner.id}`);
+        } else {
+          console.warn(`⚠️ [Broadcast] Failed to send notification to ${partner.name || 'Partner'}`);
+        }
       } catch (error) {
         // Log error but continue with other partners
-        console.error(`❌ [Broadcast] Failed to send to ${partner.id}:`, error);
+        console.error(`❌ [Broadcast] Unexpected error sending to ${partner.id}:`, error);
       }
     }
 

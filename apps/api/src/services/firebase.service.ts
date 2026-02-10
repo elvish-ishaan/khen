@@ -57,14 +57,14 @@ export async function verifyFirebaseIdToken(idToken: string) {
  * @param title - Notification title
  * @param body - Notification body
  * @param data - Optional data payload
- * @returns Message ID on success
+ * @returns Object with success status, messageId (if successful), and shouldInvalidateToken flag
  */
 export async function sendPushNotification(
   fcmToken: string,
   title: string,
   body: string,
   data?: Record<string, string>
-): Promise<string> {
+): Promise<{ success: boolean; messageId?: string; shouldInvalidateToken?: boolean }> {
   try {
     console.log('📱 [FCM] Preparing to send push notification...');
     console.log('📱 [FCM] Token (first 20 chars):', fcmToken.substring(0, 20) + '...');
@@ -107,22 +107,31 @@ export async function sendPushNotification(
     console.log('🔄 [FCM] Sending message via Firebase Admin SDK...');
     const messageId = await admin.messaging().send(message);
     console.log(`✅ [FCM] Push notification sent successfully! Message ID: ${messageId}`);
-    return messageId;
+    return { success: true, messageId };
   } catch (error) {
-    console.error('❌ [FCM] Failed to send push notification:', error);
-    if (error instanceof Error) {
-      console.error('❌ [FCM] Error details:', error.message);
-      console.error('❌ [FCM] Error stack:', error.stack);
-    }
-    // Log additional info for common errors
+    // Handle FCM errors gracefully - these are operational errors, not fatal
     if (error && typeof error === 'object' && 'code' in error) {
-      console.error('❌ [FCM] Error code:', (error as any).code);
-      if ((error as any).code === 'messaging/invalid-registration-token') {
-        console.error('❌ [FCM] Token is invalid or expired. User needs to re-register.');
-      } else if ((error as any).code === 'messaging/registration-token-not-registered') {
-        console.error('❌ [FCM] Token is not registered. User needs to re-register.');
+      const errorCode = (error as any).code;
+
+      // Token-related errors - should invalidate the token in database
+      if (
+        errorCode === 'messaging/invalid-registration-token' ||
+        errorCode === 'messaging/registration-token-not-registered' ||
+        errorCode === 'messaging/invalid-argument'
+      ) {
+        console.warn(
+          `⚠️ [FCM] Token is invalid or not registered (${errorCode}). Token should be cleared from database.`
+        );
+        return { success: false, shouldInvalidateToken: true };
       }
+
+      // Other FCM errors (quota exceeded, internal error, etc.)
+      console.error(`❌ [FCM] FCM error (${errorCode}):`, (error as any).message);
+    } else {
+      console.error('❌ [FCM] Unexpected error sending push notification:', error);
     }
-    throw error;
+
+    // Return failure but don't throw - this prevents notification failures from breaking business logic
+    return { success: false };
   }
 }

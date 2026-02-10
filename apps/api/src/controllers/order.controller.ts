@@ -238,12 +238,26 @@ export const createOrderHandler = asyncHandler(
           restaurantId: cart.restaurantId,
           type: 'new_order',
         }
-      ).catch((err) => {
-        console.error('❌ [Order] Failed to send push notification:', err);
-        if (err instanceof Error) {
-          console.error('❌ [Order] Error details:', err.message);
-        }
-      });
+      )
+        .then(async (result) => {
+          if (result.success) {
+            console.log(`✅ [Order] Push notification sent successfully! Message ID: ${result.messageId}`);
+          } else if (result.shouldInvalidateToken) {
+            console.warn('⚠️ [Order] FCM token is invalid. Clearing from database...');
+            // Clear invalid token from database
+            await prisma.restaurantOwner.update({
+              where: { id: owner.id },
+              data: { fcmToken: null },
+            });
+            console.log('✅ [Order] Invalid FCM token cleared. Owner needs to re-register.');
+          } else {
+            console.warn('⚠️ [Order] Push notification failed, but continuing with order.');
+          }
+        })
+        .catch((err) => {
+          // This should rarely happen now, but keep as safety net
+          console.error('❌ [Order] Unexpected error in push notification handler:', err);
+        });
     } else {
       console.log('⚠️ [Order] No FCM token found for restaurant owner. Skipping notification.');
       if (owner) {

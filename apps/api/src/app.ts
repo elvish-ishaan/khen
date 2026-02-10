@@ -4,7 +4,6 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { errorHandler } from './middleware/error-handler';
-import { generalLimiter } from './middleware/rate-limiter';
 import { corsMiddleware } from './middleware/cors';
 import routes from './routes';
 
@@ -23,9 +22,6 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Rate limiting
-app.use(generalLimiter);
 
 // Health check
 app.get('/health', (req, res) => {

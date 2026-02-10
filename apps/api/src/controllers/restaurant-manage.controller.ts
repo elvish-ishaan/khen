@@ -390,30 +390,43 @@ export const testPushNotificationHandler = asyncHandler(
 
     console.log('✅ [Test Notification] FCM token found, sending test notification...');
 
-    try {
-      const messageId = await sendPushNotification(
-        owner.fcmToken,
-        '🧪 Test Notification',
-        'This is a test notification from Daavat. If you see this, push notifications are working! 🎉',
-        {
-          type: 'test',
-          timestamp: new Date().toISOString(),
-        }
-      );
+    const result = await sendPushNotification(
+      owner.fcmToken,
+      '🧪 Test Notification',
+      'This is a test notification from Daavat. If you see this, push notifications are working! 🎉',
+      {
+        type: 'test',
+        timestamp: new Date().toISOString(),
+      }
+    );
 
-      console.log('✅ [Test Notification] Test notification sent successfully:', messageId);
+    if (result.success) {
+      console.log('✅ [Test Notification] Test notification sent successfully:', result.messageId);
 
       res.json({
         success: true,
         message: 'Test notification sent successfully!',
         data: {
-          messageId,
+          messageId: result.messageId,
           timestamp: new Date().toISOString(),
         },
       });
-    } catch (error) {
-      console.error('❌ [Test Notification] Failed to send test notification:', error);
-      throw new AppError(500, 'Failed to send test notification. Check server logs for details.');
+    } else if (result.shouldInvalidateToken) {
+      console.warn('⚠️ [Test Notification] FCM token is invalid. Clearing from database...');
+
+      // Clear invalid token
+      await prisma.restaurantOwner.update({
+        where: { id: owner.id },
+        data: { fcmToken: null },
+      });
+
+      throw new AppError(
+        400,
+        'Your FCM token is invalid or expired. Please re-register for notifications by logging in again to the restaurant app.'
+      );
+    } else {
+      console.error('❌ [Test Notification] Failed to send test notification');
+      throw new AppError(500, 'Failed to send test notification. Please try again later.');
     }
   }
 );
