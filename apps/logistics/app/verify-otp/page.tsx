@@ -16,7 +16,7 @@ declare global {
 
 export default function VerifyOtpPage() {
   const router = useRouter();
-  const { setPersonnel } = useAuthStore();
+  const { personnel, isLoading: authLoading, setPersonnel } = useAuthStore();
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +24,13 @@ export default function VerifyOtpPage() {
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (personnel) {
+      router.push('/dashboard');
+    }
+  }, [personnel, router]);
 
   useEffect(() => {
     const storedPhone = sessionStorage.getItem('logistics_phone');
@@ -108,7 +115,7 @@ export default function VerifyOtpPage() {
         window.confirmationResult = undefined;
 
         // Redirect to dashboard
-        window.location.href = '/';
+        window.location.href = '/dashboard';
       } else {
         setError(response.error || 'Authentication failed');
         setOtp(['', '', '', '', '', '']);
@@ -172,6 +179,15 @@ export default function VerifyOtpPage() {
     }
   };
 
+  // Show loading during auth check
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
@@ -195,7 +211,7 @@ export default function VerifyOtpPage() {
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-12 h-12 text-center text-xl font-semibold border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
                   disabled={isLoading}
                   autoFocus={index === 0}
                 />
@@ -215,7 +231,7 @@ export default function VerifyOtpPage() {
           <button
             type="submit"
             disabled={isLoading || otp.join('').length !== 6}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Verifying...' : 'Verify OTP'}
           </button>
@@ -225,7 +241,7 @@ export default function VerifyOtpPage() {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                className="text-sm font-medium text-primary hover:text-primary/90"
               >
                 Resend OTP
               </button>

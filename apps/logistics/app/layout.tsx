@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import '@workspace/ui/styles/globals.css';
 import { Suspense } from 'react';
+import { AuthInitializer } from '@/components/auth-initializer';
 
 export const metadata: Metadata = {
   title: 'Daavat Logistics - Delivery Partner App',
@@ -46,11 +47,13 @@ export default function RootLayout({
       </head>
       <body>
         <Suspense fallback={<span>loading...</span>}>
-        <Script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
-          strategy="beforeInteractive"
-        />
-        {children}
+          <Script
+            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+            strategy="beforeInteractive"
+          />
+          <AuthInitializer>
+            {children}
+          </AuthInitializer>
         </Suspense>
       </body>
     </html>

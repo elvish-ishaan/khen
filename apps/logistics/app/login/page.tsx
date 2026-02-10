@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from '@/lib/firebase';
+import { useAuthStore } from '@/stores/auth-store';
 
 // Extend Window interface
 declare global {
@@ -14,9 +15,17 @@ declare global {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { personnel, isLoading: authLoading } = useAuthStore();
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (personnel) {
+      router.push('/dashboard');
+    }
+  }, [personnel, router]);
 
   useEffect(() => {
     // Initialize invisible reCAPTCHA
@@ -83,6 +92,15 @@ export default function LoginPage() {
     }
   };
 
+  // Show loading during auth check
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
@@ -107,7 +125,7 @@ export default function LoginPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                 placeholder="9876543210"
-                className="block w-full pl-12 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="block w-full pl-12 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
                 required
                 disabled={isLoading}
               />
@@ -126,7 +144,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading || phone.length !== 10}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Sending OTP...' : 'Send OTP'}
           </button>

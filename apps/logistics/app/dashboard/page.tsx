@@ -12,7 +12,7 @@ import { NotificationDiagnostics } from '@/components/notification-diagnostics';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { personnel, fetchMe } = useAuthStore();
+  const personnel = useAuthStore((state) => state.personnel);
   const { startDuty, endDuty, isOnDuty, initializeDutyStatus } = useDeliveryStore();
   const { startTracking, stopTracking, error: locationError, clearError: clearLocationError } = useLocationStore();
   const [stats, setStats] = useState<any>(null);
@@ -25,9 +25,7 @@ export default function DashboardPage() {
     }).format(amount);
   };
 
-  useEffect(() => {
-    fetchMe();
-  }, [fetchMe]);
+  // No need to call fetchMe - auth initializer already handles it
 
   useEffect(() => {
     if (personnel) {

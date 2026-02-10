@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logisticsOnboardingApi } from '@/lib/api/onboarding.api';
+import { validators, errorMessages } from '@/lib/validators';
 
 export default function DocumentsPage() {
   const router = useRouter();
@@ -52,6 +53,24 @@ export default function DocumentsPage() {
     }
     if (!dlFile) {
       setError('Driving license image is required');
+      return;
+    }
+
+    // Validate Aadhar number
+    if (!validators.aadhar(formData.aadharNumber)) {
+      setError(errorMessages.aadhar);
+      return;
+    }
+
+    // Validate DL number
+    if (!validators.dlNumber(formData.dlNumber)) {
+      setError(errorMessages.dlNumber);
+      return;
+    }
+
+    // Validate vehicle number
+    if (!validators.vehicleNumber(formData.vehicleNumber)) {
+      setError(errorMessages.vehicleNumber);
       return;
     }
 
@@ -179,10 +198,11 @@ export default function DocumentsPage() {
                     type="text"
                     required
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                    placeholder="Enter driving license number"
+                    placeholder="e.g., DL0120190012345"
                     value={formData.dlNumber}
-                    onChange={(e) => setFormData({ ...formData, dlNumber: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, dlNumber: e.target.value.toUpperCase() })}
                   />
+                  <p className="mt-1 text-xs text-gray-500">Format: DL0120190012345</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">

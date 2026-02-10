@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { logisticsOnboardingApi } from '@/lib/api/onboarding.api';
+import { validators, errorMessages } from '@/lib/validators';
 
 export default function BankDetailsPage() {
   const router = useRouter();
@@ -12,12 +13,37 @@ export default function BankDetailsPage() {
     ifscCode: '',
     branchName: '',
   });
+  const [confirmAccountNumber, setConfirmAccountNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate account holder name
+    if (!validators.accountHolderName(formData.accountTitle)) {
+      setError(errorMessages.accountHolderName);
+      return;
+    }
+
+    // Validate account number
+    if (!validators.accountNumber(formData.accountNumber)) {
+      setError(errorMessages.accountNumber);
+      return;
+    }
+
+    // Validate account number match
+    if (formData.accountNumber !== confirmAccountNumber) {
+      setError(errorMessages.accountMismatch);
+      return;
+    }
+
+    // Validate IFSC code
+    if (!validators.ifsc(formData.ifscCode)) {
+      setError(errorMessages.ifsc);
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -83,8 +109,15 @@ export default function BankDetailsPage() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 placeholder="Enter account holder name"
                 value={formData.accountTitle}
-                onChange={(e) => setFormData({ ...formData, accountTitle: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only allow letters, spaces, and dots
+                  if (/^[a-zA-Z\s.]*$/.test(value)) {
+                    setFormData({ ...formData, accountTitle: value });
+                  }
+                }}
               />
+              <p className="mt-1 text-xs text-gray-500">Name as per bank records</p>
             </div>
 
             <div>
@@ -97,10 +130,34 @@ export default function BankDetailsPage() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 placeholder="Enter bank account number"
                 value={formData.accountNumber}
-                onChange={(e) =>
-                  setFormData({ ...formData, accountNumber: e.target.value.replace(/\D/g, '') })
-                }
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 18) {
+                    setFormData({ ...formData, accountNumber: value });
+                  }
+                }}
               />
+              <p className="mt-1 text-xs text-gray-500">9-18 digits</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Confirm Account Number
+              </label>
+              <input
+                type="text"
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                placeholder="Re-enter account number"
+                value={confirmAccountNumber}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  if (value.length <= 18) {
+                    setConfirmAccountNumber(value);
+                  }
+                }}
+              />
+              <p className="mt-1 text-xs text-gray-500">Please re-enter to confirm</p>
             </div>
 
             <div>

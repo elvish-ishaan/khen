@@ -10,12 +10,10 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { personnel, fetchMe } = useAuthStore();
+  const personnel = useAuthStore((state) => state.personnel);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
-  useEffect(() => {
-    // Fetch personnel data on mount
-    fetchMe();
-  }, [fetchMe]);
+  // No need to call fetchMe here - auth initializer already handles it
 
   useEffect(() => {
     // Check onboarding status and redirect if needed
@@ -34,7 +32,7 @@ export default function DashboardLayout({
   }, [personnel, router]);
 
   // Show loading while checking auth
-  if (!personnel) {
+  if (!personnel || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">

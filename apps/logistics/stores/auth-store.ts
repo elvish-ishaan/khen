@@ -13,7 +13,7 @@ interface AuthState {
   clearError: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   personnel: null,
   isLoading: false,
   error: null,
@@ -35,8 +35,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   fetchMe: async () => {
+    // Prevent concurrent requests
+    const currentState = get();
+    if (currentState.isLoading) {
+      return;
+    }
+
     try {
-      set({ isLoading: true });
+      set({ isLoading: true, error: null });
       const response = await logisticsAuthApi.getMe();
 
       if (response.success && response.data) {
@@ -44,6 +50,8 @@ export const useAuthStore = create<AuthState>((set) => ({
           personnel: response.data.personnel,
           isLoading: false,
         });
+      } else {
+        set({ personnel: null, isLoading: false });
       }
     } catch (error) {
       set({ personnel: null, isLoading: false });
