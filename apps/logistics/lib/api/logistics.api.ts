@@ -13,6 +13,12 @@ export interface RequestWithdrawalRequest {
   amount: number;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+  vehicleNumber?: string;
+}
+
 export interface DeliveryUser {
   id: string;
   phone: string;
@@ -94,5 +100,9 @@ export const logisticsApi = {
   // Profile
   getProfile: async () => {
     return apiClient.get('/logistics/profile');
+  },
+
+  updateProfile: async (data: UpdateProfileRequest) => {
+    return apiClient.put('/logistics/profile', data);
   },
 };

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { prisma } from '@repo/db';
 import { LogisticsAuthenticatedRequest } from '../types';
-import { updateFcmTokenSchema } from '../validators/logistics.validator';
+import { updateFcmTokenSchema, updateProfileSchema } from '../validators/logistics.validator';
 import { AppError, asyncHandler } from '../middleware/error-handler';
 
 export const startDutyHandler = asyncHandler(
@@ -119,6 +119,45 @@ export const getProfileHandler = asyncHandler(
     res.json({
       success: true,
       data: { personnel },
+    });
+  }
+);
+
+export const updateProfileHandler = asyncHandler(
+  async (req: LogisticsAuthenticatedRequest, res: Response) => {
+    if (!req.personnel) {
+      throw new AppError(401, 'Not authenticated');
+    }
+
+    const { name, email, vehicleNumber } = updateProfileSchema.parse(req.body);
+
+    // Build update data object with only provided fields
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email || null;
+    if (vehicleNumber !== undefined) updateData.vehicleNumber = vehicleNumber || null;
+
+    // Update personnel profile
+    const updatedPersonnel = await prisma.deliveryPersonnel.update({
+      where: { id: req.personnel.id },
+      data: updateData,
+      select: {
+        id: true,
+        phone: true,
+        name: true,
+        email: true,
+        vehicleType: true,
+        vehicleNumber: true,
+        isOnDuty: true,
+        onboardingStatus: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: { personnel: updatedPersonnel },
     });
   }
 );

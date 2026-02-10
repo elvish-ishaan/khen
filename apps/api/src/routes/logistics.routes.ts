@@ -4,6 +4,7 @@ import {
   endDutyHandler,
   updateFcmTokenHandler,
   getProfileHandler,
+  updateProfileHandler,
 } from '../controllers/logistics.controller';
 import {
   updateLocationHandler,
@@ -32,6 +33,7 @@ router.use(authenticateLogistics);
 
 // Profile routes
 router.get('/profile', getProfileHandler);
+router.put('/profile', updateProfileHandler);
 
 // Duty management routes
 router.post('/duty/start', startDutyHandler);

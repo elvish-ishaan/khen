@@ -71,10 +71,10 @@ export function DeliveryRouteInfo({
   const earnings = distanceKm * costPerKm;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border border-blue-200 mb-8">
+    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 rounded-lg border border-blue-200 mb-6 sm:mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">{getStatusLabel()}</h3>
-          <span className="text-xs text-gray-600 bg-white px-3 py-1 rounded-full">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">{getStatusLabel()}</h3>
+          <span className="text-xs text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full">
             {delivery.status.replace('_', ' ')}
           </span>
         </div>
@@ -85,10 +85,10 @@ export function DeliveryRouteInfo({
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="bg-white p-4 rounded-lg">
             <div className="text-xs text-gray-600 mb-1">Distance</div>
-            <div className="text-2xl font-bold text-blue-900">
+            <div className="text-xl sm:text-2xl font-bold text-blue-900">
               {isLoading ? (
                 <span className="text-base text-gray-500">Calculating...</span>
               ) : distance ? (
@@ -106,7 +106,7 @@ export function DeliveryRouteInfo({
 
           <div className="bg-white p-4 rounded-lg">
             <div className="text-xs text-gray-600 mb-1">ETA</div>
-            <div className="text-2xl font-bold text-purple-900">
+            <div className="text-xl sm:text-2xl font-bold text-purple-900">
               {isLoading ? (
                 <span className="text-base text-gray-500">Calculating...</span>
               ) : duration ? (
@@ -119,7 +119,7 @@ export function DeliveryRouteInfo({
 
           <div className="bg-white p-4 rounded-lg">
             <div className="text-xs text-gray-600 mb-1">Estimated Earnings</div>
-            <div className="text-2xl font-bold text-green-900">
+            <div className="text-xl sm:text-2xl font-bold text-green-900">
               ₹{earnings.toFixed(0)}
             </div>
             {distanceKm > 0 && (

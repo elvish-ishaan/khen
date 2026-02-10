@@ -26,9 +26,16 @@ export const getEarningsSchema = z.object({
   endDate: z.string().datetime().optional(),
 });
 
+export const updateProfileSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  email: z.string().email('Invalid email format').optional().or(z.literal('')),
+  vehicleNumber: z.string().optional().or(z.literal('')),
+});
+
 export type UpdateFcmTokenInput = z.infer<typeof updateFcmTokenSchema>;
 export type UpdateLocationInput = z.infer<typeof updateLocationSchema>;
 export type AcceptOrderInput = z.infer<typeof acceptOrderSchema>;
 export type UpdateDeliveryStatusInput = z.infer<typeof updateDeliveryStatusSchema>;
 export type RequestWithdrawalInput = z.infer<typeof requestWithdrawalSchema>;
 export type GetEarningsInput = z.infer<typeof getEarningsSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
