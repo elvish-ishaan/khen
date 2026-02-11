@@ -4,8 +4,8 @@
 
 console.log('🚀 [SW] Logistics service worker script loading...', new Date().toISOString());
 
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging-compat.js');
 
 console.log('✅ [SW] Firebase scripts loaded successfully');
 
